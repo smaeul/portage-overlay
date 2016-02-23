@@ -1,0 +1,39 @@
+diff --git a/i3status.c b/i3status.c
+index 6cf368e..7a9b36d 100644
+--- a/i3status.c
++++ b/i3status.c
+@@ -56,7 +56,7 @@
+ /* socket file descriptor for general purposes */
+ int general_socket;
+ 
+-static bool exit_upon_signal = false;
++static int exit_upon_signal = 0;
+ 
+ cfg_t *cfg, *cfg_general, *cfg_section;
+ 
+@@ -72,7 +72,7 @@ pthread_t main_thread;
+  *
+  */
+ void fatalsig(int signum) {
+-    exit_upon_signal = true;
++    exit_upon_signal = signum;
+ }
+ 
+ /*
+@@ -475,6 +475,7 @@ int main(int argc, char *argv[]) {
+ 
+     memset(&action, 0, sizeof(struct sigaction));
+     action.sa_handler = sigusr1;
++    sigaction(SIGPIPE, &action, NULL);
+     sigaction(SIGUSR1, &action, NULL);
+ 
+     if (setlocale(LC_ALL, "") == NULL)
+@@ -592,7 +593,7 @@ int main(int argc, char *argv[]) {
+ 
+     while (1) {
+         if (exit_upon_signal) {
+-            fprintf(stderr, "Exiting due to signal.\n");
++            fprintf(stderr, "Exiting due to signal %d.\n", exit_upon_signal);
+             exit(1);
+         }
+         struct timeval tv;
