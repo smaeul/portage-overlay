@@ -1,0 +1,11 @@
+diff -ur zfs-0.6.5.4/cmd/zed/zed_log.c zfs-0.6.5.4-fixed/cmd/zed/zed_log.c
+--- zfs-0.6.5.4/cmd/zed/zed_log.c	2015-06-30 22:17:56.000000000 +0000
++++ zfs-0.6.5.4-fixed/cmd/zed/zed_log.c	2016-01-31 00:58:02.978325891 +0000
+@@ -19,6 +19,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <syslog.h>
++#include <unistd.h>
+ #include "zed_log.h"
+ 
+ #define	ZED_LOG_MAX_LOG_LEN	1024
