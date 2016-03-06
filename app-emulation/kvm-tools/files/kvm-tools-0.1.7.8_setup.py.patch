@@ -1,0 +1,24 @@
+--- setup.py.orig	2016-02-29 19:37:11.600790462 -0600
++++ setup.py	2016-02-29 19:41:27.499892408 -0600
+@@ -40,11 +40,6 @@
+         os.mkdir(path.kvm_auto_dir)
+     os.chmod(path.kvm_auto_dir, 0755)
+ 
+-if os.getuid() != 0:
+-    print "Script need root user rights to install."
+-    print "Change user to root user or use sudo."
+-    sys.exit(1)
+-
+ files = [os.path.join("bin", i) for i in os.listdir("bin")]
+ dirs = [os.path.join("kvmtools", i) for i in os.listdir("kvmtools") if os.path.isdir(os.path.join("kvmtools",i))]
+ dirs.append("kvmtools")
+@@ -60,9 +55,3 @@
+     packages = dirs,
+     scripts = files
+ )    
+-copy_configs()
+-# generate qemu-kvm options
+-try:
+-    call(["generate-kvm-options", "-g"])
+-except KeyboardInterrupt:
+-    sys.exit(0)
