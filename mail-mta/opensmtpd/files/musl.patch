@@ -1,0 +1,20 @@
+diff --git opensmtpd-5.9.2p1/openbsd-compat/openbsd-compat.h opensmtpd-5.9.2p1/openbsd-compat/openbsd-compat.h
+--- opensmtpd-5.9.2p1/openbsd-compat/openbsd-compat.h
++++ opensmtpd-5.9.2p1/openbsd-compat/openbsd-compat.h
+@@ -208,6 +208,16 @@
+ void errc(int, int, const char *, ...);
+ #endif
+ 
++#ifndef HAVE_INET_NET_PTON
++unsigned int arc4random(void);
++void arc4random_buf(void *, size_t);
++uint32_t arc4random_uniform(uint32_t);
++void explicit_bzero(void *p, size_t n);
++int inet_net_pton(int, const char *, void *, size_t);
++void *reallocarray(void *, size_t, size_t);
++int res_hnok(const char *dn);
++#endif
++
+ #ifndef HAVE_PLEDGE
+ #define pledge(promises, paths) 0
+ #endif
