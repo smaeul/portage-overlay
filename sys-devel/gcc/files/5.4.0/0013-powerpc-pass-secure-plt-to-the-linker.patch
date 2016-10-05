@@ -1,0 +1,91 @@
+From fe9d9eaf0ee8baa204c05899bd6736bf825d1e4d Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <nsz@port70.net>
+Date: Thu, 5 Nov 2015 23:44:52 +0000
+Subject: [PATCH 13/19] powerpc pass --secure-plt to the linker
+
+---
+ gcc/config/rs6000/linux64.h   | 4 ++++
+ gcc/config/rs6000/secureplt.h | 1 +
+ gcc/config/rs6000/sysv4.h     | 7 +++++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/gcc/config/rs6000/linux64.h b/gcc/config/rs6000/linux64.h
+index 1b7f695..ba6fa17 100644
+--- a/gcc/config/rs6000/linux64.h
++++ b/gcc/config/rs6000/linux64.h
+@@ -174,20 +174,24 @@ extern int dot_symbols;
+ #undef	ASM_DEFAULT_SPEC
+ #undef	ASM_SPEC
+ #undef	LINK_OS_LINUX_SPEC
++#undef	LINK_SECURE_PLT_SPEC
+ 
+ #ifndef	RS6000_BI_ARCH
+ #define	ASM_DEFAULT_SPEC "-mppc64"
+ #define	ASM_SPEC	 "%(asm_spec64) %(asm_spec_common)"
+ #define	LINK_OS_LINUX_SPEC "%(link_os_linux_spec64)"
++#define	LINK_SECURE_PLT_SPEC ""
+ #else
+ #if DEFAULT_ARCH64_P
+ #define	ASM_DEFAULT_SPEC "-mppc%{!m32:64}"
+ #define	ASM_SPEC	 "%{m32:%(asm_spec32)}%{!m32:%(asm_spec64)} %(asm_spec_common)"
+ #define	LINK_OS_LINUX_SPEC "%{m32:%(link_os_linux_spec32)}%{!m32:%(link_os_linux_spec64)}"
++#define	LINK_SECURE_PLT_SPEC "%{m32: " LINK_SECURE_PLT_DEFAULT_SPEC "}"
+ #else
+ #define	ASM_DEFAULT_SPEC "-mppc%{m64:64}"
+ #define	ASM_SPEC	 "%{!m64:%(asm_spec32)}%{m64:%(asm_spec64)} %(asm_spec_common)"
+ #define	LINK_OS_LINUX_SPEC "%{!m64:%(link_os_linux_spec32)}%{m64:%(link_os_linux_spec64)}"
++#define	LINK_SECURE_PLT_SPEC "%{!m64: " LINK_SECURE_PLT_DEFAULT_SPEC "}"
+ #endif
+ #endif
+ 
+diff --git a/gcc/config/rs6000/secureplt.h b/gcc/config/rs6000/secureplt.h
+index b463463..77edf2a 100644
+--- a/gcc/config/rs6000/secureplt.h
++++ b/gcc/config/rs6000/secureplt.h
+@@ -18,3 +18,4 @@ along with GCC; see the file COPYING3.  If not see
+ <http://www.gnu.org/licenses/>.  */
+ 
+ #define CC1_SECURE_PLT_DEFAULT_SPEC "-msecure-plt"
++#define LINK_SECURE_PLT_DEFAULT_SPEC "--secure-plt"
+diff --git a/gcc/config/rs6000/sysv4.h b/gcc/config/rs6000/sysv4.h
+index c6c31dc..723036d 100644
+--- a/gcc/config/rs6000/sysv4.h
++++ b/gcc/config/rs6000/sysv4.h
+@@ -538,6 +538,10 @@ ENDIAN_SELECT(" -mbig", " -mlittle", DEFAULT_ASM_ENDIAN)
+ #define CC1_SECURE_PLT_DEFAULT_SPEC ""
+ #endif
+ 
++#ifndef LINK_SECURE_PLT_DEFAULT_SPEC
++#define LINK_SECURE_PLT_DEFAULT_SPEC ""
++#endif
++
+ /* Pass -G xxx to the compiler.  */
+ #undef CC1_SPEC
+ #define	CC1_SPEC "%{G*} %(cc1_cpu)" \
+@@ -567,6 +571,7 @@ ENDIAN_SELECT(" -mbig", " -mlittle", DEFAULT_ASM_ENDIAN)
+                : %(link_start_default)     }"
+ 
+ #define LINK_START_DEFAULT_SPEC ""
++#define LINK_SECURE_PLT_SPEC LINK_SECURE_PLT_DEFAULT_SPEC
+ 
+ #undef	LINK_SPEC
+ #define	LINK_SPEC "\
+@@ -574,6 +579,7 @@ ENDIAN_SELECT(" -mbig", " -mlittle", DEFAULT_ASM_ENDIAN)
+ %{R*} \
+ %(link_shlib) \
+ %{!T*: %(link_start) } \
++%{!static: %{!mbss-plt: %(link_secure_plt)}} \
+ %(link_os)"
+ 
+ /* Shared libraries are not default.  */
+@@ -889,6 +895,7 @@ ncrtn.o%s"
+   { "link_os_openbsd",		LINK_OS_OPENBSD_SPEC },			\
+   { "link_os_default",		LINK_OS_DEFAULT_SPEC },			\
+   { "cc1_secure_plt_default",	CC1_SECURE_PLT_DEFAULT_SPEC },		\
++  { "link_secure_plt",		LINK_SECURE_PLT_SPEC },			\
+   { "cpp_os_ads",		CPP_OS_ADS_SPEC },			\
+   { "cpp_os_yellowknife",	CPP_OS_YELLOWKNIFE_SPEC },		\
+   { "cpp_os_mvme",		CPP_OS_MVME_SPEC },			\
+-- 
+2.4.1
+

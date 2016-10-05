@@ -1,0 +1,39 @@
+From 3dd808bd7d966de6b96d53d74db43d16d580b353 Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <nsz@port70.net>
+Date: Sat, 1 Aug 2015 22:39:25 +0000
+Subject: [PATCH 11/19] microblaze
+
+---
+ gcc/config/microblaze/linux.h | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/config/microblaze/linux.h b/gcc/config/microblaze/linux.h
+index 655a70f..a8a3f3e 100644
+--- a/gcc/config/microblaze/linux.h
++++ b/gcc/config/microblaze/linux.h
+@@ -28,10 +28,20 @@
+ #undef TLS_NEEDS_GOT
+ #define TLS_NEEDS_GOT 1
+ 
+-#define DYNAMIC_LINKER "/lib/ld.so.1"
++#define GLIBC_DYNAMIC_LINKER "/lib/ld.so.1"
++
++#if TARGET_BIG_ENDIAN_DEFAULT == 0 /* LE */
++#define MUSL_DYNAMIC_LINKER_E "%{mbig-endian:;:el}"
++#else
++#define MUSL_DYNAMIC_LINKER_E "%{mlittle-endian:el}"
++#endif
++
++#undef MUSL_DYNAMIC_LINKER
++#define MUSL_DYNAMIC_LINKER "/lib/ld-musl-microblaze" MUSL_DYNAMIC_LINKER_E ".so.1"
++
+ #undef  SUBTARGET_EXTRA_SPECS
+ #define SUBTARGET_EXTRA_SPECS \
+-  { "dynamic_linker", DYNAMIC_LINKER }
++  { "dynamic_linker", GNU_USER_DYNAMIC_LINKER }
+ 
+ #undef LINK_SPEC
+ #define LINK_SPEC "%{shared:-shared} \
+-- 
+2.4.1
+
