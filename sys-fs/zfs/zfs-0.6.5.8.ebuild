@@ -21,10 +21,11 @@ HOMEPAGE="http://zfsonlinux.org/"
 
 LICENSE="BSD-2 CDDL MIT"
 SLOT="0"
-IUSE="custom-cflags debug kernel-builtin +rootfs test-suite static-libs"
+IUSE="custom-cflags debug elibc_musl kernel-builtin +rootfs test-suite static-libs"
 RESTRICT="test"
 
 COMMON_DEPEND="
+	elibc_musl? ( net-libs/libtirpc )
 	sys-apps/util-linux[static-libs?]
 	sys-libs/zlib[static-libs(+)?]
 	virtual/awk
@@ -56,6 +57,7 @@ RDEPEND="${COMMON_DEPEND}
 "
 
 AT_M4DIR="config"
+AUTOTOOLS_AUTORECONF="1"
 AUTOTOOLS_IN_SOURCE_BUILD="1"
 
 pkg_setup() {
@@ -88,6 +90,14 @@ src_prepare() {
 		-e "s|/sbin/parted|/usr/sbin/parted|" \
 		-i scripts/common.sh.in
 
+	epatch "${FILESDIR}/1ab3678b5d671b4561a2d63958d56b2f7ca1b69e.patch"
+	epatch "${FILESDIR}/0001-Use-the-correct-macro-to-include-backtrace.patch"
+	epatch "${FILESDIR}/0002-Include-sys-types.h-in-devid.h.patch"
+	epatch "${FILESDIR}/0003-Add-missing-fcntl.h-to-includes-in-mount_zfs.c.patch"
+	epatch "${FILESDIR}/0004-Ensure-correct-return-value-type.patch"
+	epatch "${FILESDIR}/0007-Remove-complicated-libspl-assert-wrappers.patch"
+	epatch "${FILESDIR}/zfs-0.6.5.8-_DATE_FMT.patch"
+	epatch "${FILESDIR}/zfs-0.6.5.8-headers.patch"
 	autotools-utils_src_prepare
 }
 

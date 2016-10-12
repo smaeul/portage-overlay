@@ -1,0 +1,12 @@
+diff --git a/zfs-0.6.5.8/cmd/zed/zed_log.c b/zfs-fixed/cmd/zed/zed_log.c
+index ae1e2cd..fe24b07 100644
+--- a/zfs-0.6.5.8/cmd/zed/zed_log.c
++++ b/zfs-fixed/cmd/zed/zed_log.c
+@@ -19,6 +19,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <syslog.h>
++#include <unistd.h>
+ #include "zed_log.h"
+ 
+ #define	ZED_LOG_MAX_LOG_LEN	1024
