@@ -18,3 +18,16 @@ diff --git opensmtpd-5.9.2p1/openbsd-compat/openbsd-compat.h opensmtpd-5.9.2p1/o
  #ifndef HAVE_PLEDGE
  #define pledge(promises, paths) 0
  #endif
+diff --git opensmtpd-6.0.2p1/smtpd/smtpd.c opensmtpd-fixed/smtpd/smtpd.c
+index 6cd270f..05c46e1 100644
+--- opensmtpd-6.0.2p1/smtpd/smtpd.c
++++ opensmtpd-fixed/smtpd/smtpd.c
+@@ -326,7 +326,7 @@ parent_shutdown(int ret)
+ 			kill(child->pid, SIGTERM);
+ 
+ 	do {
+-		pid = waitpid(WAIT_MYPGRP, NULL, 0);
++		pid = waitpid(0, NULL, 0);
+ 	} while (pid != -1 || (pid == -1 && errno == EINTR));
+ 
+ 	unlink(SMTPD_SOCKET);
