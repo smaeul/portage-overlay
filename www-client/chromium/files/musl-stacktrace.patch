@@ -1,0 +1,26 @@
+diff --git chromium-54.0.2840.34/base/debug/stack_trace.cc chromium-54.0.2840.34/base/debug/stack_trace.cc
+index ac0ead7..4ce495b 100644
+--- chromium-54.0.2840.34/base/debug/stack_trace.cc
++++ chromium-54.0.2840.34/base/debug/stack_trace.cc
+@@ -39,7 +39,7 @@ const void *const *StackTrace::Addresses(size_t* count) const {
+ 
+ std::string StackTrace::ToString() const {
+   std::stringstream stream;
+-#if !defined(__UCLIBC__)
++#if defined(__GLIBC__)
+   OutputToStream(&stream);
+ #endif
+   return stream.str();
+diff --git chromium-54.0.2840.34/base/logging.cc chromium-54.0.2840.34/base/logging.cc
+index fc9d483..0771b47 100644
+--- chromium-54.0.2840.34/base/logging.cc
++++ chromium-54.0.2840.34/base/logging.cc
+@@ -526,7 +526,7 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
+ }
+ 
+ LogMessage::~LogMessage() {
+-#if !defined(OFFICIAL_BUILD) && !defined(OS_NACL) && !defined(__UCLIBC__)
++#if !defined(OFFICIAL_BUILD) && !defined(OS_NACL) && defined(__GLIBC__)
+   if (severity_ == LOG_FATAL && !base::debug::BeingDebugged()) {
+     // Include a stack trace on a fatal, unless a debugger is attached.
+     base::debug::StackTrace trace;

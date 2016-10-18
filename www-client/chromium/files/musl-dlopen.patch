@@ -1,0 +1,13 @@
+diff --git chromium-54.0.2840.59/base/native_library_posix.cc.orig chromium-54.0.2840.59/base/native_library_posix.cc
+index 786333e..5af09cf 100644
+--- chromium-54.0.2840.59/base/native_library_posix.cc.orig
++++ chromium-54.0.2840.59/base/native_library_posix.cc
+@@ -35,7 +35,7 @@ NativeLibrary LoadNativeLibraryWithOptions(const FilePath& library_path,
+   // versions. Crash here to warn developers that they're trying to rely on
+   // uncertain behavior.
+   CHECK(!options.prefer_own_symbols);
+-#else
++#elif defined(RTLD_DEEPBIND)
+   if (options.prefer_own_symbols)
+     flags |= RTLD_DEEPBIND;
+ #endif

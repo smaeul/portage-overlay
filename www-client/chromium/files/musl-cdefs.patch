@@ -1,0 +1,13 @@
+diff --git chromium-54.0.2840.34/base/allocator/allocator_shim_internals.h chromium-fixed/base/allocator/allocator_shim_internals.h
+--- chromium-54.0.2840.34/base/allocator/allocator_shim_internals.h
++++ chromium-fixed/base/allocator/allocator_shim_internals.h
+@@ -7,7 +7,9 @@
+ 
+ #if defined(__GNUC__)
+ 
++#if defined(__GLIBC__)
+ #include <sys/cdefs.h>  // for __THROW
++#endif
+ 
+ #ifndef __THROW  // Not a glibc system
+ #ifdef _NOEXCEPT  // LLVM libc++ uses noexcept instead

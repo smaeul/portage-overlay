@@ -1,0 +1,18 @@
+diff --git chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h.orig chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h
+index 9dbd239..0c5ed72 100644
+--- chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h.orig
++++ chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h
+@@ -143,6 +143,13 @@ extern "C" {
+ # undef lstat64
+ #endif
+ 
++#ifdef pread64
++#undef pread64
++#endif
++#ifdef pwrite64
++#undef pwrite64
++#endif
++
+ /* As glibc often provides subtly incompatible data structures (and implicit
+  * wrapper functions that convert them), we provide our own kernel data
+  * structures for use by the system calls.
