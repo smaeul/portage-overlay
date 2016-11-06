@@ -1,40 +1,39 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
 EAPI=5
 
-inherit fcaps git-r3 toolchain-funcs
+inherit eutils fcaps git-r3 toolchain-funcs
 
-DESCRIPTION="generates a status bar for dzen2, xmobar or similar (mpd support)"
-HOMEPAGE="https://github.com/Gravemind/i3status"
-EGIT_REPO_URI="https://github.com/Gravemind/i3status.git"
+DESCRIPTION="generates a status bar for dzen2, xmobar or similar"
+HOMEPAGE="http://i3wm.org/i3status/"
+EGIT_REPO_URI="https://github.com/smaeul/i3status.git"
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE=""
+IUSE="pulseaudio"
 
-RDEPEND="dev-libs/confuse
+RDEPEND="!x11-misc/i3status
+	dev-libs/confuse:=
 	dev-libs/libnl:3
 	>=dev-libs/yajl-2.0.2
 	media-libs/alsa-lib
 	media-libs/libmpdclient
-	media-sound/pulseaudio"
+	pulseaudio? ( media-sound/pulseaudio )"
 DEPEND="${RDEPEND}
 	app-text/asciidoc
 	virtual/pkgconfig"
 
 src_prepare() {
-	epatch "${FILESDIR}"/connection.patch
-	epatch "${FILESDIR}"/signal.patch
 	sed -e "/@echo/d" -e "s:@\$(:\$(:g" -e "/setcap/d" \
 		-e '/CFLAGS+=-g/d' -i Makefile || die
 	rm -rf man/${PN}.1  # man not regenerated in tarball
 }
 
 src_compile() {
-	emake CC="$(tc-getCC)"
+	emake CC="$(tc-getCC)" PULSE=$(usex pulseaudio 1 0)
 }
 
 pkg_postinst() {
