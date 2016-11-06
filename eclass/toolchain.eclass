@@ -1030,6 +1030,9 @@ toolchain_src_configure() {
 	*-freebsd*)
 		confgcc+=( --enable-__cxa_atexit )
 		;;
+	*-musl*)
+		confgcc+=( --enable-__cxa_atexit )
+		;;
 	*-solaris*)
 		confgcc+=( --enable-__cxa_atexit )
 		;;

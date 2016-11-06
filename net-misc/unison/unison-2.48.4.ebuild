@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -9,26 +9,27 @@ inherit eutils versionator
 IUSE="gtk doc static debug threads +ocamlopt test"
 
 DESCRIPTION="Two-way cross-platform file synchronizer"
-HOMEPAGE="http://www.cis.upenn.edu/~bcpierce/unison/"
+HOMEPAGE="https://www.seas.upenn.edu/~bcpierce/unison/"
 LICENSE="GPL-2"
 SLOT="$(get_version_component_range 1-2 ${PV})"
 KEYWORDS="~amd64 ~arm ~ppc ~x86 ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~sparc-solaris"
 
 # ocaml version so we are sure it has ocamlopt use flag
-DEPEND=">=dev-lang/ocaml-3.10.2[ocamlopt?]
-	gtk? ( >=dev-ml/lablgtk-2.2 )
+DEPEND="dev-lang/ocaml[ocamlopt?]
+	gtk? ( dev-ml/lablgtk )
 	test? ( || ( dev-util/ctags virtual/emacs ) )"
 
-RDEPEND="gtk? ( >=dev-ml/lablgtk-2.2
+RDEPEND="gtk? ( dev-ml/lablgtk
 	|| ( net-misc/x11-ssh-askpass net-misc/ssh-askpass-fullscreen ) )
 	!net-misc/unison:0
 	app-eselect/eselect-unison"
 
 #PDEPEND="gtk? ( media-fonts/font-schumacher-misc )"
 
-SRC_URI="http://www.cis.upenn.edu/~bcpierce/unison/download/releases/${P}/${P}.tar.gz
-	doc? ( http://www.cis.upenn.edu/~bcpierce/unison/download/releases/${P}/${P}-manual.pdf
-		http://www.cis.upenn.edu/~bcpierce/unison/download/releases/${P}/${P}-manual.html )"
+SRC_URI="https://www.seas.upenn.edu/~bcpierce/unison/download/releases/${P}/${P}.tar.gz
+	doc? ( https://www.seas.upenn.edu/~bcpierce/unison/download/releases/${P}/${P}-manual.pdf
+		https://www.seas.upenn.edu/~bcpierce/unison/download/releases/${P}/${P}-manual.html )"
+S="${WORKDIR}"/src
 
 src_compile() {
 	local myconf
@@ -80,4 +81,5 @@ pkg_postinst() {
 	elog "Unison now uses SLOTs, so you can specify servercmd=/usr/bin/unison-${SLOT}"
 	elog "in your profile files to access exactly this version over ssh."
 	elog "Or you can use 'eselect unison' to set the version."
+	eselect unison update
 }

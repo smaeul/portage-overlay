@@ -175,11 +175,14 @@ PATCHES=(
 	"${FILESDIR}/musl-headers.patch"
 	"${FILESDIR}/musl-mallinfo.patch"
 	"${FILESDIR}/musl-pthread.patch"
+	"${FILESDIR}/musl-sandbox.patch"
 	"${FILESDIR}/musl-siginfo.patch"
+	"${FILESDIR}/musl-stacksize.patch"
 	"${FILESDIR}/musl-stacktrace.patch"
 	"${FILESDIR}/musl-syscall.patch"
 	"${FILESDIR}/musl-ucontext.patch"
 	"${FILESDIR}/musl-wordsize.patch"
+	"${FILESDIR}/unset-madv_free.patch"
 )
 
 pkg_pretend() {

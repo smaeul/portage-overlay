@@ -1,0 +1,22 @@
+diff --git chromium-54.0.2840.34/gbase/threading/platform_thread_linux.cc.orig chromium-fixed/gbase/threading/platform_thread_linux.cc
+index 299ae2b..8c0cdaa 100644
+--- chromium-54.0.2840.34/gbase/threading/platform_thread_linux.cc.orig
++++ chromium-fixed/gbase/threading/platform_thread_linux.cc
+@@ -155,12 +155,14 @@ void InitThreading() {}
+ void TerminateOnThread() {}
+ 
+ size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
+-#if !defined(THREAD_SANITIZER)
+-  return 0;
+-#else
++#if defined(THREAD_SANITIZER)
+   // ThreadSanitizer bloats the stack heavily. Evidence has been that the
+   // default stack size isn't enough for some browser tests.
+   return 2 * (1 << 23);  // 2 times 8192K (the default stack size on Linux).
++#elif defined(__GLIBC__)
++  return 0;
++#else
++  return 1 * (1 << 23);  // 8192K (the default stack size on glibc)
+ #endif
+ }
+ 
