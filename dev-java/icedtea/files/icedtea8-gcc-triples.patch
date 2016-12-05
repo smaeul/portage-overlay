@@ -1,0 +1,12 @@
+diff -Naur openjdk.orig/common/autoconf/toolchain.m4 openjdk/common/autoconf/toolchain.m4
+--- openjdk.orig/common/autoconf/toolchain.m4	2016-06-12 00:44:29.228208686 -0700
++++ openjdk/common/autoconf/toolchain.m4	2016-06-12 13:47:45.259143742 -0700
+@@ -72,7 +72,7 @@
+   else
+     COMPILER_VERSION_TEST=`$COMPILER --version 2>&1 | $HEAD -n 1`
+     # Check that this is GCC or the compatible distcc.
+-    $COMPILER --version 2>&1 | $GREP -E "^(gcc|g\+\+|distcc)" >&AS_MESSAGE_LOG_FD 2>&1
++    $COMPILER --version 2>&1 | $GREP -E "^(.*gcc|.*g\+\+|distcc)" >&AS_MESSAGE_LOG_FD 2>&1
+     if test $? -ne 0; then
+       AC_MSG_NOTICE([The $COMPILER_NAME compiler (located as $COMPILER) does not seem to be the recommended GCC compiler.])
+       AC_MSG_NOTICE([The result from running with --version was: "$COMPILER_VERSION_TEST"])
