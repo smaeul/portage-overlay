@@ -36,7 +36,6 @@ AUTOTOOLS_IN_SOURCE_BUILD="1"
 DOCS=( AUTHORS DISCLAIMER )
 
 pkg_setup() {
-	linux-info_pkg_setup
 	CONFIG_CHECK="
 		!DEBUG_LOCK_ALLOC
 		!GRKERNSEC_RANDSTRUCT
@@ -53,12 +52,12 @@ pkg_setup() {
 		!DEBUG_INFO_REDUCED
 	"
 
+	linux-mod_pkg_setup
+
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
 		{ kernel_is le 4 8 || die "Linux 4.8 is the latest supported version."; }
-
-	check_extra_config
 }
 
 src_prepare() {
