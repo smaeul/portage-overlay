@@ -1,7 +1,7 @@
-diff --git chromium-54.0.2840.34/gbase/threading/platform_thread_linux.cc.orig chromium-fixed/gbase/threading/platform_thread_linux.cc
+diff --git chromium-54.0.2840.34/base/threading/platform_thread_linux.cc.orig chromium-fixed/base/threading/platform_thread_linux.cc
 index 299ae2b..8c0cdaa 100644
---- chromium-54.0.2840.34/gbase/threading/platform_thread_linux.cc.orig
-+++ chromium-fixed/gbase/threading/platform_thread_linux.cc
+--- chromium-54.0.2840.34/base/threading/platform_thread_linux.cc.orig
++++ chromium-fixed/base/threading/platform_thread_linux.cc
 @@ -155,12 +155,14 @@ void InitThreading() {}
  void TerminateOnThread() {}
  
@@ -20,3 +20,28 @@ index 299ae2b..8c0cdaa 100644
  #endif
  }
  
+diff --git a/chrome/browser/chrome_browser_main_posix.cc.orig b/chrome/browser/chrome_browser_main_posix.cc
+index f9f1c12..521eb42 100644
+--- a/chrome/browser/chrome_browser_main_posix.cc.orig
++++ b/chrome/browser/chrome_browser_main_posix.cc
+@@ -275,6 +275,7 @@ void ChromeBrowserMainPartsPosix::PostMainMessageLoopStart() {
+     g_pipe_pid = getpid();
+     g_shutdown_pipe_read_fd = pipefd[0];
+     g_shutdown_pipe_write_fd = pipefd[1];
++#ifdef __GLIBC__
+ #if !defined(ADDRESS_SANITIZER) && !defined(KEEP_SHADOW_STACKS)
+     const size_t kShutdownDetectorThreadStackSize = PTHREAD_STACK_MIN * 2;
+ #else
+@@ -283,6 +284,12 @@ void ChromeBrowserMainPartsPosix::PostMainMessageLoopStart() {
+     // size to avoid hitting the guard page.
+     const size_t kShutdownDetectorThreadStackSize = PTHREAD_STACK_MIN * 4;
+ #endif
++#else
++    // PTHREAD_STACK_MIN is much smaller on musl. ConstructTlsVector uses
++    // 6616 bytes of stack by itself. This matches the value of the GLIBC
++    // minumum * 2.
++    const size_t kShutdownDetectorThreadStackSize = 32768;
++#endif
+     // TODO(viettrungluu,willchan): crbug.com/29675 - This currently leaks, so
+     // if you change this, you'll probably need to change the suppression.
+     if (!base::PlatformThread::CreateNonJoinable(

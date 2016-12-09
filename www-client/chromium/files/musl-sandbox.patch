@@ -1,7 +1,7 @@
---- chromium-54.0.2840.34/gsandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
-+++ chromium-54.0.2840.34/gsandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+--- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
++++ chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
 @@ -114,23 +114,13 @@
- chromium-54.0.2840.34/g CLONE_VM, nor CLONE_THREAD, which includes all fork() implementations.
+ // CLONE_VM, nor CLONE_THREAD, which includes all fork() implementations.
  ResultExpr RestrictCloneToThreadsAndEPERMFork() {
    const Arg<unsigned long> flags(0);
 +  const int required = CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND |
@@ -10,7 +10,7 @@
 +                   CLONE_DETACHED;
 +  const BoolExpr thread_clone_ok = (flags&~safe)==required;
  
-- chromium-54.0.2840.34/g/ TODO(mdempsky): Extend DSL to support (flags & ~mask1) == mask2.
+-  // TODO(mdempsky): Extend DSL to support (flags & ~mask1) == mask2.
 -  const uint64_t kAndroidCloneMask = CLONE_VM | CLONE_FS | CLONE_FILES |
 -                                     CLONE_SIGHAND | CLONE_THREAD |
 -                                     CLONE_SYSVSEM;
@@ -30,8 +30,8 @@
        .ElseIf((flags & (CLONE_VM | CLONE_THREAD)) == 0, Error(EPERM))
        .Else(CrashSIGSYSClone());
  }
---- chromium-54.0.2840.34/gsandbox/linux/seccomp-bpf-helpers/syscall_sets.cc.orig
-+++ chromium-54.0.2840.34/gsandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+--- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc.orig
++++ chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
 @@ -494,6 +494,7 @@
      case __NR_mlock:
      case __NR_munlock:

@@ -11,10 +11,10 @@ diff --git chromium-54.0.2840.34/base/allocator/allocator_shim_internals.h chrom
  
  #ifndef __THROW  // Not a glibc system
  #ifdef _NOEXCEPT  // LLVM libc++ uses noexcept instead
-diff --git chromium-54.0.2840.34/gsandbox/linux/suid/sandbox.c.orig chromium-fixed/gsandbox/linux/suid/sandbox.c
+diff --git chromium-54.0.2840.34/sandbox/linux/suid/sandbox.c.orig chromium-fixed/sandbox/linux/suid/sandbox.c
 index b655d1c..84a9f54 100644
---- chromium-54.0.2840.34/gsandbox/linux/suid/sandbox.c.orig
-+++ chromium-fixed/gsandbox/linux/suid/sandbox.c
+--- chromium-54.0.2840.34/sandbox/linux/suid/sandbox.c.orig
++++ chromium-fixed/sandbox/linux/suid/sandbox.c
 @@ -42,7 +42,16 @@
  
  static bool DropRoot();

@@ -1,7 +1,7 @@
-diff --git a/./breakpad/src/client/linux/handler/exception_handler.cc.orig b/./breakpad/src/client/linux/handler/exception_handler.cc
+diff --git chromium/breakpad/src/client/linux/handler/exception_handler.cc.orig chromium/breakpad/src/client/linux/handler/exception_handler.cc
 index b63f973..bf99823 100644
---- a/./breakpad/src/client/linux/handler/exception_handler.cc.orig
-+++ b/./breakpad/src/client/linux/handler/exception_handler.cc
+--- chromium/breakpad/src/client/linux/handler/exception_handler.cc.orig
++++ chromium/breakpad/src/client/linux/handler/exception_handler.cc
 @@ -477,7 +477,9 @@ bool ExceptionHandler::SimulateSignalDelivery(int sig) {
    siginfo.si_code = SI_USER;
    siginfo.si_pid = getpid();

@@ -18,7 +18,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 ~arm ~arm64 x86"
-IUSE="cups elibc_musl +gn gnome gnome-keyring gtk3 +hangouts kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +tcmalloc widevine"
+IUSE="cups +gn gnome gnome-keyring gtk3 +hangouts kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
 # Native Client binaries are compiled with different set of flags, bug #452066.
@@ -34,6 +34,7 @@ COMMON_DEPEND="
 	>=dev-libs/elfutils-0.149
 	dev-libs/expat:=
 	dev-libs/glib:=
+	dev-libs/icu:=
 	>=dev-libs/jsoncpp-0.5.0-r1:=
 	dev-libs/nspr:=
 	>=dev-libs/nss-3.14.3:=
@@ -76,7 +77,7 @@ COMMON_DEPEND="
 	dev-libs/libxml2:=[icu]
 	dev-libs/libxslt:=
 	media-libs/flac:=
-	>=media-libs/harfbuzz-0.9.41:=[icu(+)]
+	>=media-libs/harfbuzz-1.3.1:=[icu(+)]
 	>=media-libs/libwebp-0.4.0:=
 	sys-libs/zlib:=[minizip]
 	kerberos? ( virtual/krb5 )
@@ -109,6 +110,7 @@ DEPEND="${COMMON_DEPEND}
 	sys-apps/hwids[usb(+)]
 	>=sys-devel/bison-2.4.3
 	sys-devel/flex
+	elibc_musl? ( sys-libs/queue )
 	virtual/pkgconfig
 	dev-vcs/git
 	$(python_gen_any_dep '
@@ -161,11 +163,12 @@ For other desktop environments, try one of the following:
 "
 
 PATCHES=(
-	"${FILESDIR}/${PN}-system-ffmpeg-r3.patch"
-	"${FILESDIR}/${PN}-system-jinja-r13.patch"
+	"${FILESDIR}/${PN}-system-ffmpeg-r4.patch"
+	"${FILESDIR}/${PN}-system-jinja-r14.patch"
 	"${FILESDIR}/${PN}-widevine-r1.patch"
-	"${FILESDIR}/chromium-54-ffmpeg2compat.patch"
+	"${FILESDIR}/${PN}-54-ffmpeg2compat.patch"
 	"${FILESDIR}/${PN}-gn-bootstrap-ld.patch"
+	"${FILESDIR}/${PN}-icu-58.patch"
 	"${FILESDIR}/musl-bootstrap.patch"
 	"${FILESDIR}/musl-cdefs.patch"
 	"${FILESDIR}/musl-dlopen.patch"
@@ -252,7 +255,6 @@ src_prepare() {
 		third_party/cld_2
 		third_party/cld_3
 		third_party/cros_system_api
-		third_party/cython/python_flags.py
 		third_party/devscripts
 		third_party/dom_distiller_js
 		third_party/fips181
@@ -263,7 +265,6 @@ src_prepare() {
 		third_party/google_input_tools/third_party/closure_library/third_party/closure
 		third_party/hunspell
 		third_party/iccjpeg
-		third_party/icu
 		third_party/jstemplate
 		third_party/khronos
 		third_party/leveldatabase
@@ -357,7 +358,6 @@ src_configure() {
 
 	# Use system-provided libraries.
 	# TODO: use_system_hunspell (upstream changes needed).
-	# TODO: use_system_icu (bug #576370).
 	# TODO: use_system_libsrtp (bug #459932).
 	# TODO: use_system_libusb (http://crbug.com/266149).
 	# TODO: use_system_opus (https://code.google.com/p/webrtc/issues/detail?id=3077).
@@ -387,6 +387,7 @@ src_configure() {
 	local gn_system_libraries="
 		flac
 		harfbuzz-ng
+		icu
 		libjpeg
 		libpng
 		libvpx
@@ -401,9 +402,6 @@ src_configure() {
 		gn_system_libraries+=" ffmpeg"
 	fi
 	build/linux/unbundle/replace_gn_files.py --system-libraries ${gn_system_libraries} || die
-
-	# Needed for system icu - we don't need additional data files.
-	# myconf_gyp+=" -Dicu_use_data_file_flag=0"
 
 	# TODO: patch gyp so that this arm conditional is not needed.
 	if ! use arm; then
@@ -555,6 +553,9 @@ src_configure() {
 	# Make sure the build system will use the right tools, bug #340795.
 	tc-export AR CC CXX NM
 
+	# https://bugs.gentoo.org/588596
+	append-cxxflags $(test-flags-CXX -fno-delete-null-pointer-checks)
+
 	# Define a custom toolchain for GN
 	myconf_gn+=" custom_toolchain=\"${FILESDIR}/toolchain:default\""
 
@@ -586,7 +587,7 @@ src_configure() {
 		chromium/scripts/build_ffmpeg.py linux ${ffmpeg_target_arch} \
 			--branding ${ffmpeg_branding} -- ${build_ffmpeg_args} || die
 		chromium/scripts/copy_config.sh || die
-		chromium/scripts/generate_gyp.py || die
+		chromium/scripts/generate_gn.py || die
 		popd > /dev/null || die
 	fi
 
@@ -691,8 +692,6 @@ src_install() {
 	insinto "${CHROMIUM_HOME}"
 	doins out/Release/*.bin || die
 	doins out/Release/*.pak || die
-
-	doins out/Release/icudtl.dat || die
 
 	doins -r out/Release/locales || die
 	doins -r out/Release/resources || die

@@ -19,13 +19,13 @@ index b1af95d..9e7a95f 100644
  
  #if defined(USE_OZONE) || defined(USE_X11)
  #include "ui/events/devices/input_device_event_observer.h"
-@@ -169,7 +169,7 @@ void RecordStartupMetricsOnBlockingPool() {
+@@ -173,7 +173,7 @@ void RecordStartupMetricsOnBlockingPool() {
  }
  
  void RecordLinuxGlibcVersion() {
 -#if defined(OS_LINUX) && !defined(OS_CHROMEOS)
 +#if defined(OS_LINUX) && defined(__GLIBC__)
-   Version version(gnu_get_libc_version());
+   base::Version version(gnu_get_libc_version());
  
    UMALinuxGlibcVersion glibc_version_result = UMA_LINUX_GLIBC_NOT_PARSEABLE;
 @@ -193,7 +193,7 @@ void RecordLinuxGlibcVersion() {
