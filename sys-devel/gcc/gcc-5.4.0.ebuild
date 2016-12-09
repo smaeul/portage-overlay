@@ -44,13 +44,9 @@ src_prepare() {
 	is_crosscompile && EPATCH_EXCLUDE+=" 05_all_gcc-spec-env.patch"
 
 	if use elibc_musl || [[ ${CATEGORY} = cross-*-musl ]]; then
-		#cd "${S}"
-		#sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
-		#mv libstdc\+\+-v3/config/os/gnu-linux libstdc\+\+-v3/config/os/gnu-linux.org
-		#cp -r libstdc\+\+-v3/config/os/generic libstdc\+\+-v3/config/os/gnu-linux
-		#cp libstdc++-v3/config/os/gnu-linux.org/arm-eabi-extra.ver libstdc++-v3/config/os/gnu-linux/
-		#mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
-		#cp -r libitm/config/generic libitm/config/linux/x86
+		cd "${S}"
+		sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+		sed -i 's@lib64@lib@g' gcc/config/i386/t-linux64
 		epatch "${FILESDIR}"/${PN}-5.3.0-musl.diff
 	fi
 
