@@ -55,7 +55,7 @@ src_compile() {
 	use ocamlopt || myconf="$myconf NATIVE=false"
 
 	# Discard cflags as it will try to pass them to ocamlc...
-	emake $myconf CFLAGS="" buildexecutable
+	emake -j1 $myconf CFLAGS="" buildexecutable
 }
 
 src_test() {
