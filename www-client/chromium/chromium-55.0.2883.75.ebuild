@@ -51,7 +51,6 @@ COMMON_DEPEND="
 	media-libs/speex:=
 	pulseaudio? ( media-sound/pulseaudio:= )
 	system-ffmpeg? ( >=media-video/ffmpeg-2.7.2:= )
-	sys-apps/dbus:=
 	sys-apps/pciutils:=
 	>=sys-libs/libcap-2.22:=
 	virtual/udev
@@ -107,6 +106,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-perl/JSON
 	>=dev-util/gperf-3.0.3
 	dev-util/ninja
+	sys-apps/dbus:=
 	sys-apps/hwids[usb(+)]
 	>=sys-devel/bison-2.4.3
 	sys-devel/flex
@@ -215,6 +215,8 @@ pkg_setup() {
 
 src_prepare() {
 	default
+
+	filter-ldflags "*sort*"
 
 	local keeplibs=(
 		base/third_party/dmg_fp
