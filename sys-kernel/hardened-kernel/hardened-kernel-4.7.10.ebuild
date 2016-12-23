@@ -27,8 +27,11 @@ src_compile() {
 }
 
 src_install() {
+	dobin usr/gen_init_cpio
+
 	mkdir "${ED%/}/boot" || die
 	installkernel "${KVER}" arch/x86/boot/bzImage System.map "${ED%/}/boot" || die
+
 	mkdir -p "${ED%/}/lib/modules/${KVER}/kernel" || die
 	find . -name '*.ko' | while read -r mod; do
 		mkdir -p "${ED%/}/lib/modules/${KVER}/kernel/$(dirname "$mod")" || die
@@ -37,4 +40,8 @@ src_install() {
 	done
 	cp modules.builtin modules.order "${ED%/}/lib/modules/${KVER}" || die
 	depmod -b "${ED%/}" "${KVER}" || die
+}
+
+pkg_postinst() {
+	depmod "${KVER}"
 }
