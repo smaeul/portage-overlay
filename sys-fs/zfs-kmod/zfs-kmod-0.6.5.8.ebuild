@@ -40,7 +40,6 @@ AUTOTOOLS_IN_SOURCE_BUILD="1"
 DOCS=( AUTHORS COPYRIGHT DISCLAIMER README.markdown )
 
 pkg_setup() {
-	linux-info_pkg_setup
 	CONFIG_CHECK="!DEBUG_LOCK_ALLOC
 		EFI_PARTITION
 		IOSCHED_NOOP
@@ -62,12 +61,12 @@ pkg_setup() {
 			DEVTMPFS
 	"
 
+	linux-mod_pkg_setup
+
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
 		{ kernel_is le 4 8 || die "Linux 4.8 is the latest supported version."; }
-
-	check_extra_config
 }
 
 src_prepare() {
