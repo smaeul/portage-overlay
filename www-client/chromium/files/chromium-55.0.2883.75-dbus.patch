@@ -1,0 +1,429 @@
+diff --git chromium-55.0.2883.75/chrome/browser/BUILD.gn.orig chromium-55.0.2883.75/chrome/browser/BUILD.gn
+index 87409e5..d4e32b3 100644
+--- chromium-55.0.2883.75/chrome/browser/BUILD.gn.orig
++++ chromium-55.0.2883.75/chrome/browser/BUILD.gn
+@@ -3468,8 +3468,6 @@ split_static_library("browser") {
+       "fullscreen_aurax11.cc",
+       "icon_loader_auralinux.cc",
+       "media/webrtc/window_icon_util_x11.cc",
+-      "password_manager/native_backend_kwallet_x.cc",
+-      "password_manager/native_backend_kwallet_x.h",
+       "platform_util_linux.cc",
+       "shell_integration_linux.cc",
+       "shell_integration_linux.h",
+@@ -3478,6 +3476,12 @@ split_static_library("browser") {
+       "themes/theme_service_aurax11.h",
+       "web_applications/web_app_linux.cc",
+     ]
++    if (use_dbus) {
++      sources += [
++        "password_manager/native_backend_kwallet_x.cc",
++        "password_manager/native_backend_kwallet_x.h",
++      ]
++    }
+     if (!use_ozone) {
+       sources += [
+         "password_manager/native_backend_libsecret.cc",
+diff --git chromium-55.0.2883.75/chrome/browser/chrome_browser_main_linux.cc.orig chromium-55.0.2883.75/chrome/browser/chrome_browser_main_linux.cc
+index bbc21dd..215283c 100644
+--- chromium-55.0.2883.75/chrome/browser/chrome_browser_main_linux.cc.orig
++++ chromium-55.0.2883.75/chrome/browser/chrome_browser_main_linux.cc
+@@ -80,7 +80,7 @@ void ChromeBrowserMainPartsLinux::PostProfileInit() {
+ }
+ 
+ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
+-#if !defined(OS_CHROMEOS)
++#if !defined(OS_CHROMEOS) && defined(USE_DBUS)
+   bluez::DBusThreadManagerLinux::Initialize();
+   bluez::BluezDBusManager::Initialize(
+       bluez::DBusThreadManagerLinux::Get()->GetSystemBus(), false);
+@@ -90,7 +90,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
+ }
+ 
+ void ChromeBrowserMainPartsLinux::PostDestroyThreads() {
+-#if !defined(OS_CHROMEOS)
++#if !defined(OS_CHROMEOS) && defined(USE_DBUS)
+   bluez::BluezDBusManager::Shutdown();
+   bluez::DBusThreadManagerLinux::Shutdown();
+ #endif
+diff --git chromium-55.0.2883.75/chrome/browser/password_manager/password_store_factory.cc.orig chromium-55.0.2883.75/chrome/browser/password_manager/password_store_factory.cc
+index 862f2f1..5bc625b 100644
+--- chromium-55.0.2883.75/chrome/browser/password_manager/password_store_factory.cc.orig
++++ chromium-55.0.2883.75/chrome/browser/password_manager/password_store_factory.cc
+@@ -198,6 +198,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
+   std::unique_ptr<PasswordStoreX::NativeBackend> backend;
+   if (selected_backend == os_crypt::SelectedLinuxBackend::KWALLET ||
+       selected_backend == os_crypt::SelectedLinuxBackend::KWALLET5) {
++#if defined(USE_DBUS)
+     VLOG(1) << "Trying KWallet for password storage.";
+     base::nix::DesktopEnvironment used_desktop_env =
+         selected_backend == os_crypt::SelectedLinuxBackend::KWALLET
+@@ -210,6 +211,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
+     } else {
+       backend.reset();
+     }
++#endif  // defined(USE_DBUS)
+   } else if (selected_backend == os_crypt::SelectedLinuxBackend::GNOME_ANY ||
+              selected_backend ==
+                  os_crypt::SelectedLinuxBackend::GNOME_KEYRING ||
+diff --git chromium-55.0.2883.75/device/battery/battery_status_manager_default.cc.orig chromium-55.0.2883.75/device/battery/battery_status_manager_default.cc
+index c0a513d..9b62ec9 100644
+--- chromium-55.0.2883.75/device/battery/battery_status_manager_default.cc.orig
++++ chromium-55.0.2883.75/device/battery/battery_status_manager_default.cc
+@@ -22,11 +22,10 @@ class BatteryStatusManagerDefault : public BatteryStatusManager {
+  private:
+   // BatteryStatusManager:
+   bool StartListeningBatteryChange() override {
+-    NOTIMPLEMENTED();
+     return false;
+   }
+ 
+-  void StopListeningBatteryChange() override { NOTIMPLEMENTED(); }
++  void StopListeningBatteryChange() override { }
+ 
+   DISALLOW_COPY_AND_ASSIGN(BatteryStatusManagerDefault);
+ };
+diff --git chromium-55.0.2883.75/device/bluetooth/bluetooth_adapter_factory.cc.orig chromium-55.0.2883.75/device/bluetooth/bluetooth_adapter_factory.cc
+index e542638..811fed8 100644
+--- chromium-55.0.2883.75/device/bluetooth/bluetooth_adapter_factory.cc.orig
++++ chromium-55.0.2883.75/device/bluetooth/bluetooth_adapter_factory.cc
+@@ -60,7 +60,7 @@ bool BluetoothAdapterFactory::IsBluetoothAdapterAvailable() {
+   if (default_adapter.Get())
+     return true;
+ #if defined(OS_ANDROID) || defined(OS_CHROMEOS) || defined(OS_WIN) || \
+-    defined(OS_LINUX) || defined(OS_MACOSX)
++    (defined(OS_LINUX) && defined(USE_DBUS)) || defined(OS_MACOSX)
+   return true;
+ #else
+   return false;
+@@ -76,14 +76,14 @@ bool BluetoothAdapterFactory::IsLowEnergyAvailable() {
+   if (default_adapter.Get())
+     return true;
+ #if defined(OS_ANDROID) || defined(OS_CHROMEOS) || defined(OS_WIN) || \
+-    defined(OS_LINUX)
++    (defined(OS_LINUX) && defined(USE_DBUS))
+   return true;
+ #elif defined(OS_MACOSX)
+   return base::mac::IsAtLeastOS10_10();
+ #else
+   return false;
+ #endif  // defined(OS_ANDROID) || defined(OS_CHROMEOS) || defined(OS_WIN) ||
+-        // defined(OS_LINUX)
++        // (defined(OS_LINUX) && defined(USE_DBUS))
+ }
+ 
+ // static
+diff --git chromium-55.0.2883.75/device/power_save_blocker/BUILD.gn.orig chromium-55.0.2883.75/device/power_save_blocker/BUILD.gn
+index 746be5a..b219a7f 100644
+--- chromium-55.0.2883.75/device/power_save_blocker/BUILD.gn.orig
++++ chromium-55.0.2883.75/device/power_save_blocker/BUILD.gn
+@@ -47,6 +47,9 @@ component("power_save_blocker") {
+   if (is_chromeos || !use_x11 || !use_dbus) {
+     sources -= [ "power_save_blocker_x11.cc" ]
+   }
++  if (!is_chromeos && use_x11 && !use_dbus) {
++    sources += [ "power_save_blocker_ozone.cc" ]
++  }
+ 
+   if (is_android) {
+     deps += [
+diff --git chromium-55.0.2883.75/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc.orig chromium-55.0.2883.75/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+index db956ab..d6ec75b 100644
+--- chromium-55.0.2883.75/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc.orig
++++ chromium-55.0.2883.75/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+@@ -1330,7 +1330,7 @@ void BluetoothLowEnergyCreateServiceFunction::DoWork() {
+ // TODO: Ideally this should be handled by our feature system, so that this
+ // code doesn't even compile on OSes it isn't being used on, but currently this
+ // is not possible.
+-#if !defined(OS_WIN)
++#if !defined(OS_WIN) && (!defined(OS_LINUX) || defined(USE_DBUS))
+   base::WeakPtr<device::BluetoothLocalGattService> service =
+       device::BluetoothLocalGattService::Create(
+           event_router_->adapter(),
+@@ -1351,6 +1351,7 @@ template class BLEPeripheralExtensionFunction<
+     apibtle::CreateCharacteristic::Params>;
+ 
+ void BluetoothLowEnergyCreateCharacteristicFunction::DoWork() {
++#if !defined(OS_LINUX) || defined(USE_DBUS)
+   device::BluetoothLocalGattService* service =
+       event_router_->adapter()->GetGattService(params_->service_id);
+   if (!service) {
+@@ -1371,6 +1372,9 @@ void BluetoothLowEnergyCreateCharacteristicFunction::DoWork() {
+ 
+   Respond(ArgumentList(apibtle::CreateCharacteristic::Results::Create(
+       characteristic->GetIdentifier())));
++#else
++  Respond(Error(kErrorPlatformNotSupported));
++#endif
+ }
+ 
+ // createDescriptor:
+@@ -1379,6 +1383,7 @@ template class BLEPeripheralExtensionFunction<
+     apibtle::CreateDescriptor::Params>;
+ 
+ void BluetoothLowEnergyCreateDescriptorFunction::DoWork() {
++#if !defined(OS_LINUX) || defined(USE_DBUS)
+   device::BluetoothLocalGattCharacteristic* characteristic =
+       event_router_->GetLocalCharacteristic(params_->characteristic_id);
+   if (!characteristic) {
+@@ -1394,6 +1399,9 @@ void BluetoothLowEnergyCreateDescriptorFunction::DoWork() {
+ 
+   Respond(ArgumentList(
+       apibtle::CreateDescriptor::Results::Create(descriptor->GetIdentifier())));
++#else
++  Respond(Error(kErrorPlatformNotSupported));
++#endif
+ }
+ 
+ // registerService:
+diff --git chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.cc.orig chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.cc
+index 2b8ccd7..af30192 100644
+--- chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.cc.orig
++++ chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.cc
+@@ -16,10 +16,12 @@
+ #include "base/threading/sequenced_worker_pool.h"
+ #include "components/onc/onc_constants.h"
+ #include "content/public/browser/browser_thread.h"
++#if defined(USE_DBUS)
+ #include "dbus/bus.h"
+ #include "dbus/message.h"
+ #include "dbus/object_path.h"
+ #include "dbus/object_proxy.h"
++#endif
+ #include "extensions/browser/api/networking_private/network_config_dbus_constants_linux.h"
+ #include "extensions/browser/api/networking_private/networking_private_api.h"
+ #include "extensions/browser/api/networking_private/networking_private_delegate_observer.h"
+@@ -29,6 +31,8 @@
+ namespace extensions {
+ 
+ namespace {
++
++#if defined(USE_DBUS)
+ // Access Point info strings.
+ const char kAccessPointInfoName[] = "Name";
+ const char kAccessPointInfoGuid[] = "GUID";
+@@ -95,6 +99,7 @@ std::string ConstructNetworkGuid(const dbus::ObjectPath& device_path,
+                                  const std::string& ssid) {
+   return device_path.value() + "|" + access_point_path.value() + "|" + ssid;
+ }
++#endif
+ 
+ // Logs that the method is not implemented and reports |kErrorNotSupported|
+ // to the failure callback.
+@@ -105,6 +110,7 @@ void ReportNotSupported(
+   failure_callback.Run(extensions::networking_private::kErrorNotSupported);
+ }
+ 
++#if defined(USE_DBUS)
+ // Fires the appropriate callback when the network connect operation succeeds
+ // or fails.
+ void OnNetworkConnectOperationCompleted(
+@@ -131,9 +137,11 @@ void GetCachedNetworkPropertiesCallback(
+   }
+   success_callback.Run(std::move(properties));
+ }
++#endif
+ 
+ }  // namespace
+ 
++#if defined(USE_DBUS)
+ NetworkingPrivateLinux::NetworkingPrivateLinux(
+     std::unique_ptr<VerifyDelegate> verify_delegate)
+     : NetworkingPrivateDelegate(std::move(verify_delegate)),
+@@ -146,7 +154,14 @@ NetworkingPrivateLinux::NetworkingPrivateLinux(
+       FROM_HERE,
+       base::Bind(&NetworkingPrivateLinux::Initialize, base::Unretained(this)));
+ }
++#else
++NetworkingPrivateLinux::NetworkingPrivateLinux(
++    std::unique_ptr<VerifyDelegate> verify_delegate)
++    : NetworkingPrivateDelegate(std::move(verify_delegate)) {
++}
++#endif
+ 
++#if defined(USE_DBUS)
+ NetworkingPrivateLinux::~NetworkingPrivateLinux() {
+   dbus_thread_.Stop();
+ }
+@@ -186,6 +201,7 @@ bool NetworkingPrivateLinux::CheckNetworkManagerSupported(
+ 
+   return true;
+ }
++#endif
+ 
+ void NetworkingPrivateLinux::GetProperties(
+     const std::string& guid,
+@@ -205,6 +221,7 @@ void NetworkingPrivateLinux::GetState(
+     const std::string& guid,
+     const DictionaryCallback& success_callback,
+     const FailureCallback& failure_callback) {
++#if defined(USE_DBUS)
+   if (!CheckNetworkManagerSupported(failure_callback))
+     return;
+ 
+@@ -221,8 +238,12 @@ void NetworkingPrivateLinux::GetState(
+       base::Bind(&GetCachedNetworkPropertiesCallback, base::Passed(&error),
+                  base::Passed(&network_properties), success_callback,
+                  failure_callback));
++#else
++  ReportNotSupported("NetworkManager over DBus", failure_callback);
++#endif
+ }
+ 
++#if defined(USE_DBUS)
+ void NetworkingPrivateLinux::GetCachedNetworkProperties(
+     const std::string& guid,
+     base::DictionaryValue* properties,
+@@ -249,6 +270,7 @@ void NetworkingPrivateLinux::GetCachedNetworkProperties(
+   // Swap the new copy into the dictionary that is shared with the reply.
+   properties->Swap(temp_properties.get());
+ }
++#endif
+ 
+ void NetworkingPrivateLinux::SetProperties(
+     const std::string& guid,
+@@ -281,6 +303,7 @@ void NetworkingPrivateLinux::GetNetworks(
+     int limit,
+     const NetworkListCallback& success_callback,
+     const FailureCallback& failure_callback) {
++#if defined(USE_DBUS)
+   if (!CheckNetworkManagerSupported(failure_callback)) {
+     return;
+   }
+@@ -306,8 +329,12 @@ void NetworkingPrivateLinux::GetNetworks(
+       base::Bind(&NetworkingPrivateLinux::OnAccessPointsFound,
+                  base::Unretained(this), base::Passed(&network_map),
+                  success_callback, failure_callback));
++#else
++  ReportNotSupported("NetworkManager over DBus", failure_callback);
++#endif
+ }
+ 
++#if defined(USE_DBUS)
+ bool NetworkingPrivateLinux::GetNetworksForScanRequest() {
+   if (!network_manager_proxy_) {
+     return false;
+@@ -493,11 +520,13 @@ void NetworkingPrivateLinux::DisconnectFromNetwork(const std::string& guid,
+     *error = "Failed to disconnect network";
+   }
+ }
++#endif
+ 
+ void NetworkingPrivateLinux::StartConnect(
+     const std::string& guid,
+     const VoidCallback& success_callback,
+     const FailureCallback& failure_callback) {
++#if defined(USE_DBUS)
+   if (!CheckNetworkManagerSupported(failure_callback))
+     return;
+ 
+@@ -510,12 +539,16 @@ void NetworkingPrivateLinux::StartConnect(
+                  base::Unretained(this), guid, base::Unretained(error.get())),
+       base::Bind(&OnNetworkConnectOperationCompleted, base::Passed(&error),
+                  success_callback, failure_callback));
++#else
++  ReportNotSupported("NetworkManager over DBus", failure_callback);
++#endif
+ }
+ 
+ void NetworkingPrivateLinux::StartDisconnect(
+     const std::string& guid,
+     const VoidCallback& success_callback,
+     const FailureCallback& failure_callback) {
++#if defined(USE_DBUS)
+   if (!CheckNetworkManagerSupported(failure_callback))
+     return;
+ 
+@@ -528,6 +561,9 @@ void NetworkingPrivateLinux::StartDisconnect(
+                  base::Unretained(this), guid, base::Unretained(error.get())),
+       base::Bind(&OnNetworkConnectOperationCompleted, base::Passed(&error),
+                  success_callback, failure_callback));
++#else
++  ReportNotSupported("NetworkManager over DBus", failure_callback);
++#endif
+ }
+ 
+ void NetworkingPrivateLinux::SetWifiTDLSEnabledState(
+@@ -598,19 +634,28 @@ bool NetworkingPrivateLinux::DisableNetworkType(const std::string& type) {
+ }
+ 
+ bool NetworkingPrivateLinux::RequestScan() {
++#if defined(USE_DBUS)
+   return GetNetworksForScanRequest();
++#else
++  return false;
++#endif
+ }
+ 
+ void NetworkingPrivateLinux::AddObserver(
+     NetworkingPrivateDelegateObserver* observer) {
++#if defined(USE_DBUS)
+   network_events_observers_.AddObserver(observer);
++#endif
+ }
+ 
+ void NetworkingPrivateLinux::RemoveObserver(
+     NetworkingPrivateDelegateObserver* observer) {
++#if defined(USE_DBUS)
+   network_events_observers_.RemoveObserver(observer);
++#endif
+ }
+ 
++#if defined(USE_DBUS)
+ void NetworkingPrivateLinux::OnAccessPointsFound(
+     std::unique_ptr<NetworkMap> network_map,
+     const NetworkListCallback& success_callback,
+@@ -1204,5 +1249,6 @@ void NetworkingPrivateLinux::OnNetworksChangedEventTask(
+   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+   OnNetworksChangedEventOnUIThread(*guid_list);
+ }
++#endif
+ 
+ }  // namespace extensions
+diff --git chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.h.orig chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.h
+index 6d69d97..c0fd874 100644
+--- chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.h.orig
++++ chromium-55.0.2883.75/extensions/browser/api/networking_private/networking_private_linux.h
+@@ -16,22 +16,26 @@
+ #include "components/keyed_service/core/keyed_service.h"
+ #include "extensions/browser/api/networking_private/networking_private_delegate.h"
+ 
++#if defined(USE_DBUS)
+ namespace dbus {
+ class Bus;
+ class ObjectPath;
+ class ObjectProxy;
+ class Response;
+ };
++#endif
+ 
+ namespace extensions {
+ 
+ // Linux NetworkingPrivateDelegate implementation.
+ class NetworkingPrivateLinux : public NetworkingPrivateDelegate {
+  public:
++#if defined(USE_DBUS)
+   using NetworkMap =
+       std::map<base::string16, std::unique_ptr<base::DictionaryValue>>;
+ 
+   typedef std::vector<std::string> GuidList;
++#endif
+ 
+   explicit NetworkingPrivateLinux(
+       std::unique_ptr<VerifyDelegate> verify_delegate);
+@@ -101,6 +105,7 @@ class NetworkingPrivateLinux : public NetworkingPrivateDelegate {
+   void RemoveObserver(NetworkingPrivateDelegateObserver* observer) override;
+ 
+  private:
++#if defined(USE_DBUS)
+   ~NetworkingPrivateLinux() override;
+ 
+   // https://developer.gnome.org/NetworkManager/unstable/spec.html#type-NM_DEVICE_TYPE
+@@ -268,6 +273,7 @@ class NetworkingPrivateLinux : public NetworkingPrivateDelegate {
+   // Observers to Network Events.
+   base::ObserverList<NetworkingPrivateDelegateObserver>
+       network_events_observers_;
++#endif
+ 
+   DISALLOW_COPY_AND_ASSIGN(NetworkingPrivateLinux);
+ };
