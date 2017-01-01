@@ -20,14 +20,14 @@ DEPEND=">=sys-devel/make-3.81
 		>=sys-apps/s6-2.4.0.0:=[static-libs]
 	)
 	!static? (
-		>=dev-lang/execline-2.2.0.0:=
+		>=dev-lang/execline-2.2.0.0:=[static=]
 		>=dev-libs/skalibs-2.4.0.0:=
-		>=sys-apps/s6-2.4.0.0:=
+		>=sys-apps/s6-2.4.0.0:=[static=]
 	)
 "
 RDEPEND="
-	>=dev-lang/execline-2.2.0.0
-	>=sys-apps/s6-2.4.0.0:=
+	>=dev-lang/execline-2.2.0.0:=[!static?]
+	>=sys-apps/s6-2.4.0.0:=[!static?]
 	!static? (
 		>=dev-libs/skalibs-2.4.0.0:=
 	)
@@ -53,7 +53,7 @@ src_configure() {
 		--with-lib=/usr/$(get_libdir)/s6 \
 		--with-lib=/usr/$(get_libdir)/skalibs \
 		--with-sysdeps=/usr/$(get_libdir)/skalibs \
-		--enable-shared \
+		$(use_enable !static shared) \
 		$(use_enable static allstatic) \
 		$(use_enable static static-libc) \
 		$(use_enable static-libs static)
