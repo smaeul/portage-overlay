@@ -1,0 +1,22 @@
+From 517ae27f73365d27bff3bac875db699d0e58b89c Mon Sep 17 00:00:00 2001
+From: beck <>
+Date: Sun, 6 Nov 2016 10:17:49 +0000
+Subject: [PATCH] Commit a reminder that the default is not the default. This
+ needs to be revisited. ok jsing@
+
+---
+ crypto/x509/x509_vpm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/x509/x509_vpm.c b/crypto/x509/x509_vpm.c
+index 3ab3a55..b9c57dc 100644
+--- a/crypto/x509/x509_vpm.c
++++ b/crypto/x509/x509_vpm.c
+@@ -575,6 +575,7 @@ static const X509_VERIFY_PARAM default_table[] = {
+ 	{
+ 		.name = "default",
+ 		.depth = 100,
++		.trust = 0,  /* XXX This is not the default trust value */
+ 		.id = vpm_empty_id
+ 	},
+ 	{

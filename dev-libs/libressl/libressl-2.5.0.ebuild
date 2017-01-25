@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
-EAPI=5
+EAPI=6
 
 inherit eutils multilib-minimal
 
@@ -22,7 +22,19 @@ RDEPEND="!dev-libs/openssl:0"
 DEPEND="${RDEPEND}"
 PDEPEND="app-misc/ca-certificates"
 
+PATCHES=(
+	"${FILESDIR}/${PN}-2.5.0-altchains-1.patch"
+	"${FILESDIR}/${PN}-2.5.0-altchains-2.patch"
+	"${FILESDIR}/${PN}-2.5.0-altchains-3.patch"
+	"${FILESDIR}/${PN}-2.5.0-altchains-4.patch"
+	"${FILESDIR}/${PN}-2.5.0-altchains-5.patch"
+	"${FILESDIR}/${PN}-2.5.0-altchains-6.patch"
+	"${FILESDIR}/${PN}-2.5.0-altchains-7.patch"
+)
+
 src_prepare() {
+	default
+
 	touch crypto/Makefile.in
 
 	sed -i \
