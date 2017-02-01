@@ -1,0 +1,177 @@
+diff --git openjdk/jdk/src/solaris/native/java/net/PlainDatagramSocketImpl.c.orig openjdk/jdk/src/solaris/native/java/net/PlainDatagramSocketImpl.c
+index 77899d6..447f3be 100644
+--- openjdk/jdk/src/solaris/native/java/net/PlainDatagramSocketImpl.c.orig
++++ openjdk/jdk/src/solaris/native/java/net/PlainDatagramSocketImpl.c
+@@ -41,7 +41,6 @@
+ #endif
+ #ifdef __linux__
+ #include <unistd.h>
+-#include <sys/sysctl.h>
+ #include <sys/utsname.h>
+ #include <netinet/ip.h>
+ 
+diff --git openjdk/jdk/src/solaris/native/java/net/PlainSocketImpl.c.orig openjdk/jdk/src/solaris/native/java/net/PlainSocketImpl.c
+index 724c1cf..4789697 100644
+--- openjdk/jdk/src/solaris/native/java/net/PlainSocketImpl.c.orig
++++ openjdk/jdk/src/solaris/native/java/net/PlainSocketImpl.c
+@@ -43,7 +43,6 @@
+ #endif
+ #ifdef __linux__
+ #include <unistd.h>
+-#include <sys/sysctl.h>
+ #endif
+ 
+ #include "jvm.h"
+diff --git openjdk/jdk/src/solaris/javavm/export/jvm_md.h.orig openjdk/jdk/src/solaris/javavm/export/jvm_md.h
+index 5c68191..62415ee 100644
+--- openjdk/jdk/src/solaris/javavm/export/jvm_md.h.orig
++++ openjdk/jdk/src/solaris/javavm/export/jvm_md.h
+@@ -65,7 +65,7 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <errno.h>
+-#include <sys/signal.h>
++#include <signal.h>
+ 
+ /* O Flags */
+ 
+diff --git openjdk/jdk/src/solaris/native/java/net/net_util_md.h.orig openjdk/jdk/src/solaris/native/java/net/net_util_md.h
+index 58be690..49d3923 100644
+--- openjdk/jdk/src/solaris/native/java/net/net_util_md.h.orig
++++ openjdk/jdk/src/solaris/native/java/net/net_util_md.h
+@@ -33,7 +33,7 @@
+ #include <unistd.h>
+ 
+ #ifndef USE_SELECT
+-#include <sys/poll.h>
++#include <poll.h>
+ #endif
+ 
+ 
+diff --git openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c.orig openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c
+index 1788944..75d95a0 100644
+--- openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c.orig
++++ openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c
+@@ -47,7 +47,6 @@
+ 
+ #if defined(__linux__)
+ #include <sys/ioctl.h>
+-#include <bits/ioctls.h>
+ #include <sys/utsname.h>
+ #include <stdio.h>
+ #endif
+diff --git openjdk/jdk/src/solaris/native/java/net/linux_close.c.orig openjdk/jdk/src/solaris/native/java/net/linux_close.c
+index 2d3dfe2..c8a0235 100644
+--- openjdk/jdk/src/solaris/native/java/net/linux_close.c.orig
++++ openjdk/jdk/src/solaris/native/java/net/linux_close.c
+@@ -56,7 +56,7 @@ typedef struct {
+ /*
+  * Signal to unblock thread
+  */
+-static int sigWakeup = (__SIGRTMAX - 2);
++static int sigWakeup;
+ 
+ /*
+  * The fd table and the number of file descriptors
+@@ -95,6 +95,7 @@ static void __attribute((constructor)) init() {
+     /*
+      * Setup the signal handler
+      */
++    sigWakeup = SIGRTMAX - 2;
+     sa.sa_handler = sig_wakeup;
+     sa.sa_flags   = 0;
+     sigemptyset(&sa.sa_mask);
+diff --git openjdk/jdk/src/solaris/native/sun/nio/ch/NativeThread.c.orig openjdk/jdk/src/solaris/native/sun/nio/ch/NativeThread.c
+index 5e2a78b..f5483bb 100644
+--- openjdk/jdk/src/solaris/native/sun/nio/ch/NativeThread.c.orig
++++ openjdk/jdk/src/solaris/native/sun/nio/ch/NativeThread.c
+@@ -34,9 +34,9 @@
+ 
+ #ifdef __linux__
+   #include <pthread.h>
+-  #include <sys/signal.h>
++  #include <signal.h>
+   /* Also defined in net/linux_close.c */
+-  #define INTERRUPT_SIGNAL (__SIGRTMAX - 2)
++  #define INTERRUPT_SIGNAL (SIGRTMAX - 2)
+ #elif __solaris__
+   #include <thread.h>
+   #include <signal.h>
+diff --git openjdk/jdk/src/solaris/native/java/lang/childproc.h.orig openjdk/jdk/src/solaris/native/java/lang/childproc.h
+index 75352a7..58368fd 100644
+--- openjdk/jdk/src/solaris/native/java/lang/childproc.h.orig
++++ openjdk/jdk/src/solaris/native/java/lang/childproc.h
+@@ -119,7 +119,7 @@ typedef struct _SpawnInfo {
+  * The cached and split version of the JDK's effective PATH.
+  * (We don't support putenv("PATH=...") in native code)
+  */
+-const char * const *parentPathv;
++extern const char * const *parentPathv;
+ 
+ ssize_t restartableWrite(int fd, const void *buf, size_t count);
+ int restartableDup2(int fd_from, int fd_to);
+diff --git openjdk/jdk/src/solaris/native/java/lang/childproc.c.orig openjdk/jdk/src/solaris/native/java/lang/childproc.c
+index 1d183cf..0b3d343 100644
+--- openjdk/jdk/src/solaris/native/java/lang/childproc.c.orig
++++ openjdk/jdk/src/solaris/native/java/lang/childproc.c
+@@ -33,6 +33,7 @@
+ 
+ #include "childproc.h"
+ 
++const char * const *parentPathv;
+ 
+ ssize_t
+ restartableWrite(int fd, const void *buf, size_t count)
+diff --git openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.h.orig openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.h
+index ea704b7..582382e 100644
+--- openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.h.orig
++++ openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.h
+@@ -265,6 +265,6 @@ typedef struct GSS_FUNCTION_TABLE {
+ typedef GSS_FUNCTION_TABLE *GSS_FUNCTION_TABLE_PTR;
+ 
+ /* global GSS function table */
+-GSS_FUNCTION_TABLE_PTR ftab;
++extern GSS_FUNCTION_TABLE_PTR ftab;
+ 
+ #endif
+diff --git openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.c.orig openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.c
+index 8a1d0ee..1d86255 100644
+--- openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.c.orig
++++ openjdk/jdk/src/solaris/native/sun/security/jgss/wrapper/NativeFunc.c
+@@ -28,6 +28,8 @@
+ #include <dlfcn.h>
+ #include "NativeFunc.h"
+ 
++GSS_FUNCTION_TABLE_PTR ftab;
++
+ /* standard GSS method names (ordering is from mapfile) */
+ static const char RELEASE_NAME[]                = "gss_release_name";
+ static const char IMPORT_NAME[]                 = "gss_import_name";
+diff --git openjdk/jdk/src/solaris/native/common/jdk_util_md.h.orig openjdk/jdk/src/solaris/native/common/jdk_util_md.h
+index c13bb77..5d57def 100644
+--- openjdk/jdk/src/solaris/native/common/jdk_util_md.h.orig
++++ openjdk/jdk/src/solaris/native/common/jdk_util_md.h
+@@ -37,7 +37,11 @@
+ #define ISNAND(d) isnan(d)
+ #elif defined(__linux__) || defined(_ALLBSD_SOURCE)
+ #include <math.h>
++#if !defined(__linux__) || defined(__GLIBC__)
+ #define ISNANF(f) isnanf(f)
++#else
++#define ISNANF(f) isnan(f)
++#endif
+ #define ISNAND(d) isnan(d)
+ #elif defined(_AIX)
+ #include <math.h>
+diff --git openjdk/jdk/src/share/native/common/jni_util.c.orig openjdk/jdk/src/share/native/common/jni_util.c
+index 0d00897..2a02769 100644
+--- openjdk/jdk/src/share/native/common/jni_util.c.orig
++++ openjdk/jdk/src/share/native/common/jni_util.c
+@@ -26,6 +26,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
++#include "io_util.h"
+ #include "jvm.h"
+ #include "jni.h"
+ #include "jni_util.h"
