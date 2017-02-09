@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -21,7 +21,7 @@ HOMEPAGE="http://zfsonlinux.org/"
 
 LICENSE="BSD-2 CDDL MIT"
 SLOT="0"
-IUSE="custom-cflags debug elibc_musl kernel-builtin +rootfs test-suite static-libs"
+IUSE="custom-cflags debug kernel-builtin +rootfs test-suite static-libs"
 RESTRICT="test"
 
 COMMON_DEPEND="
@@ -53,7 +53,7 @@ RDEPEND="${COMMON_DEPEND}
 		app-misc/pax-utils
 		!<sys-boot/grub-2.00-r2:2
 		)
-	!>=sys-fs/udev-init-scripts-28
+	sys-fs/udev-init-scripts
 "
 
 AT_M4DIR="config"
