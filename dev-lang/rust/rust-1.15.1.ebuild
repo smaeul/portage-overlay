@@ -71,11 +71,12 @@ src_configure() {
 
 	local stagename="RUST_STAGE0_${ARCH}"
 	local stage0="${WORKDIR}/${!stagename}/rustc"
+	local triple="${CBUILD/gentoo/unknown}"
 
 	use local-bootstrap && stage0="${EPREFIX}/usr"
 
 	"${ECONF_SOURCE:-.}"/configure \
-		--build=${CBUILD} \
+		--build="${triple}" \
 		--prefix="${EPREFIX}/usr" \
 		--libdir="${EPREFIX}/usr/$(get_libdir)/${P}" \
 		--mandir="${EPREFIX}/usr/share/${P}/man" \
@@ -106,7 +107,8 @@ src_compile() {
 	if use local-bootstrap; then
 		# make rust put stage0 libraries where stage1 can find them
 		local bootver="$(readlink -f /usr/bin/rustc)"
-		ln -s . "${CBUILD}/stage0/lib/rust-${bootver##*rustc-}" ||
+		local triple="${CBUILD/gentoo/unknown}"
+		ln -s . "${triple}/stage0/lib/rust-${bootver##*rustc-}" ||
 			die "could not fix bootstrap"
 	fi
 
