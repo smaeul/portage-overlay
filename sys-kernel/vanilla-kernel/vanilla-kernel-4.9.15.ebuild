@@ -4,7 +4,7 @@
 
 EAPI=5
 
-DESCRIPTION="Hardened Linux kernel (binary package)"
+DESCRIPTION="Vanilla Linux kernel (binary package)"
 HOMEPAGE="https://www.kernel.org"
 
 LICENSE="GPL-2"
@@ -12,12 +12,12 @@ SLOT="0"
 KEYWORDS="amd64 x86"
 
 DEPEND="
-	=sys-kernel/hardened-sources-${PVR}
+	=sys-kernel/vanilla-sources-${PVR}
 	sys-apps/debianutils
 	sys-apps/kmod
 "
 
-KVER="${PV}-hardened-${PR}"
+KVER="${PV}-${PR}"
 KVER="${KVER%-r0}"
 
 S="${EPREFIX}/usr/src/linux-${KVER}"
