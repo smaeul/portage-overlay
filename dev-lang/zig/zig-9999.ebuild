@@ -15,12 +15,18 @@ SLOT="0"
 KEYWORDS=""
 IUSE="vim-syntax"
 
-RDEPEND=">=sys-devel/llvm-3.9.0:=[clang]
-	<sys-devel/llvm-4.0.0[clang]"
-DEPEND="${RDEPEND}"
+RDEPEND="
+	>=sys-devel/clang-4.0.0:4=
+	>=sys-devel/llvm-4.0.0:4="
+DEPEND="${RDEPEND}
+	dev-util/ninja"
 
 CMAKE_MAKEFILE_GENERATOR="ninja"
 CMAKE_MIN_VERSION="2.8.5"
+
+PATCHES=(
+	"${FILESDIR}/zig-clang-path.patch"
+)
 
 src_install() {
 	cmake-utils_src_install
