@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -16,12 +16,12 @@ SRC_URI="https://www.opensmtpd.org/archives/${MY_P/_}.tar.gz"
 
 LICENSE="ISC BSD BSD-1 BSD-2 BSD-4"
 SLOT="0"
-KEYWORDS="amd64 x86"
-IUSE="elibc_musl libressl pam +mta"
+KEYWORDS="~amd64 ~x86"
+IUSE="libressl pam +mta"
 
-DEPEND="elibc_musl? ( sys-libs/fts-standalone )
-		!libressl? ( dev-libs/openssl:0 )
+DEPEND="!libressl? ( dev-libs/openssl:0 )
 		libressl? ( dev-libs/libressl )
+		elibc_musl? ( sys-libs/fts-standalone )
 		sys-libs/zlib
 		pam? ( virtual/pam )
 		sys-libs/db:=
@@ -48,7 +48,9 @@ S=${WORKDIR}/${MY_P/_}
 src_prepare() {
 	# Use /run instead of /var/run
 	sed -i -e '/pidfile_path/s:_PATH_VARRUN:"/run/":' openbsd-compat/pidfile.c || die
-	use elibc_musl && epatch "${FILESDIR}"/musl.patch
+	epatch "${FILESDIR}"/${P}-autoconf.patch
+	epatch "${FILESDIR}"/${P}-libressl.patch
+	epatch "${FILESDIR}"/${P}-musl.patch
 	epatch_user
 	eautoreconf
 }
@@ -63,7 +65,6 @@ src_configure() {
 		--with-path-socket=/run \
 		--with-path-CAfile=/etc/ssl/certs/ca-certificates.crt \
 		--sysconfdir=/etc/opensmtpd \
-		$(usex elibc_musl --with-libs=-lfts) \
 		$(use_with pam auth-pam)
 }
 
