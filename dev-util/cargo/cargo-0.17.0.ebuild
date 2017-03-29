@@ -1,6 +1,5 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=6
 
@@ -14,12 +13,13 @@ bufstream-0.1.2
 cargotest-0.1.0
 cfg-if-0.1.0
 cmake-0.1.19
-crates-io-0.4.0
+crates-io-0.6.0
 crossbeam-0.2.10
 curl-0.4.1
 curl-sys-0.3.6
 docopt-0.6.86
 env_logger-0.3.5
+error-chain-0.7.2
 filetime-0.1.10
 flate2-0.2.14
 fs2-0.3.0
@@ -33,12 +33,13 @@ idna-0.1.0
 kernel32-sys-0.2.2
 lazy_static-0.2.2
 libc-0.2.18
-libgit2-sys-0.6.5
-libssh2-sys-0.2.4
-libz-sys-1.0.10
+libgit2-sys-0.6.6
+libssh2-sys-0.2.5
+libz-sys-1.0.13
 log-0.3.6
 matches-0.1.4
 memchr-0.1.11
+metadeps-1.1.1
 miniz-sys-0.1.7
 miow-0.1.3
 net2-0.2.26
@@ -50,9 +51,9 @@ num-iter-0.1.32
 num-rational-0.1.35
 num-traits-0.1.36
 num_cpus-1.1.0
-openssl-0.9.1
+openssl-0.9.6
 openssl-probe-0.1.0
-openssl-sys-0.9.1
+openssl-sys-0.9.6
 pkg-config-0.3.8
 psapi-sys-0.1.0
 rand-0.3.14
@@ -61,6 +62,7 @@ regex-syntax-0.3.9
 rustc-serialize-0.3.21
 semver-0.5.1
 semver-parser-0.6.1
+shell-escape-0.1.3
 strsim-0.5.1
 tar-0.4.9
 tempdir-0.3.5
@@ -102,6 +104,7 @@ IUSE="doc libressl local-bootstrap"
 
 COMMON_DEPEND="sys-libs/zlib
 	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:0= )
 	net-libs/libssh2
 	net-libs/http-parser"
 RDEPEND="${COMMON_DEPEND}
@@ -142,7 +145,6 @@ src_configure() {
 		--build=${CTARGET}
 		--target=${CTARGET}
 		--cargo="$bootstrap"
-		$(use_enable libressl build-openssl)
 		--enable-optimize
 #		--release-channel stable
 		--disable-verify-install

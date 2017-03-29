@@ -1,0 +1,31 @@
+From e66df0d9fce19d3ba408cf97692dd6d37fc6c998 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 25 Feb 2017 23:51:58 -0600
+Subject: [PATCH 2/5] Link libgcc_s over libunwind on musl
+
+---
+ src/libunwind/build.rs | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/src/libunwind/build.rs b/src/libunwind/build.rs
+index ed3d5212bf..58fe3f0e70 100644
+--- a/src/libunwind/build.rs
++++ b/src/libunwind/build.rs
+@@ -14,12 +14,8 @@ fn main() {
+     println!("cargo:rerun-if-changed=build.rs");
+     let target = env::var("TARGET").expect("TARGET was not set");
+ 
+-    if target.contains("linux") {
+-        if target.contains("musl") && !target.contains("mips") {
+-            println!("cargo:rustc-link-lib=static=unwind");
+-        } else if !target.contains("android") {
+-            println!("cargo:rustc-link-lib=gcc_s");
+-        }
++    if target.contains("linux") && !target.contains("android") {
++        println!("cargo:rustc-link-lib=gcc_s");
+     } else if target.contains("freebsd") {
+         println!("cargo:rustc-link-lib=gcc_s");
+     } else if target.contains("rumprun") {
+-- 
+2.11.0
+
