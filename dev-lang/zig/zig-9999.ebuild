@@ -19,7 +19,8 @@ RDEPEND="
 	>=sys-devel/clang-4.0.0:4=
 	>=sys-devel/llvm-4.0.0:4="
 DEPEND="${RDEPEND}
-	dev-util/ninja"
+	dev-util/ninja
+	sys-devel/lld"
 
 CMAKE_MAKEFILE_GENERATOR="ninja"
 CMAKE_MIN_VERSION="2.8.5"
