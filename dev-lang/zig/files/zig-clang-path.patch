@@ -1,5 +1,3 @@
-diff --git zig-9999/cmake/Findclang.cmake
-index 27f1b6d..baf1b7c 100644
 --- zig-9999/cmake/Findclang.cmake.orig
 +++ zig-9999/cmake/Findclang.cmake
 @@ -8,6 +8,7 @@
@@ -7,7 +5,7 @@ index 27f1b6d..baf1b7c 100644
  find_path(CLANG_INCLUDE_DIRS NAMES clang/Frontend/ASTUnit.h
      PATHS
 +        /usr/lib/llvm/4/include
-         /usr/lib/llvm-4/include
+         /usr/lib/llvm-4.0/include
          /mingw64/include)
  
 @@ -15,6 +16,7 @@ macro(FIND_AND_ADD_CLANG_LIB _libname_)
@@ -15,6 +13,6 @@ index 27f1b6d..baf1b7c 100644
      find_library(CLANG_${_prettylibname_}_LIB NAMES ${_libname_}
          PATHS
 +            /usr/lib/llvm/4/lib
-             /usr/lib/llvm-4/lib
+             /usr/lib/llvm-4.0/lib
              /mingw64/lib)
      if(CLANG_${_prettylibname_}_LIB)
