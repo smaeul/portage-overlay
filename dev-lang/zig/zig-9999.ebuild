@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/andrewrk/zig"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS=""
-IUSE="vim-syntax"
+IUSE=""
 
 RDEPEND="
 	>=sys-devel/clang-4.0.0:4=
@@ -35,10 +35,4 @@ src_install() {
 	dodoc doc/*.md
 	mv example examples || die
 	dodoc -r examples
-
-	if use vim-syntax; then
-		mv doc/vim doc/vimfiles || die
-		insinto /usr/share/vim
-		doins -r doc/vimfiles
-	fi
 }
