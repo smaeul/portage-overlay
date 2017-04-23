@@ -16,7 +16,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 ~arm ~arm64 x86"
+KEYWORDS="amd64 ~arm ~arm64 ~x86"
 IUSE="component-build cups +dbus gconf gnome-keyring gtk3 +hangouts kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
@@ -102,6 +102,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-perl/JSON
 	>=dev-util/gperf-3.0.3
 	dev-util/ninja
+	net-libs/nodejs
 	sys-apps/hwids[usb(+)]
 	>=sys-devel/bison-2.4.3
 	sys-devel/flex
@@ -162,9 +163,9 @@ pre_build_checks() {
 			# bugs: #601654
 			die "At least clang 3.9.1 is required"
 		fi
-		if tc-is-gcc && ! version_is_at_least 4.9 "$(gcc-version)"; then
+		if tc-is-gcc && ! version_is_at_least 4.8 "$(gcc-version)"; then
 			# bugs: #535730, #525374, #518668, #600288
-			die "At least gcc 4.9 is required"
+			die "At least gcc 4.8 is required"
 		fi
 	fi
 
@@ -199,20 +200,21 @@ src_prepare() {
 	local PATCHES=(
 		"${FILESDIR}/${PN}-widevine-r1.patch"
 		"${FILESDIR}/${PN}-FORTIFY_SOURCE.patch"
-		"${FILESDIR}/chromium-57-gcc4.patch"
+		"${FILESDIR}/${PN}-gn-bootstrap-r2.patch"
+		"${FILESDIR}/skia-avx2.patch"
 		"${FILESDIR}/${P}-dbus.patch"
 		"${FILESDIR}/musl-bootstrap.patch"
 		"${FILESDIR}/musl-cdefs.patch"
 		"${FILESDIR}/musl-dlopen.patch"
 		"${FILESDIR}/musl-dns.patch"
-		"${FILESDIR}/musl-execinfo.patch"
+		"${FILESDIR}/musl-execinfo-r2.patch"
 		"${FILESDIR}/musl-fpstate.patch"
 		"${FILESDIR}/musl-headers.patch"
 		"${FILESDIR}/musl-mallinfo-r3.patch"
 		"${FILESDIR}/musl-pthread-r2.patch"
 		"${FILESDIR}/musl-sandbox-r2.patch"
 		"${FILESDIR}/musl-siginfo.patch"
-		"${FILESDIR}/musl-stacksize.patch"
+		"${FILESDIR}/musl-stacksize-r2.patch"
 		"${FILESDIR}/musl-stacktrace.patch"
 		"${FILESDIR}/musl-syscall.patch"
 		"${FILESDIR}/musl-ucontext.patch"
@@ -222,6 +224,9 @@ src_prepare() {
 	use system-ffmpeg && PATCHES+=( "${FILESDIR}/${PN}-system-ffmpeg-r4.patch" )
 
 	default
+
+	mkdir -p third_party/node/linux/node-linux-x64/bin || die
+	ln -s "${EPREFIX}"/usr/bin/node third_party/node/linux/node-linux-x64/bin/node || die
 
 	filter-ldflags "*sort*"
 
@@ -296,6 +301,8 @@ src_prepare() {
 		third_party/mesa
 		third_party/modp_b64
 		third_party/mt19937ar
+		third_party/node
+		third_party/node/node_modules/vulcanize/third_party/UglifyJS2
 		third_party/openh264
 		third_party/openmax_dl
 		third_party/opus
@@ -527,7 +534,7 @@ src_configure() {
 
 	einfo "Configuring Chromium..."
 	# TODO: bootstrapped gn binary hangs when using tcmalloc with portage's sandbox.
-	tools/gn/bootstrap/bootstrap.py -v --gn-gen-args "${myconf_gn} use_allocator=\"none\"" || die
+	tools/gn/bootstrap/bootstrap.py -v --no-clean --gn-gen-args "${myconf_gn} use_allocator=\"none\"" || die
 	myconf_gn+=" use_allocator=$(usex tcmalloc \"tcmalloc\" \"none\")"
 	out/Release/gn gen --args="${myconf_gn}" out/Release || die
 }

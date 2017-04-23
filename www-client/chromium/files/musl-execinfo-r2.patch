@@ -1,11 +1,11 @@
 --- chromium-54.0.2840.59/base/debug/stack_trace_posix.cc.orig	2016-05-08 07:59:51.749087517 +0200
 +++ chromium-54.0.2840.59/base/debug/stack_trace_posix.cc	2016-05-08 08:01:24.988950619 +0200
 @@ -24,7 +24,7 @@
- #if defined(__GLIBCXX__)
+ #if !defined(USE_SYMBOLIZE)
  #include <cxxabi.h>
  #endif
 -#if !defined(__UCLIBC__)
-+#if defined(__GLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
  #include <execinfo.h>
  #endif
  
@@ -13,17 +13,16 @@
    // Note: code in this function is NOT async-signal safe (std::string uses
    // malloc internally).
  
--#if defined(__GLIBCXX__) && !defined(__UCLIBC__)
-+#if defined(__GLIBCXX__) && defined(__GLIBC__)
+-#if !defined(__UCLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
  
    std::string::size_type search_from = 0;
    while (search_from < text->size()) {
-@@ -112,7 +112,7 @@ void DemangleSymbols(std::string* text)
+@@ -112,6 +112,6 @@ void DemangleSymbols(std::string* text)
      }
    }
- 
--#endif  // defined(__GLIBCXX__) && !defined(__UCLIBC__)
-+#endif  // defined(__GLIBCXX__) && defined(__GLIBC__)
+-#endif  // !defined(__UCLIBC__)
++#endif  // defined(__GLIBC__) && !defined(__UCLIBC__)
  }
  #endif  // !defined(USE_SYMBOLIZE)
  
@@ -32,7 +31,7 @@
  };
  
 -#if !defined(__UCLIBC__)
-+#if defined(__GLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
  void OutputPointer(void* pointer, BacktraceOutputHandler* handler) {
    // This should be more than enough to store a 64-bit number in hex:
    // 16 hex digits + 1 for null-terminator.
@@ -41,32 +40,32 @@
  #endif  // defined(USE_SYMBOLIZE)
  }
 -#endif  // !defined(__UCLIBC__)
-+#endif  // defined(__GLIBC__)
++#endif  // defined(__GLIBC__) && !defined(__UCLIBC__)
  
  void PrintToStderr(const char* output) {
    // NOTE: This code MUST be async-signal safe (it's used by in-process
 @@ -716,7 +716,7 @@ StackTrace::StackTrace() {
-   // NOTE: This code MUST be async-signal safe (it's used by in-process
-   // stack dumping signal handler). NO malloc or stdio is allowed here.
+ // NOTE: This code MUST be async-signal safe (it's used by in-process
+ // stack dumping signal handler). NO malloc or stdio is allowed here.
  
 -#if !defined(__UCLIBC__)
-+#if defined(__GLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
+   count = std::min(arraysize(trace_), count);
+ 
    // Though the backtrace API man page does not list any possible negative
-   // return values, we take no chance.
-   count_ = base::saturated_cast<size_t>(backtrace(trace_, arraysize(trace_)));
 @@ -729,13 +729,13 @@ void StackTrace::Print() const {
    // NOTE: This code MUST be async-signal safe (it's used by in-process
    // stack dumping signal handler). NO malloc or stdio is allowed here.
  
 -#if !defined(__UCLIBC__)
-+#if defined(__GLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
    PrintBacktraceOutputHandler handler;
    ProcessBacktrace(trace_, count_, &handler);
  #endif
  }
  
 -#if !defined(__UCLIBC__)
-+#if defined(__GLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
  void StackTrace::OutputToStream(std::ostream* os) const {
    StreamBacktraceOutputHandler handler(os);
    ProcessBacktrace(trace_, count_, &handler);
@@ -81,16 +80,7 @@
  #include <cxxabi.h>
  #include <dlfcn.h>
  #include <execinfo.h>
-@@ -164,7 +164,7 @@ void WTFReportAssertionFailure(const char* file,
- }
- 
- void WTFGetBacktrace(void** stack, int* size) {
--#if OS(MACOSX) || (OS(LINUX) && !defined(__UCLIBC__))
-+#if OS(MACOSX) || (OS(LINUX) && defined(__GLIBC__))
-   *size = backtrace(stack, *size);
- #elif OS(WIN)
-   // The CaptureStackBackTrace function is available in XP, but it is not
-@@ -215,7 +215,7 @@ class FrameToNameScope {
+@@ -142,7 +142,7 @@ class FrameToNameScope {
  };
  
  FrameToNameScope::FrameToNameScope(void* addr) : m_name(0), m_cxaDemangled(0) {
@@ -110,7 +100,7 @@
  #include <cxxabi.h>
  #include <execinfo.h>
  #endif
-@@ -55,7 +55,7 @@ void PrintError(const char* format, ...)
+@@ -60,7 +60,7 @@ void PrintError(const char* format, ...)
  // to get usable symbols on Linux. This is copied from V8. Chromium has a more
  // advanced stace trace system; also more difficult to copy.
  void DumpBacktrace() {
