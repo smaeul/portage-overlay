@@ -308,7 +308,7 @@ index 076bbe7193..0bfb6fc036 100644
  
 -    // Make sure that the linker/gcc really don't pull in anything, including
 -    // default objects, libs, etc.
--    base.pre_link_args.push("-nostdlib".to_string());
+-    base.pre_link_args.get_mut(&LinkerFlavor::Gcc).unwrap().push("-nostdlib".to_string());
 -
      // At least when this was tested, the linker would not add the
      // `GNU_EH_FRAME` program header to executables generated, which is required
@@ -334,3 +334,15 @@ index 076bbe7193..0bfb6fc036 100644
 -- 
 2.11.0
 
+diff --git rustc-beta-src/src/bootstrap/sanity.rs
+index 0c37158..3ae23d3 100644
+--- rustc-beta-src/src/bootstrap/sanity.rs.orig
++++ rustc-beta-src/src/bootstrap/sanity.rs
+@@ -21,7 +21,6 @@
+ use std::collections::HashSet;
+ use std::env;
+ use std::ffi::{OsStr, OsString};
+-use std::fs;
+ use std::process::Command;
+ 
+ use build_helper::output;

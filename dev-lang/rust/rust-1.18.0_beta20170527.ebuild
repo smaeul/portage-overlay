@@ -17,20 +17,19 @@ if [[ ${PV} = *beta* ]]; then
 else
 	ABI_VER="$(get_version_component_range 1-2)"
 	SLOT="stable/${ABI_VER}"
-	MY_P="rustc-beta"
+	MY_P="rustc-${PV}"
 	SRC="${MY_P}-src.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
-CARGO_VERSION="0.17.0"
-STAGE0_VERSION="1.17.0-dev"
-RUST_STAGE0_amd64="rustc-${STAGE0_VERSION}-x86_64-unknown-linux-musl"
+STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0-dev"
+RUST_STAGE0="rust-${STAGE0_VERSION}-${CBUILD/gentoo/unknown}"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
 
 SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.gz
-	amd64? ( http://portage.smaeul.xyz/rust/${RUST_STAGE0_amd64}.tar.gz )
+	http://portage.smaeul.xyz/distfiles/${RUST_STAGE0}.tar.gz
 "
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
@@ -39,7 +38,7 @@ IUSE="clang debug doc libcxx +system-llvm"
 REQUIRED_USE="libcxx? ( clang )"
 
 RDEPEND="libcxx? ( sys-libs/libcxx )
-	system-llvm? ( sys-devel/llvm )
+	system-llvm? ( sys-devel/llvm:= )
 "
 
 DEPEND="${RDEPEND}
@@ -48,9 +47,7 @@ DEPEND="${RDEPEND}
 	clang? ( sys-devel/clang )
 "
 
-PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
-	|| ( 	>=dev-util/cargo-${CARGO_VERSION}
-		>=dev-util/cargo-bin-${CARGO_VERSION} )"
+PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425"
 
 PATCHES=(
 	${FILESDIR}/0001-Factor-out-helper-for-getting-C-runtime-linkage.patch
@@ -63,12 +60,19 @@ PATCHES=(
 
 S="${WORKDIR}/${MY_P}-src"
 
+src_prepare() {
+	default
+
+	"${WORKDIR}/${RUST_STAGE0}/install.sh" \
+		--prefix="${WORKDIR}/stage0" \
+		--components=rust-std-${CBUILD/gentoo/unknown},rustc,cargo \
+		--disable-ldconfig \
+		|| die
+}
+
 src_configure() {
 	export CFG_DISABLE_LDCONFIG="notempty"
 	export LLVM_LINK_SHARED=1
-
-	local stagename="RUST_STAGE0_${ARCH}"
-	local stage0="${!stagename}"
 
 	"${ECONF_SOURCE:-.}"/configure \
 		--build=${CBUILD/gentoo/unknown} \
@@ -77,14 +81,14 @@ src_configure() {
 		--libdir="${EPREFIX}/usr/$(get_libdir)/${P}" \
 		--mandir="${EPREFIX}/usr/share/${P}/man" \
 		--release-channel=${SLOT%%/*} \
-		--disable-jemalloc \
 		--disable-manage-submodules \
 		--default-linker=$(tc-getBUILD_CC) \
 		--default-ar=$(tc-getBUILD_AR) \
 		--python=${EPYTHON} \
 		--disable-rpath \
 		--enable-local-rust \
-		--local-rust-root="${WORKDIR}/${stage0}/rustc" \
+		--enable-vendor \
+		--local-rust-root="${WORKDIR}/stage0" \
 		$(use_enable clang) \
 		$(use_enable debug) \
 		$(use_enable debug llvm-assertions) \
@@ -94,12 +98,8 @@ src_configure() {
 		$(use_enable !debug optimize-tests) \
 		$(use_enable doc docs) \
 		$(use_enable libcxx libcpp) \
-		$(usex system-llvm "--llvm-root=$(llvm-config --prefix)" " ") \
+		$(usex system-llvm "--llvm-root=${EPREFIX}$(llvm-config --prefix)" " ") \
 		|| die
-}
-
-src_compile() {
-	emake dist VERBOSE=1
 }
 
 src_install() {
@@ -113,7 +113,6 @@ src_install() {
 	rm "${D}/usr/lib/rust-${PV}/rustlib/manifest-rustc" || die
 	rm "${D}/usr/lib/rust-${PV}/rustlib/rust-installer-version" || die
 	rm "${D}/usr/lib/rust-${PV}/rustlib/uninstall.sh" || die
-
 
 	mv "${D}/usr/bin/rustc" "${D}/usr/bin/rustc-${PV}" || die
 	mv "${D}/usr/bin/rustdoc" "${D}/usr/bin/rustdoc-${PV}" || die
