@@ -1,9 +1,9 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
+
 # Build written by Andrew John Hughes (gnu_andrew@member.fsf.org)
 
-EAPI="5"
+EAPI="6"
 SLOT="8"
 
 inherit check-reqs gnome2-utils java-pkg-2 java-vm-2 multiprocessing pax-utils prefix versionator
@@ -13,15 +13,16 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="9d3757e6da35.tar.xz"
-JAXP_TARBALL="81c2773fbb0d.tar.xz"
-JAXWS_TARBALL="f57f3ddddff6.tar.xz"
-JDK_TARBALL="0cc71de3df18.tar.xz"
-LANGTOOLS_TARBALL="a553c153d376.tar.xz"
-OPENJDK_TARBALL="200203ccf4bb.tar.xz"
-NASHORN_TARBALL="0fb33c8b64d1.tar.xz"
-HOTSPOT_TARBALL="be4aeaa327f7.tar.xz"
-SHENANDOAH_TARBALL="24002f5b584e.tar.xz"
+CORBA_TARBALL="22ed32f45405.tar.xz"
+JAXP_TARBALL="fdc2a6442d2f.tar.xz"
+JAXWS_TARBALL="c1bfc2395c57.tar.xz"
+JDK_TARBALL="cfc292a2c1c6.tar.xz"
+LANGTOOLS_TARBALL="4ef0ee927940.tar.xz"
+OPENJDK_TARBALL="ed5ee0ac7111.tar.xz"
+NASHORN_TARBALL="f2d9bca28d0e.tar.xz"
+HOTSPOT_TARBALL="00b7bbd261c9.tar.xz"
+SHENANDOAH_TARBALL="6ffe8637a506.tar.xz"
+AARCH32_TARBALL="b93c39bf2bcf.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -35,6 +36,7 @@ OPENJDK_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-openjdk-${OPENJDK_TARBALL}"
 NASHORN_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-nashorn-${NASHORN_TARBALL}"
 HOTSPOT_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-hotspot-${HOTSPOT_TARBALL}"
 SHENANDOAH_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-shenandoah-${SHENANDOAH_TARBALL}"
+AARCH32_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-aarch32-${AARCH32_TARBALL}"
 
 CACAO_GENTOO_TARBALL="icedtea-${CACAO_TARBALL}"
 JAMVM_GENTOO_TARBALL="icedtea-${JAMVM_TARBALL}"
@@ -56,17 +58,18 @@ SRC_URI="
 	${ICEDTEA_URL}/nashorn.tar.xz -> ${NASHORN_GENTOO_TARBALL}
 	${ICEDTEA_URL}/langtools.tar.xz -> ${LANGTOOLS_GENTOO_TARBALL}
 	shenandoah? ( ${ICEDTEA_URL}/shenandoah.tar.xz -> ${SHENANDOAH_GENTOO_TARBALL} )
+	arm? ( ${ICEDTEA_URL}/aarch32.tar.xz -> ${AARCH32_GENTOO_TARBALL} )
 	${DROP_URL}/cacao/${CACAO_TARBALL} -> ${CACAO_GENTOO_TARBALL}
 	${DROP_URL}/jamvm/${JAMVM_TARBALL} -> ${JAMVM_GENTOO_TARBALL}"
 
 LICENSE="Apache-1.1 Apache-2.0 GPL-1 GPL-2 GPL-2-with-linking-exception LGPL-2 MPL-1.0 MPL-1.1 public-domain W3C"
-KEYWORDS="~amd64 ~arm ~ppc64 ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
-IUSE="+alsa cacao +cups doc examples +gtk headless-awt infinality
+IUSE="+alsa cacao +cups doc examples +gtk headless-awt
 	jamvm +jbootstrap kerberos libressl nsplugin pax_kernel +pch
 	pulseaudio sctp selinux shenandoah smartcard +source +sunec test +webstart zero"
 
-REQUIRED_USE="gtk? ( !headless-awt )"
+REQUIRED_USE="gtk? ( !headless-awt ) pax_kernel? ( !pch )"
 
 # Ideally the following were optional at build time.
 ALSA_COMMON_DEP="
@@ -74,7 +77,7 @@ ALSA_COMMON_DEP="
 CUPS_COMMON_DEP="
 	>=net-print/cups-1.2.12"
 X_COMMON_DEP="
-	>=media-libs/giflib-4.1.6:=
+	>=media-libs/giflib-4.1.6:0=
 	>=media-libs/libpng-1.2:0=
 	>=x11-libs/libX11-1.1.3
 	>=x11-libs/libXext-1.1.1
@@ -93,11 +96,11 @@ X_DEPEND="
 
 # The Javascript requirement is obsolete; OpenJDK 8+ has Nashorn
 COMMON_DEP="
-	>=dev-libs/glib-2.26:2
-	media-libs/fontconfig
-	>=media-libs/freetype-2.5.3:2=[infinality?]
-	>=media-libs/lcms-2.5
-	>=sys-libs/zlib-1.2.3:=
+	>=dev-libs/glib-2.26:2=
+	media-libs/fontconfig:1.0=
+	>=media-libs/freetype-2.5.3:2=
+	>=media-libs/lcms-2.5:2=
+	>=sys-libs/zlib-1.2.3
 	virtual/jpeg:0=
 	kerberos? ( virtual/krb5 )
 	sctp? ( net-misc/lksctp-tools )
@@ -115,9 +118,9 @@ RDEPEND="${COMMON_DEP}
 	cups? ( ${CUPS_COMMON_DEP} )
 	gtk? (
 		>=dev-libs/atk-1.30.0
-		>=x11-libs/cairo-1.8.8:=
+		>=x11-libs/cairo-1.8.8
 		x11-libs/gdk-pixbuf:2
-		>=x11-libs/gtk+-2.8:2=
+		>=x11-libs/gtk+-2.8:2
 		>=x11-libs/pango-1.24.5
 	)
 	!headless-awt? ( ${X_COMMON_DEP} )
@@ -141,8 +144,8 @@ DEPEND="${COMMON_DEP} ${ALSA_COMMON_DEP} ${CUPS_COMMON_DEP} ${X_COMMON_DEP} ${X_
 	app-arch/zip
 	app-misc/ca-certificates
 	dev-lang/perl
-	!libressl? ( dev-libs/openssl )
-	libressl? ( dev-libs/libressl )
+	!libressl? ( dev-libs/openssl:0 )
+	libressl? ( dev-libs/libressl:0 )
 	sys-apps/attr
 	sys-apps/lsb-release
 	x11-libs/libXt
@@ -188,10 +191,10 @@ src_unpack() {
 	unpack ${SRC_PKG}
 }
 
-java_prepare() {
-	ln -s "${FILESDIR}/${P}-gnuconfig.patch" patches || die
-	ln -s "${FILESDIR}/${P}-hotspot.patch" patches || die
-	ln -s "${FILESDIR}/${P}-jdk.patch" patches || die
+src_configure() {
+	ln -s "${FILESDIR}/${PN}-3.2.0-gnuconfig.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.2.0-hotspot.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.4.0-jdk.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-gcc-triples.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-execinfo.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-fix-libjvm-load.patch" patches || die
@@ -202,22 +205,20 @@ java_prepare() {
 
 	# icedtea doesn't like some locales. #330433 #389717
 	export LANG="C" LC_ALL="C"
-}
-
-src_configure() {
-	local cacao_config config hotspot_port hs_config jamvm_config use_cacao use_jamvm use_zero zero_config
-	local vm=$(java-pkg_get-current-vm)
 
 	DISTRIBUTION_PATCHES=""
-	DISTRIBUTION_PATCHES+="patches/${P}-gnuconfig.patch "
-	DISTRIBUTION_PATCHES+="patches/${P}-hotspot.patch "
-	DISTRIBUTION_PATCHES+="patches/${P}-jdk.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.2.0-gnuconfig.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.2.0-hotspot.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-gcc-triples.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-execinfo.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-libjvm-load.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-noagent-musl.patch "
 
 	export DISTRIBUTION_PATCHES
+
+	local cacao_config config hotspot_port hs_config jamvm_config use_cacao use_jamvm use_zero zero_config
+	local vm=$(java-pkg_get-current-vm)
 
 	# gcj-jdk ensures ecj is present.
 	if use jbootstrap || has "${vm}" gcj-jdk; then
@@ -244,7 +245,7 @@ src_configure() {
 
 	# Are we on a architecture with a HotSpot port?
 	# In-tree JIT ports are available for amd64, arm, arm64, ppc64 (be&le), SPARC and x86.
-	if { use amd64 || use arm64 || use ppc64 || use sparc || use x86; }; then
+	if { use amd64 || use arm || use arm64 || use ppc64 || use sparc || use x86; }; then
 		hotspot_port="yes"
 	fi
 
@@ -255,14 +256,18 @@ src_configure() {
 	fi
 
 	if use shenandoah; then
-		if use amd64; then
+		if { use amd64 || use arm64; }; then
 			hs_config="--with-hotspot-build=shenandoah"
 			hs_config+=" --with-hotspot-src-zip="${DISTDIR}/${SHENANDOAH_GENTOO_TARBALL}""
 		else
-			eerror "Shenandoah can only be built on x86_64. Please re-build with USE="-shenandoah""
+			eerror "Shenandoah can only be built on arm64 and x86_64. Please re-build with USE="-shenandoah""
 		fi
 	else
-		hs_config="--with-hotspot-src-zip="${DISTDIR}/${HOTSPOT_GENTOO_TARBALL}""
+		if use arm ; then
+			hs_config="--with-hotspot-src-zip="${DISTDIR}/${AARCH32_GENTOO_TARBALL}""
+		else
+			hs_config="--with-hotspot-src-zip="${DISTDIR}/${HOTSPOT_GENTOO_TARBALL}""
+		fi
 	fi
 
 	# Turn on JamVM if needed (non-HS archs) or requested
@@ -324,11 +329,11 @@ src_configure() {
 		--disable-downloading --disable-Werror --disable-tests \
 		--enable-system-lcms --enable-system-jpeg \
 		--enable-system-zlib --disable-systemtap-tests \
+		--enable-improved-font-rendering \
 		$(use_enable headless-awt headless) \
 		$(use_enable !headless-awt system-gif) \
 		$(use_enable !headless-awt system-png) \
 		$(use_enable doc docs) \
-		$(use_enable infinality) \
 		$(use_enable kerberos system-kerberos) \
 		$(use_with pax_kernel pax "${EPREFIX}/usr/sbin/paxmark.sh") \
 		$(use_enable pch precompiled-headers) \
@@ -384,6 +389,20 @@ src_install() {
 	java-vm_sandbox-predict /proc/self/coredump_filter
 }
 
-pkg_preinst() { gnome2_icon_savelist; }
+pkg_preinst() {
+	# From 3.4.0 onwards, the arm directory is a symlink to the aarch32
+	# directory. We need to clear the old directory for a clean upgrade.
+	if use arm; then
+		local dir
+		for dir in "${EROOT}usr/$(get_libdir)/icedtea${SLOT}"/{lib,jre/lib}/arm; do
+			if [[ -d ${dir} && ! -L ${dir} ]]; then
+				rm -r "${dir}" || die
+			fi
+		done
+	fi
+
+	gnome2_icon_savelist
+}
+
 pkg_postinst() { gnome2_icon_cache_update; }
 pkg_postrm() { gnome2_icon_cache_update; }

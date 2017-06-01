@@ -47,7 +47,7 @@ index 58be690..49d3923 100644
 +#include <poll.h>
  #endif
  
- 
+ int NET_Timeout(int s, long timeout);
 diff --git openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c.orig openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c
 index 1788944..75d95a0 100644
 --- openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c.orig
