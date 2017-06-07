@@ -227,17 +227,15 @@ index 2b8ccd7..af30192 100644
  }  // namespace
  
 +#if defined(USE_DBUS)
- NetworkingPrivateLinux::NetworkingPrivateLinux(
-     std::unique_ptr<VerifyDelegate> verify_delegate)
-     : NetworkingPrivateDelegate(std::move(verify_delegate)),
-@@ -146,7 +154,14 @@ NetworkingPrivateLinux::NetworkingPrivateLinux(
+ NetworkingPrivateLinux::NetworkingPrivateLinux()
+     : dbus_thread_("Networking Private DBus"), network_manager_proxy_(NULL) {
+   base::Thread::Options thread_options(base::MessageLoop::Type::TYPE_IO, 0);
+@@ -146,7 +154,11 @@ NetworkingPrivateLinux::NetworkingPrivateLinux(
        FROM_HERE,
        base::Bind(&NetworkingPrivateLinux::Initialize, base::Unretained(this)));
  }
 +#else
-+NetworkingPrivateLinux::NetworkingPrivateLinux(
-+    std::unique_ptr<VerifyDelegate> verify_delegate)
-+    : NetworkingPrivateDelegate(std::move(verify_delegate)) {
++NetworkingPrivateLinux::NetworkingPrivateLinux() {
 +}
 +#endif
  

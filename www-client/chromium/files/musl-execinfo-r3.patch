@@ -69,8 +69,8 @@
  void StackTrace::OutputToStream(std::ostream* os) const {
    StreamBacktraceOutputHandler handler(os);
    ProcessBacktrace(trace_, count_, &handler);
---- chromium-54.0.2840.59/third_party/WebKit/Source/wtf/Assertions.cpp.orig	2016-05-08 08:02:03.230553120 +0200
-+++ chromium-54.0.2840.59/third_party/WebKit/Source/wtf/Assertions.cpp	2016-05-08 08:02:35.822504255 +0200
+--- chromium-54.0.2840.59/third_party/WebKit/Source/platform/wtf/Assertions.cpp.orig	2016-05-08 08:02:03.230553120 +0200
++++ chromium-54.0.2840.59/third_party/WebKit/Source/platform/wtf/Assertions.cpp	2016-05-08 08:02:35.822504255 +0200
 @@ -60,7 +60,7 @@
  #include <windows.h>
  #endif
@@ -109,3 +109,25 @@
    void* trace[100];
    int size = backtrace(trace, sizeof(trace) / sizeof(*trace));
    char** symbols = backtrace_symbols(trace, size);
+diff --git chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+index 154fefe..9f04b23 100644
+--- chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h.orig
++++ chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+@@ -14,7 +14,7 @@
+ #define ENABLE_CRASH_OVERRIDES 1
+ 
+ /* Define to 1 if you have the `backtrace' function. */
+-#define HAVE_BACKTRACE 1
++/* #undef HAVE_BACKTRACE */
+ 
+ /* Define to 1 if you have the <CrashReporterClient.h> header file. */
+ /* #undef HAVE_CRASHREPORTERCLIENT_H */
+@@ -55,7 +55,7 @@
+ #define HAVE_ERRNO_H 1
+ 
+ /* Define to 1 if you have the <execinfo.h> header file. */
+-#define HAVE_EXECINFO_H 1
++/* #undef HAVE_EXECINFO_H */
+ 
+ /* Define to 1 if you have the <fcntl.h> header file. */
+ #define HAVE_FCNTL_H 1
