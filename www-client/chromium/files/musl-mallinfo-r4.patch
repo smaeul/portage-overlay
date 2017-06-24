@@ -41,6 +41,7 @@
 +  size_t malloc_usage = 0;
  #endif
    memory_metrics->malloc_mb = malloc_usage / 1024 / 1024;
+ 
 --- chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h.orig
 +++ chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
 @@ -130,7 +130,7 @@

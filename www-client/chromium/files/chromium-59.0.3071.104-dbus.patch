@@ -230,7 +230,7 @@ index 2b8ccd7..af30192 100644
  NetworkingPrivateLinux::NetworkingPrivateLinux()
      : dbus_thread_("Networking Private DBus"), network_manager_proxy_(NULL) {
    base::Thread::Options thread_options(base::MessageLoop::Type::TYPE_IO, 0);
-@@ -146,7 +154,11 @@ NetworkingPrivateLinux::NetworkingPrivateLinux(
+@@ -146,7 +154,12 @@ NetworkingPrivateLinux::NetworkingPrivateLinux(
        FROM_HERE,
        base::Bind(&NetworkingPrivateLinux::Initialize, base::Unretained(this)));
  }
@@ -243,7 +243,7 @@ index 2b8ccd7..af30192 100644
  NetworkingPrivateLinux::~NetworkingPrivateLinux() {
    dbus_thread_.Stop();
  }
-@@ -186,6 +201,7 @@ bool NetworkingPrivateLinux::CheckNetworkManagerSupported(
+@@ -186,6 +199,7 @@ bool NetworkingPrivateLinux::CheckNetworkManagerSupported(
  
    return true;
  }
@@ -251,7 +251,7 @@ index 2b8ccd7..af30192 100644
  
  void NetworkingPrivateLinux::GetProperties(
      const std::string& guid,
-@@ -205,6 +221,7 @@ void NetworkingPrivateLinux::GetState(
+@@ -205,6 +219,7 @@ void NetworkingPrivateLinux::GetState(
      const std::string& guid,
      const DictionaryCallback& success_callback,
      const FailureCallback& failure_callback) {
@@ -259,7 +259,7 @@ index 2b8ccd7..af30192 100644
    if (!CheckNetworkManagerSupported(failure_callback))
      return;
  
-@@ -221,8 +238,12 @@ void NetworkingPrivateLinux::GetState(
+@@ -221,8 +236,12 @@ void NetworkingPrivateLinux::GetState(
        base::Bind(&GetCachedNetworkPropertiesCallback, base::Passed(&error),
                   base::Passed(&network_properties), success_callback,
                   failure_callback));
@@ -272,7 +272,7 @@ index 2b8ccd7..af30192 100644
  void NetworkingPrivateLinux::GetCachedNetworkProperties(
      const std::string& guid,
      base::DictionaryValue* properties,
-@@ -249,6 +270,7 @@ void NetworkingPrivateLinux::GetCachedNetworkProperties(
+@@ -249,6 +268,7 @@ void NetworkingPrivateLinux::GetCachedNetworkProperties(
    // Swap the new copy into the dictionary that is shared with the reply.
    properties->Swap(temp_properties.get());
  }
@@ -280,7 +280,7 @@ index 2b8ccd7..af30192 100644
  
  void NetworkingPrivateLinux::SetProperties(
      const std::string& guid,
-@@ -281,6 +303,7 @@ void NetworkingPrivateLinux::GetNetworks(
+@@ -281,6 +301,7 @@ void NetworkingPrivateLinux::GetNetworks(
      int limit,
      const NetworkListCallback& success_callback,
      const FailureCallback& failure_callback) {
@@ -288,7 +288,7 @@ index 2b8ccd7..af30192 100644
    if (!CheckNetworkManagerSupported(failure_callback)) {
      return;
    }
-@@ -306,8 +329,12 @@ void NetworkingPrivateLinux::GetNetworks(
+@@ -306,8 +327,12 @@ void NetworkingPrivateLinux::GetNetworks(
        base::Bind(&NetworkingPrivateLinux::OnAccessPointsFound,
                   base::Unretained(this), base::Passed(&network_map),
                   success_callback, failure_callback));
@@ -301,7 +301,7 @@ index 2b8ccd7..af30192 100644
  bool NetworkingPrivateLinux::GetNetworksForScanRequest() {
    if (!network_manager_proxy_) {
      return false;
-@@ -493,11 +520,13 @@ void NetworkingPrivateLinux::DisconnectFromNetwork(const std::string& guid,
+@@ -493,11 +518,13 @@ void NetworkingPrivateLinux::DisconnectFromNetwork(const std::string& guid,
      *error = "Failed to disconnect network";
    }
  }
@@ -315,7 +315,7 @@ index 2b8ccd7..af30192 100644
    if (!CheckNetworkManagerSupported(failure_callback))
      return;
  
-@@ -510,12 +539,16 @@ void NetworkingPrivateLinux::StartConnect(
+@@ -510,12 +537,16 @@ void NetworkingPrivateLinux::StartConnect(
                   base::Unretained(this), guid, base::Unretained(error.get())),
        base::Bind(&OnNetworkConnectOperationCompleted, base::Passed(&error),
                   success_callback, failure_callback));
@@ -332,7 +332,7 @@ index 2b8ccd7..af30192 100644
    if (!CheckNetworkManagerSupported(failure_callback))
      return;
  
-@@ -528,6 +561,9 @@ void NetworkingPrivateLinux::StartDisconnect(
+@@ -528,6 +559,9 @@ void NetworkingPrivateLinux::StartDisconnect(
                   base::Unretained(this), guid, base::Unretained(error.get())),
        base::Bind(&OnNetworkConnectOperationCompleted, base::Passed(&error),
                   success_callback, failure_callback));
@@ -342,7 +342,7 @@ index 2b8ccd7..af30192 100644
  }
  
  void NetworkingPrivateLinux::SetWifiTDLSEnabledState(
-@@ -598,19 +634,28 @@ bool NetworkingPrivateLinux::DisableNetworkType(const std::string& type) {
+@@ -598,19 +632,28 @@ bool NetworkingPrivateLinux::DisableNetworkType(const std::string& type) {
  }
  
  bool NetworkingPrivateLinux::RequestScan() {
@@ -371,7 +371,7 @@ index 2b8ccd7..af30192 100644
  void NetworkingPrivateLinux::OnAccessPointsFound(
      std::unique_ptr<NetworkMap> network_map,
      const NetworkListCallback& success_callback,
-@@ -1202,5 +1247,6 @@ void NetworkingPrivateLinux::OnNetworksChangedEventTask(
+@@ -1202,5 +1245,6 @@ void NetworkingPrivateLinux::OnNetworksChangedEventTask(
    DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
    OnNetworksChangedEventOnUIThread(*guid_list);
  }
