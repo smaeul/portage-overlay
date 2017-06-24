@@ -16,7 +16,7 @@ cmake-0.1.22
 crates-io-0.7.0
 crossbeam-0.2.10
 curl-0.4.6
-curl-sys-0.3.11
+curl-sys-0.3.10
 docopt-0.7.0
 dtoa-0.4.1
 env_logger-0.4.2
@@ -35,7 +35,7 @@ itoa-0.3.1
 kernel32-sys-0.2.2
 lazy_static-0.2.5
 libc-0.2.21
-libgit2-sys-0.6.8
+libgit2-sys-0.6.7
 libssh2-sys-0.2.5
 libz-sys-1.0.13
 log-0.3.7
@@ -54,7 +54,7 @@ num-rational-0.1.36
 num-traits-0.1.37
 num_cpus-1.3.0
 openssl-0.9.10
-openssl-probe-0.1.0
+openssl-probe-0.1.1
 openssl-sys-0.9.10
 pkg-config-0.3.9
 psapi-sys-0.1.0
@@ -77,7 +77,7 @@ shell-escape-0.1.3
 strsim-0.6.0
 syn-0.11.9
 synom-0.11.3
-tar-0.4.11
+tar-0.4.10
 tempdir-0.3.5
 term-0.4.5
 thread-id-2.0.0
@@ -85,7 +85,7 @@ thread-id-3.0.0
 thread_local-0.2.7
 thread_local-0.3.3
 time-0.1.36
-toml-0.3.1
+toml-0.3.2
 unicode-bidi-0.2.5
 unicode-normalization-0.1.4
 unicode-xid-0.0.4
@@ -99,15 +99,15 @@ winapi-0.2.8
 winapi-build-0.1.1
 ws2_32-sys-0.2.1
 "
-OPENSSL_VERSION="1.0.2k"
 
-inherit cargo bash-completion-r1 toolchain-funcs
+inherit cargo bash-completion-r1
+
+CTARGET=${CHOST/gentoo/unknown}
 
 DESCRIPTION="The Rust's package manager"
 HOMEPAGE="http://crates.io"
 SRC_URI="https://github.com/rust-lang/cargo/archive/${PV}.tar.gz -> ${P}.tar.gz
-	http://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-${CBUILD/gentoo/unknown}.tar.gz
-	libressl? ( https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz )
+	http://portage.smaeul.xyz/distfiles/cargo-${CARGO_SNAPSHOT_VERSION}-${CTARGET}.tar.gz
 	$(cargo_crate_uris ${CRATES})"
 
 RESTRICT="mirror"
@@ -119,6 +119,7 @@ IUSE="doc libressl"
 
 COMMON_DEPEND="sys-libs/zlib
 	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:0= )
 	net-libs/libssh2
 	net-libs/http-parser"
 RDEPEND="${COMMON_DEPEND}
@@ -132,16 +133,6 @@ DEPEND="${COMMON_DEPEND}
 	sys-apps/findutils
 	sys-apps/sed"
 
-src_prepare() {
-	default
-
-	find -name 'Makefile*' -exec sed -i "s/musl-gcc/$(tc-getCC)/g" {} +
-	if use libressl; then
-		mkdir -p target/openssl || die
-		ln -s "${DISTDIR}/openssl-${OPENSSL_VERSION}.tar.gz" target/openssl || die
-	fi
-}
-
 src_configure() {
 	# NOTE: 'disable-nightly' is used by crates (such as 'matches') to entirely
 	# skip their internal libraries that make use of unstable rustc features.
@@ -149,16 +140,16 @@ src_configure() {
 	# otherwise you could get compilation issues.
 	# see: github.com/gentoo/gentoo-rust/issues/13
 	local myeconfargs=(
-		--build=${CBUILD/gentoo/unknown}
-		--host=${CHOST/gentoo/unknown}
-		--target=${CHOST/gentoo/unknown}
-		--cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CBUILD/gentoo/unknown}/cargo/bin/cargo"
+		--prefix=/usr
+		--build=${CTARGET}
+		--host=${CTARGET}
+		--target=${CTARGET}
+		--cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CTARGET}/cargo/bin/cargo"
 		--enable-optimize
-#		--release-channel stable
+		--release-channel=stable
 		--disable-verify-install
 		--disable-debug
 		--disable-cross-tests
-		$(use_enable libressl build-openssl)
 	)
 	econf "${myeconfargs[@]}"
 }
@@ -173,7 +164,7 @@ src_compile() {
 }
 
 src_install() {
-	emake prepare-image-${CHOST/gentoo/unknown} IMGDIR_${CHOST/gentoo/unknown}="${ED}/usr"
+	emake prepare-image-${CTARGET} IMGDIR_${CTARGET}="${ED}/usr"
 
 	# Install HTML documentation
 	use doc && HTML_DOCS=("target/doc")
@@ -192,5 +183,5 @@ src_test() {
 	emake test \
 		CFG_ENABLE_OPTIMIZE=1 \
 		VERBOSE=1 \
-		CFG_LOCAL_CARGO="${WORKDIR}"/${P}/target/${CHOST/gentoo/unknown}/release/cargo
+		CFG_LOCAL_CARGO="${WORKDIR}"/${P}/target/${CTARGET}/release/cargo
 }
