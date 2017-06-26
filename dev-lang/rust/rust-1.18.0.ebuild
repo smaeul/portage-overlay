@@ -22,8 +22,9 @@ else
 	KEYWORDS="~amd64 ~x86"
 fi
 
-STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0-dev"
-RUST_STAGE0="rust-${STAGE0_VERSION}-${CBUILD/gentoo/unknown}"
+CTARGET=${CHOST/gentoo/unknown}
+STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0"
+RUST_STAGE0="rust-${STAGE0_VERSION}-${CTARGET}"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
@@ -47,7 +48,9 @@ DEPEND="${RDEPEND}
 	clang? ( sys-devel/clang )
 "
 
-PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425"
+PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
+	dev-util/cargo
+"
 
 PATCHES=(
 	${FILESDIR}/0001-Factor-out-helper-for-getting-C-runtime-linkage.patch
@@ -65,7 +68,7 @@ src_prepare() {
 
 	"${WORKDIR}/${RUST_STAGE0}/install.sh" \
 		--prefix="${WORKDIR}/stage0" \
-		--components=rust-std-${CBUILD/gentoo/unknown},rustc,cargo \
+		--components=rust-std-${CTARGET},rustc,cargo \
 		--disable-ldconfig \
 		|| die
 }
@@ -75,8 +78,8 @@ src_configure() {
 	export LLVM_LINK_SHARED=1
 
 	"${ECONF_SOURCE:-.}"/configure \
-		--build=${CBUILD/gentoo/unknown} \
-		--host=${CHOST/gentoo/unknown} \
+		--build=${CTARGET} \
+		--host=${CTARGET} \
 		--prefix="${EPREFIX}/usr" \
 		--libdir="${EPREFIX}/usr/$(get_libdir)/${P}" \
 		--mandir="${EPREFIX}/usr/share/${P}/man" \
