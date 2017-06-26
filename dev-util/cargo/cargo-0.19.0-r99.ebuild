@@ -3,7 +3,7 @@
 
 EAPI=6
 
-CARGO_SNAPSHOT_VERSION="0.19.0-dev"
+CARGO_SNAPSHOT_VERSION="0.19.0"
 CRATES="
 advapi32-sys-0.2.0
 aho-corasick-0.5.3
