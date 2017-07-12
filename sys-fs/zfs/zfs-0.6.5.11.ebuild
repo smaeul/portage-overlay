@@ -95,7 +95,6 @@ src_prepare() {
 	epatch "${FILESDIR}/0002-Include-sys-types.h-in-devid.h.patch"
 	epatch "${FILESDIR}/0003-Add-missing-fcntl.h-to-includes-in-mount_zfs.c.patch"
 	epatch "${FILESDIR}/0004-Ensure-correct-return-value-type.patch"
-	epatch "${FILESDIR}/0007-Remove-complicated-libspl-assert-wrappers.patch"
 	epatch "${FILESDIR}/zfs-0.6.5.8-_DATE_FMT.patch"
 	epatch "${FILESDIR}/zfs-0.6.5.8-headers.patch"
 	autotools-utils_src_prepare
