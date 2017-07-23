@@ -3,9 +3,10 @@
 
 EAPI=6
 
+LLVM_MAX_SLOT=4
 PYTHON_COMPAT=( python2_7 )
 
-inherit python-any-r1 versionator toolchain-funcs
+inherit python-any-r1 versionator toolchain-funcs llvm
 
 if [[ ${PV} = *beta* ]]; then
 	betaver=${PV//*beta}
@@ -23,7 +24,7 @@ else
 fi
 
 CTARGET=${CHOST/gentoo/unknown}
-STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0"
+STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).0"
 RUST_STAGE0="rust-${STAGE0_VERSION}-${CTARGET}"
 
 DESCRIPTION="Systems programming language from Mozilla"
@@ -35,21 +36,22 @@ SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.gz
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
 
-IUSE="clang debug doc libcxx +system-llvm"
-REQUIRED_USE="libcxx? ( clang )"
+IUSE="debug doc jemalloc system-llvm"
+REQUIRED_USE=""
 
-RDEPEND="libcxx? ( sys-libs/libcxx )
+RDEPEND="
 	system-llvm? ( sys-devel/llvm:= )
 "
-
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
-	>=dev-lang/perl-5.0
-	clang? ( sys-devel/clang )
+	>=sys-devel/gcc-4.7
+	!system-llvm? (
+		dev-util/cmake
+		dev-util/ninja
+	)
 "
-
 PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
-	dev-util/cargo
+	|| ( dev-util/cargo dev-util/cargo-bin )
 "
 
 PATCHES=(
@@ -63,6 +65,15 @@ PATCHES=(
 
 S="${WORKDIR}/${MY_P}-src"
 
+toml_usex() {
+	usex "$1" true false
+}
+
+pkg_setup() {
+	llvm_pkg_setup
+	python-any-r1_pkg_setup
+}
+
 src_prepare() {
 	default
 
@@ -74,48 +85,60 @@ src_prepare() {
 }
 
 src_configure() {
-	export CFG_DISABLE_LDCONFIG="notempty"
-	export LLVM_LINK_SHARED=1
+	cat <<- EOF > "${S}"/config.toml
+		[llvm]
+		ninja = true
+		[build]
+		build = "${CTARGET}"
+		host = ["${CTARGET}"]
+		target = ["${CTARGET}"]
+		cargo = "${WORKDIR}/stage0/bin/cargo"
+		rustc = "${WORKDIR}/stage0/bin/rustc"
+		docs = $(toml_usex doc)
+		compiler-docs = $(toml_usex doc)
+		submodules = false
+		python = "${EPYTHON}"
+		locked-deps = true
+		vendor = true
+		verbose = 2
+		[install]
+		prefix = "${EPREFIX}/usr"
+		docdir = "share/doc/${P}"
+		libdir = "$(get_libdir)"
+		mandir = "share/${P}/man"
+		[rust]
+		optimize = $(toml_usex !debug)
+		debug-assertions = $(toml_usex debug)
+		debuginfo = $(toml_usex debug)
+		debug-lines = $(toml_usex debug)
+		use-jemalloc = $(toml_usex jemalloc)
+		channel = "${SLOT%%/*}"
+		rpath = false
+		[target.${CTARGET}]
+		cc = "$(tc-getCC)"
+		cxx = "$(tc-getCXX)"
+	EOF
+	use system-llvm && cat <<- EOF >> "${S}"/config.toml
+		llvm-config = "$(get_llvm_prefix)/bin/llvm-config"
+	EOF
+}
 
-	"${ECONF_SOURCE:-.}"/configure \
-		--build=${CTARGET} \
-		--host=${CTARGET} \
-		--prefix="${EPREFIX}/usr" \
-		--libdir="${EPREFIX}/usr/$(get_libdir)/${P}" \
-		--mandir="${EPREFIX}/usr/share/${P}/man" \
-		--release-channel=${SLOT%%/*} \
-		--disable-manage-submodules \
-		--default-linker=$(tc-getBUILD_CC) \
-		--default-ar=$(tc-getBUILD_AR) \
-		--python=${EPYTHON} \
-		--disable-rpath \
-		--enable-local-rust \
-		--enable-vendor \
-		--local-rust-root="${WORKDIR}/stage0" \
-		$(use_enable clang) \
-		$(use_enable debug) \
-		$(use_enable debug llvm-assertions) \
-		$(use_enable !debug optimize) \
-		$(use_enable !debug optimize-cxx) \
-		$(use_enable !debug optimize-llvm) \
-		$(use_enable !debug optimize-tests) \
-		$(use_enable doc docs) \
-		$(use_enable libcxx libcpp) \
-		$(usex system-llvm "--llvm-root=${EPREFIX}$(llvm-config --prefix)" " ") \
-		|| die
+src_compile() {
+	export RUST_BACKTRACE=1
+	use system-llvm && export LLVM_LINK_SHARED=1
+
+	./x.py build || die
 }
 
 src_install() {
-	unset SUDO_USER
+	env DESTDIR="${D}" ./x.py install || die
 
-	default
-
-	rm "${D}/usr/lib/rust-${PV}/rustlib/components" || die
-	rm "${D}/usr/lib/rust-${PV}/rustlib/install.log" || die
-	rm "${D}/usr/lib/rust-${PV}/rustlib/manifest-rust-std-x86_64-unknown-linux-musl" || die
-	rm "${D}/usr/lib/rust-${PV}/rustlib/manifest-rustc" || die
-	rm "${D}/usr/lib/rust-${PV}/rustlib/rust-installer-version" || die
-	rm "${D}/usr/lib/rust-${PV}/rustlib/uninstall.sh" || die
+	rm "${D}/usr/lib/rustlib/components" || die
+	rm "${D}/usr/lib/rustlib/install.log" || die
+	rm "${D}/usr/lib/rustlib/manifest-rust-std-x86_64-unknown-linux-musl" || die
+	rm "${D}/usr/lib/rustlib/manifest-rustc" || die
+	rm "${D}/usr/lib/rustlib/rust-installer-version" || die
+	rm "${D}/usr/lib/rustlib/uninstall.sh" || die
 
 	mv "${D}/usr/bin/rustc" "${D}/usr/bin/rustc-${PV}" || die
 	mv "${D}/usr/bin/rustdoc" "${D}/usr/bin/rustdoc-${PV}" || die
@@ -124,20 +147,15 @@ src_install() {
 
 	dodoc COPYRIGHT
 
-	dodir "/usr/share/doc/rust-${PV}/"
-	mv "${D}/usr/share/doc/rust"/* "${D}/usr/share/doc/rust-${PV}/" || die
-	rmdir "${D}/usr/share/doc/rust/" || die
-
 	cat <<-EOF > "${T}"/50${P}
-	LDPATH="/usr/$(get_libdir)/${P}"
-	MANPATH="/usr/share/${P}/man"
+		MANPATH="/usr/share/${P}/man"
 	EOF
 	doenvd "${T}"/50${P}
 
 	cat <<-EOF > "${T}/provider-${P}"
-	/usr/bin/rustdoc
-	/usr/bin/rust-gdb
-	/usr/bin/rust-lldb
+		/usr/bin/rustdoc
+		/usr/bin/rust-gdb
+		/usr/bin/rust-lldb
 	EOF
 	dodir /etc/env.d/rust
 	insinto /etc/env.d/rust

@@ -1,21 +1,42 @@
-From c5df136c4f1abf1fea042f9ed3255453a4bbc776 Mon Sep 17 00:00:00 2001
+From 29276b826a85010ce3ad23dbdc1be778629b86bf Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Tue, 21 Mar 2017 22:36:27 -0500
-Subject: [PATCH 5/5] completely remove musl_root and its c library overriding
+Subject: [PATCH] completely remove musl_root and its c library overriding
 
 ---
- src/bootstrap/bin/rustc.rs                  | 10 --------
- src/bootstrap/cc.rs                         | 27 +++----------------
- src/bootstrap/compile.rs                    | 18 -------------
- src/bootstrap/config.rs                     | 40 -----------------------------
- src/bootstrap/config.toml.example           |  6 -----
- src/bootstrap/lib.rs                        |  8 ------
- src/bootstrap/sanity.rs                     | 21 ---------------
- src/librustc_back/target/linux_musl_base.rs | 15 -----------
- 8 files changed, 3 insertions(+), 142 deletions(-)
+ configure                                        |  6 ----
+ src/bootstrap/bin/rustc.rs                       | 10 ------
+ src/bootstrap/cc.rs                              | 27 ++--------------
+ src/bootstrap/compile.rs                         | 18 -----------
+ src/bootstrap/config.rs                          | 40 ------------------------
+ src/bootstrap/config.toml.example                |  6 ----
+ src/bootstrap/lib.rs                             |  8 -----
+ src/bootstrap/sanity.rs                          | 22 -------------
+ src/ci/docker/cross/Dockerfile                   |  5 +--
+ src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile |  1 -
+ src/ci/docker/dist-x86_64-musl/Dockerfile        |  1 -
+ src/librustc_back/target/linux_musl_base.rs      | 15 ---------
+ 12 files changed, 4 insertions(+), 155 deletions(-)
 
+diff --git a/configure b/configure
+index af59d5b0bb88..2e41cba61f29 100755
+--- a/configure
++++ b/configure
+@@ -481,12 +481,6 @@ valopt armv7-linux-androideabi-ndk "" "armv7-linux-androideabi NDK standalone pa
+ valopt aarch64-linux-android-ndk "" "aarch64-linux-android NDK standalone path"
+ valopt x86_64-linux-android-ndk "" "x86_64-linux-android NDK standalone path"
+ valopt nacl-cross-path  "" "NaCl SDK path (Pepper Canary is recommended). Must be absolute!"
+-valopt musl-root "/usr/local" "MUSL root installation directory (deprecated)"
+-valopt musl-root-x86_64 "" "x86_64-unknown-linux-musl install directory"
+-valopt musl-root-i686 "" "i686-unknown-linux-musl install directory"
+-valopt musl-root-arm "" "arm-unknown-linux-musleabi install directory"
+-valopt musl-root-armhf "" "arm-unknown-linux-musleabihf install directory"
+-valopt musl-root-armv7 "" "armv7-unknown-linux-musleabihf install directory"
+ valopt extra-filename "" "Additional data that is hashed and passed to the -C extra-filename flag"
+ valopt qemu-armhf-rootfs "" "rootfs in qemu testing, you probably don't want to use this"
+ 
 diff --git a/src/bootstrap/bin/rustc.rs b/src/bootstrap/bin/rustc.rs
-index a996240f61..747e47c180 100644
+index d048645d4d53..ee881649636f 100644
 --- a/src/bootstrap/bin/rustc.rs
 +++ b/src/bootstrap/bin/rustc.rs
 @@ -30,7 +30,6 @@
@@ -26,8 +47,8 @@ index a996240f61..747e47c180 100644
  use std::io;
  use std::io::prelude::*;
  use std::str::FromStr;
-@@ -94,15 +93,6 @@ fn main() {
-             cmd.arg("-Cprefer-dynamic");
+@@ -125,15 +124,6 @@ fn main() {
+             cmd.arg("--cfg").arg("rustbuild");
          }
  
 -        // Help the libc crate compile by assisting it in finding the MUSL
@@ -43,7 +64,7 @@ index a996240f61..747e47c180 100644
          // cross compiling.
          if let Ok(s) = env::var("RUSTC_FLAGS") {
 diff --git a/src/bootstrap/cc.rs b/src/bootstrap/cc.rs
-index 54c8194678..e2bde4a658 100644
+index 54c8194678e6..e2bde4a65861 100644
 --- a/src/bootstrap/cc.rs
 +++ b/src/bootstrap/cc.rs
 @@ -51,7 +51,7 @@ pub fn find(build: &mut Build) {
@@ -102,10 +123,10 @@ index 54c8194678..e2bde4a658 100644
      }
  }
 diff --git a/src/bootstrap/compile.rs b/src/bootstrap/compile.rs
-index 3459c1d2b8..cac69efaf9 100644
+index 9946c93913fe..c32fa7a1c763 100644
 --- a/src/bootstrap/compile.rs
 +++ b/src/bootstrap/compile.rs
-@@ -72,11 +72,6 @@ pub fn std(build: &Build, target: &str, compiler: &Compiler) {
+@@ -82,11 +82,6 @@ pub fn std(build: &Build, target: &str, compiler: &Compiler) {
              cargo.env("JEMALLOC_OVERRIDE", jemalloc);
          }
      }
@@ -115,18 +136,23 @@ index 3459c1d2b8..cac69efaf9 100644
 -        }
 -    }
  
-     build.run(&mut cargo);
-     update_mtime(build, &libstd_stamp(build, &compiler, target));
-@@ -105,19 +100,6 @@ pub fn std_link(build: &Build,
+     run_cargo(build,
+               &mut cargo,
+@@ -114,10 +109,6 @@ pub fn std_link(build: &Build,
+     let libdir = build.sysroot_libdir(target_compiler, target);
+     add_to_sysroot(&libdir, &libstd_stamp(build, compiler, target));
  
-     t!(fs::create_dir_all(&libdir));
-     add_to_sysroot(&out_dir, &libdir);
--
 -    if target.contains("musl") && !target.contains("mips") {
 -        copy_musl_third_party_objects(build, target, &libdir);
 -    }
--}
 -
+     if build.config.sanitizers && compiler.stage != 0 && target == "x86_64-apple-darwin" {
+         // The sanitizers are only built in stage1 or above, so the dylibs will
+         // be missing in stage0 and causes panic. See the `std()` function above
+@@ -126,15 +117,6 @@ pub fn std_link(build: &Build,
+     }
+ }
+ 
 -/// Copies the crt(1,i,n).o startup objects
 -///
 -/// Only required for musl targets that statically link to libc
@@ -134,23 +160,25 @@ index 3459c1d2b8..cac69efaf9 100644
 -    for &obj in &["crt1.o", "crti.o", "crtn.o"] {
 -        copy(&build.musl_root(target).unwrap().join("lib").join(obj), &into.join(obj));
 -    }
- }
- 
- /// Build and prepare startup objects like rsbegin.o and rsend.o
+-}
+-
+ fn copy_apple_sanitizer_dylibs(native_dir: &Path, platform: &str, into: &Path) {
+     for &sanitizer in &["asan", "tsan"] {
+         let filename = format!("libclang_rt.{}_{}_dynamic.dylib", sanitizer, platform);
 diff --git a/src/bootstrap/config.rs b/src/bootstrap/config.rs
-index dcd49c51e3..221ff0f009 100644
+index af10a5825805..4ad742c1afac 100644
 --- a/src/bootstrap/config.rs
 +++ b/src/bootstrap/config.rs
-@@ -96,8 +96,6 @@ pub struct Config {
-     // misc
+@@ -97,8 +97,6 @@ pub struct Config {
+     pub low_priority: bool,
      pub channel: String,
      pub quiet_tests: bool,
 -    // Fallback musl-root for all targets
 -    pub musl_root: Option<PathBuf>,
      pub prefix: Option<PathBuf>,
+     pub sysconfdir: Option<PathBuf>,
      pub docdir: Option<PathBuf>,
-     pub libdir: Option<PathBuf>,
-@@ -119,7 +117,6 @@ pub struct Target {
+@@ -122,7 +120,6 @@ pub struct Target {
      pub cc: Option<PathBuf>,
      pub cxx: Option<PathBuf>,
      pub ndk: Option<PathBuf>,
@@ -158,7 +186,7 @@ index dcd49c51e3..221ff0f009 100644
      pub qemu_rootfs: Option<PathBuf>,
  }
  
-@@ -220,7 +217,6 @@ struct Rust {
+@@ -226,7 +223,6 @@ struct Rust {
      default_linker: Option<String>,
      default_ar: Option<String>,
      channel: Option<String>,
@@ -166,7 +194,7 @@ index dcd49c51e3..221ff0f009 100644
      rpath: Option<bool>,
      optimize_tests: Option<bool>,
      debuginfo_tests: Option<bool>,
-@@ -235,7 +231,6 @@ struct TomlTarget {
+@@ -241,7 +237,6 @@ struct TomlTarget {
      cc: Option<String>,
      cxx: Option<String>,
      android_ndk: Option<String>,
@@ -174,7 +202,7 @@ index dcd49c51e3..221ff0f009 100644
      qemu_rootfs: Option<String>,
  }
  
-@@ -357,7 +352,6 @@ impl Config {
+@@ -366,7 +361,6 @@ impl Config {
              set(&mut config.channel, rust.channel.clone());
              config.rustc_default_linker = rust.default_linker.clone();
              config.rustc_default_ar = rust.default_ar.clone();
@@ -182,7 +210,7 @@ index dcd49c51e3..221ff0f009 100644
  
              match rust.codegen_units {
                  Some(0) => config.rust_codegen_units = num_cpus::get() as u32,
-@@ -381,7 +375,6 @@ impl Config {
+@@ -390,7 +384,6 @@ impl Config {
                  }
                  target.cxx = cfg.cxx.clone().map(PathBuf::from);
                  target.cc = cfg.cc.clone().map(PathBuf::from);
@@ -190,7 +218,7 @@ index dcd49c51e3..221ff0f009 100644
                  target.qemu_rootfs = cfg.qemu_rootfs.clone().map(PathBuf::from);
  
                  config.target_config.insert(triple.clone(), target);
-@@ -475,39 +468,6 @@ impl Config {
+@@ -490,39 +483,6 @@ impl Config {
                  "CFG_TARGET" if value.len() > 0 => {
                      self.target.extend(value.split(" ").map(|s| s.to_string()));
                  }
@@ -231,10 +259,10 @@ index dcd49c51e3..221ff0f009 100644
                      self.rustc_default_ar = Some(value.to_string());
                  }
 diff --git a/src/bootstrap/config.toml.example b/src/bootstrap/config.toml.example
-index 5a00e90f37..17b6809c6c 100644
+index 0eb6c4c82c4d..da1e96cc0425 100644
 --- a/src/bootstrap/config.toml.example
 +++ b/src/bootstrap/config.toml.example
-@@ -265,12 +265,6 @@
+@@ -279,12 +279,6 @@
  # build native code.
  #android-ndk = "/path/to/ndk"
  
@@ -248,10 +276,10 @@ index 5a00e90f37..17b6809c6c 100644
  # Distribution options
  #
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index 72aec15e53..6a9915e98c 100644
+index 00cbc589ae6a..52f368e45107 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -888,14 +888,6 @@ impl Build {
+@@ -880,14 +880,6 @@ impl Build {
          return base
      }
  
@@ -263,15 +291,23 @@ index 72aec15e53..6a9915e98c 100644
 -            .map(|p| &**p)
 -    }
 -
-     /// Returns the root of the "rootfs" image that this target will be using,
-     /// if one was configured.
-     ///
+     /// Returns whether the target will be tested using the `remote-test-client`
+     /// and `remote-test-server` binaries.
+     fn remote_tested(&self, target: &str) -> bool {
 diff --git a/src/bootstrap/sanity.rs b/src/bootstrap/sanity.rs
-index bc439d6f78..d315b44eb5 100644
+index df6378a970bd..a76731ecef9c 100644
 --- a/src/bootstrap/sanity.rs
 +++ b/src/bootstrap/sanity.rs
-@@ -157,27 +157,6 @@ pub fn check(build: &mut Build) {
-             panic!("the iOS target is only supported on OSX");
+@@ -21,7 +21,6 @@
+ use std::collections::HashSet;
+ use std::env;
+ use std::ffi::{OsStr, OsString};
+-use std::fs;
+ use std::process::Command;
+ 
+ use build_helper::output;
+@@ -156,27 +155,6 @@ pub fn check(build: &mut Build) {
+             panic!("the iOS target is only supported on macOS");
          }
  
 -        // Make sure musl-root is valid if specified
@@ -298,11 +334,51 @@ index bc439d6f78..d315b44eb5 100644
          if target.contains("msvc") {
              // There are three builds of cmake on windows: MSVC, MinGW, and
              // Cygwin. The Cygwin build does not have generators for Visual
+diff --git a/src/ci/docker/cross/Dockerfile b/src/ci/docker/cross/Dockerfile
+index b4399a8d53ff..bc632e850526 100644
+--- a/src/ci/docker/cross/Dockerfile
++++ b/src/ci/docker/cross/Dockerfile
+@@ -58,10 +58,7 @@ ENV STAGING_DIR=/tmp
+ 
+ ENV RUST_CONFIGURE_ARGS \
+       --enable-extended \
+-      --target=$TARGETS \
+-      --musl-root-arm=/usr/local/arm-linux-musleabi \
+-      --musl-root-armhf=/usr/local/arm-linux-musleabihf \
+-      --musl-root-armv7=/usr/local/armv7-linux-musleabihf
++      --target=$TARGETS
+ ENV SCRIPT python2.7 ../x.py dist --target $TARGETS
+ 
+ # sccache
+diff --git a/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile b/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile
+index 805d238de1f9..52fef4cc4409 100644
+--- a/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile
++++ b/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile
+@@ -31,7 +31,6 @@ RUN curl -o /usr/local/bin/sccache \
+ 
+ ENV RUST_CONFIGURE_ARGS \
+       --target=i686-unknown-linux-musl,i586-unknown-linux-gnu \
+-      --musl-root-i686=/musl-i686 \
+       --enable-extended
+ 
+ # Newer binutils broke things on some vms/distros (i.e., linking against
+diff --git a/src/ci/docker/dist-x86_64-musl/Dockerfile b/src/ci/docker/dist-x86_64-musl/Dockerfile
+index 2eea5ab14697..49d73cb64fe9 100644
+--- a/src/ci/docker/dist-x86_64-musl/Dockerfile
++++ b/src/ci/docker/dist-x86_64-musl/Dockerfile
+@@ -31,7 +31,6 @@ RUN curl -o /usr/local/bin/sccache \
+ 
+ ENV RUST_CONFIGURE_ARGS \
+       --target=x86_64-unknown-linux-musl \
+-      --musl-root-x86_64=/musl-x86_64 \
+       --enable-extended
+ 
+ # Newer binutils broke things on some vms/distros (i.e., linking against
 diff --git a/src/librustc_back/target/linux_musl_base.rs b/src/librustc_back/target/linux_musl_base.rs
-index 076bbe7193..0bfb6fc036 100644
+index 304d4bf257b4..6473c2609f9f 100644
 --- a/src/librustc_back/target/linux_musl_base.rs
 +++ b/src/librustc_back/target/linux_musl_base.rs
-@@ -13,10 +13,6 @@ use target::TargetOptions;
+@@ -14,10 +14,6 @@ use target::TargetOptions;
  pub fn opts() -> TargetOptions {
      let mut base = super::linux_base::opts();
  
@@ -313,9 +389,9 @@ index 076bbe7193..0bfb6fc036 100644
      // At least when this was tested, the linker would not add the
      // `GNU_EH_FRAME` program header to executables generated, which is required
      // when unwinding to locate the unwinding information. I'm not sure why this
-@@ -48,17 +44,6 @@ pub fn opts() -> TargetOptions {
-     base.pre_link_args.push("-Wl,-(".to_string());
-     base.post_link_args.push("-Wl,-)".to_string());
+@@ -49,17 +45,6 @@ pub fn opts() -> TargetOptions {
+     base.pre_link_args.get_mut(&LinkerFlavor::Gcc).unwrap().push("-Wl,-(".to_string());
+     base.post_link_args.insert(LinkerFlavor::Gcc, vec!["-Wl,-)".to_string()]);
  
 -    // When generating a statically linked executable there's generally some
 -    // small setup needed which is listed in these files. These are provided by
@@ -331,18 +407,3 @@ index 076bbe7193..0bfb6fc036 100644
      // Except for on MIPS, these targets statically link libc by default.
      base.crt_static_default = true;
  
--- 
-2.11.0
-
-diff --git rustc-beta-src/src/bootstrap/sanity.rs
-index 0c37158..3ae23d3 100644
---- rustc-beta-src/src/bootstrap/sanity.rs.orig
-+++ rustc-beta-src/src/bootstrap/sanity.rs
-@@ -21,7 +21,6 @@
- use std::collections::HashSet;
- use std::env;
- use std::ffi::{OsStr, OsString};
--use std::fs;
- use std::process::Command;
- 
- use build_helper::output;

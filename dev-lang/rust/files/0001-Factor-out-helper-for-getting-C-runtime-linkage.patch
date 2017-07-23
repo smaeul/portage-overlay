@@ -1,33 +1,23 @@
-From 2ddb887ab9e67050be5aad9ab48a4211b801ee33 Mon Sep 17 00:00:00 2001
+From f63ee0c22732599f2cac1b743794f6b609263da7 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 25 Feb 2017 22:33:07 -0600
-Subject: [PATCH 1/5] Factor out helper for getting C runtime linkage
+Subject: [PATCH] Factor out helper for getting C runtime linkage
 
 ---
- src/librustc/session/mod.rs            | 29 +++++++++++++++++++++++++++++
- src/librustc_driver/target_features.rs | 27 +--------------------------
- 2 files changed, 30 insertions(+), 26 deletions(-)
+ src/librustc/session/mod.rs            | 16 ++++++++++++++++
+ src/librustc_driver/target_features.rs | 16 +---------------
+ 2 files changed, 17 insertions(+), 15 deletions(-)
 
 diff --git a/src/librustc/session/mod.rs b/src/librustc/session/mod.rs
-index 3ba82f34c3..141d3a2aee 100644
+index 827fa72f0340..caeace8d4e9a 100644
 --- a/src/librustc/session/mod.rs
 +++ b/src/librustc/session/mod.rs
-@@ -34,6 +34,7 @@ use syntax::parse::ParseSess;
- use syntax::symbol::Symbol;
- use syntax::{ast, codemap};
- use syntax::feature_gate::AttributeType;
-+use syntax::feature_gate::UnstableFeatures;
- use syntax_pos::{Span, MultiSpan};
- 
- use rustc_back::PanicStrategy;
-@@ -378,6 +379,34 @@ impl Session {
+@@ -396,6 +396,22 @@ impl Session {
              .unwrap_or(self.opts.debug_assertions)
      }
  
 +    pub fn crt_static(&self) -> bool {
 +        let requested_features = self.opts.cg.target_feature.split(',');
-+        let unstable_options = self.opts.debugging_opts.unstable_options;
-+        let is_nightly = UnstableFeatures::from_environment().is_nightly_build();
 +        let found_negative = requested_features.clone().any(|r| r == "-crt-static");
 +        let found_positive = requested_features.clone().any(|r| r == "+crt-static");
 +
@@ -35,45 +25,25 @@ index 3ba82f34c3..141d3a2aee 100644
 +        // then see if the `-crt-static` feature was passed to disable that.
 +        // Otherwise if we don't have a static crt by default then see if the
 +        // `+crt-static` feature was passed.
-+        let crt_static = if self.target.target.options.crt_static_default {
++        if self.target.target.options.crt_static_default {
 +            !found_negative
 +        } else {
 +            found_positive
-+        };
-+
-+        // If we switched from the default then that's only allowed on nightly, so
-+        // gate that here.
-+        if (found_positive || found_negative) && (!is_nightly || !unstable_options) {
-+            self.fatal("specifying the `crt-static` target feature is only allowed \
-+                on the nightly channel with `-Z unstable-options` passed \
-+                as well");
 +        }
-+
-+        return crt_static;
 +    }
 +
      pub fn must_not_eliminate_frame_pointers(&self) -> bool {
          self.opts.debuginfo != DebugInfoLevel::NoDebugInfo ||
          !self.target.target.options.eliminate_frame_pointer
 diff --git a/src/librustc_driver/target_features.rs b/src/librustc_driver/target_features.rs
-index 4f3abbb362..a064bf5436 100644
+index bee61bb39802..4616db3ae874 100644
 --- a/src/librustc_driver/target_features.rs
 +++ b/src/librustc_driver/target_features.rs
-@@ -12,7 +12,6 @@ use syntax::ast;
- use llvm::LLVMRustHasFeature;
- use rustc::session::Session;
- use rustc_trans::back::write::create_target_machine;
--use syntax::feature_gate::UnstableFeatures;
- use syntax::symbol::Symbol;
- use libc::c_char;
- 
-@@ -49,31 +48,7 @@ pub fn add_configuration(cfg: &mut ast::CrateConfig, sess: &Session) {
-         }
+@@ -25,21 +25,7 @@ pub fn add_configuration(cfg: &mut ast::CrateConfig, sess: &Session) {
+         cfg.insert((tf, Some(feat)));
      }
  
 -    let requested_features = sess.opts.cg.target_feature.split(',');
--    let unstable_options = sess.opts.debugging_opts.unstable_options;
--    let is_nightly = UnstableFeatures::from_environment().is_nightly_build();
 -    let found_negative = requested_features.clone().any(|r| r == "-crt-static");
 -    let found_positive = requested_features.clone().any(|r| r == "+crt-static");
 -
@@ -87,19 +57,8 @@ index 4f3abbb362..a064bf5436 100644
 -        found_positive
 -    };
 -
--    // If we switched from the default then that's only allowed on nightly, so
--    // gate that here.
--    if (found_positive || found_negative) && (!is_nightly || !unstable_options) {
--        sess.fatal("specifying the `crt-static` target feature is only allowed \
--                    on the nightly channel with `-Z unstable-options` passed \
--                    as well");
--    }
--
 -    if crt_static {
 +    if sess.crt_static() {
          cfg.insert((tf, Some(Symbol::intern("crt-static"))));
      }
  }
--- 
-2.11.0
-
