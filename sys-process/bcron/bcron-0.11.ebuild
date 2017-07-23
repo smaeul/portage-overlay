@@ -20,7 +20,6 @@ RDEPEND="
 	>=sys-process/cronbase-0.3.2
 	virtual/mta
 	sys-apps/ucspi-unix
-	virtual/daemontools
 "
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
