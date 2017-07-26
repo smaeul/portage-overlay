@@ -3,7 +3,6 @@
 
 EAPI=6
 
-CARGO_SNAPSHOT_VERSION="0.19.0"
 CRATES="
 advapi32-sys-0.2.0
 aho-corasick-0.5.3
@@ -58,6 +57,7 @@ num-traits-0.1.37
 num_cpus-1.5.0
 openssl-0.9.13
 openssl-probe-0.1.1
+openssl-sys-0.9.13
 openssl-sys-0.9.15
 pkg-config-0.3.9
 psapi-sys-0.1.0
@@ -104,8 +104,9 @@ winapi-build-0.1.1
 ws2_32-sys-0.2.1
 "
 
-inherit bash-completion-r1 cargo
+inherit bash-completion-r1 cargo versionator
 
+CARGO_SNAPSHOT_VERSION="0.$(($(get_version_component_range 2) - 1)).0"
 CTARGET=${CHOST/gentoo/unknown}
 
 DESCRIPTION="The Rust's package manager"
@@ -131,7 +132,6 @@ RDEPEND="${COMMON_DEPEND}
 	net-misc/curl[ssl]"
 DEPEND="${COMMON_DEPEND}
 	>=virtual/rust-1.9.0
-	|| ( dev-util/cargo dev-util/cargo-bin )
 	dev-util/cmake
 	sys-apps/coreutils
 	sys-apps/diffutils
@@ -141,23 +141,28 @@ DEPEND="${COMMON_DEPEND}
 src_prepare() {
 	default
 
-	rm Cargo.lock
+	# libressl needs a newer version of openssl-sys
+	use libressl && rm Cargo.lock
 }
 
 src_compile() {
-	cargo_src_compile
+	export CARGO_HOME="${ECARGO_HOME}"
+	local cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CTARGET}/cargo/bin/cargo"
+	${cargo} build --release
 
-	use doc && cargo doc
+	# Build HTML documentation
+	use doc && ${cargo} doc
 }
 
 src_install() {
-	cargo_src_install
-
-	doman src/etc/man/*
-
-	use bash-completion && newbashcomp src/etc/cargo.bashcomp.sh
+	dobin target/release/cargo
 
 	# Install HTML documentation
 	use doc && HTML_DOCS=("target/doc")
 	einstalldocs
+
+	use bash-completion && newbashcomp src/etc/cargo.bashcomp.sh cargo
+	insinto /usr/share/zsh/site-functions
+	doins src/etc/_cargo
+	doman src/etc/man/*
 }
