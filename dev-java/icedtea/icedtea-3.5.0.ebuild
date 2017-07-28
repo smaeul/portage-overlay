@@ -13,15 +13,15 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="22ed32f45405.tar.xz"
-JAXP_TARBALL="fdc2a6442d2f.tar.xz"
-JAXWS_TARBALL="c1bfc2395c57.tar.xz"
-JDK_TARBALL="cfc292a2c1c6.tar.xz"
-LANGTOOLS_TARBALL="4ef0ee927940.tar.xz"
-OPENJDK_TARBALL="ed5ee0ac7111.tar.xz"
-NASHORN_TARBALL="f2d9bca28d0e.tar.xz"
-HOTSPOT_TARBALL="00b7bbd261c9.tar.xz"
-SHENANDOAH_TARBALL="6ffe8637a506.tar.xz"
+CORBA_TARBALL="e53fedec27e8.tar.xz"
+JAXP_TARBALL="a7fb5fa68e85.tar.xz"
+JAXWS_TARBALL="8c2ac8bef689.tar.xz"
+JDK_TARBALL="bdf93656feba.tar.xz"
+LANGTOOLS_TARBALL="0456f88e5c29.tar.xz"
+OPENJDK_TARBALL="ee1282876d8a.tar.xz"
+NASHORN_TARBALL="6743b468dda3.tar.xz"
+HOTSPOT_TARBALL="24ab92601b89.tar.xz"
+SHENANDOAH_TARBALL="098a7fa49b3b.tar.xz"
 AARCH32_TARBALL="b93c39bf2bcf.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
@@ -69,7 +69,7 @@ IUSE="+alsa cacao +cups doc examples +gtk headless-awt
 	jamvm +jbootstrap kerberos libressl nsplugin pax_kernel +pch
 	pulseaudio sctp selinux shenandoah smartcard +source +sunec test +webstart zero"
 
-REQUIRED_USE="gtk? ( !headless-awt ) pax_kernel? ( !pch )"
+REQUIRED_USE="gtk? ( !headless-awt )"
 
 # Ideally the following were optional at build time.
 ALSA_COMMON_DEP="
@@ -193,7 +193,7 @@ src_unpack() {
 
 src_configure() {
 	ln -s "${FILESDIR}/${PN}-3.2.0-gnuconfig.patch" patches || die
-	ln -s "${FILESDIR}/${PN}-3.2.0-hotspot.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.5.0-hotspot.patch" patches || die
 	ln -s "${FILESDIR}/${PN}-3.4.0-jdk.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-gcc-triples.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-execinfo.patch" patches || die
@@ -208,7 +208,7 @@ src_configure() {
 
 	DISTRIBUTION_PATCHES=""
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.2.0-gnuconfig.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}-3.2.0-hotspot.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.5.0-hotspot.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-gcc-triples.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-execinfo.patch "
@@ -306,6 +306,13 @@ src_configure() {
 		config+=" --disable-ccache"
 	fi
 
+	# PaX breaks pch, bug #601016
+	if use pch && ! host-is-pax; then
+		config+=" --enable-precompiled-headers"
+	else
+		config+=" --disable-precompiled-headers"
+	fi
+
 	config+=" --with-parallel-jobs=$(makeopts_jobs)"
 
 	unset JAVA_HOME JDK_HOME CLASSPATH JAVAC JAVACFLAGS
@@ -336,7 +343,6 @@ src_configure() {
 		$(use_enable doc docs) \
 		$(use_enable kerberos system-kerberos) \
 		$(use_with pax_kernel pax "${EPREFIX}/usr/sbin/paxmark.sh") \
-		$(use_enable pch precompiled-headers) \
 		$(use_enable sctp system-sctp) \
 		$(use_enable smartcard system-pcsc) \
 		$(use_enable sunec) \

@@ -29,7 +29,7 @@ index ba84788..c22281f 100644
    "CONT",       SIGCONT,        /* Continue (POSIX).  */
    "STOP",       SIGSTOP,        /* Stop, unblockable (POSIX).  */
 diff --git openjdk/hotspot/src/os/linux/vm/os_linux.cpp.orig openjdk/hotspot/src/os/linux/vm/os_linux.cpp
-index 3d64fc4..c72eb32 100644
+index 89ba0ff..d2e4f28 100644
 --- openjdk/hotspot/src/os/linux/vm/os_linux.cpp.orig
 +++ openjdk/hotspot/src/os/linux/vm/os_linux.cpp
 @@ -94,7 +94,9 @@
@@ -42,7 +42,7 @@ index 3d64fc4..c72eb32 100644
  # include <sys/ipc.h>
  # include <sys/shm.h>
  # include <link.h>
-@@ -522,6 +524,7 @@ void os::Linux::hotspot_sigmask(Thread* thread) {
+@@ -530,6 +532,7 @@ void os::Linux::hotspot_sigmask(Thread* thread) {
  // detecting pthread library
  
  void os::Linux::libpthread_init() {
@@ -50,7 +50,7 @@ index 3d64fc4..c72eb32 100644
    // Save glibc and pthread version strings. Note that _CS_GNU_LIBC_VERSION
    // and _CS_GNU_LIBPTHREAD_VERSION are supported in glibc >= 2.3.2. Use a
    // generic name for earlier versions.
-@@ -580,6 +583,12 @@ void os::Linux::libpthread_init() {
+@@ -588,6 +591,12 @@ void os::Linux::libpthread_init() {
    if (os::Linux::is_NPTL() || os::Linux::supports_variable_stack_size()) {
       os::Linux::set_is_floating_stack();
    }
@@ -63,9 +63,9 @@ index 3d64fc4..c72eb32 100644
  }
  
  /////////////////////////////////////////////////////////////////////////////
-@@ -2800,11 +2809,7 @@ extern "C" JNIEXPORT int fork1() { return fork(); }
- // If we are running with earlier version, which did not have symbol versions,
- // we should use the base version.
+@@ -2833,17 +2842,13 @@ extern "C" JNIEXPORT int fork1() { return fork(); }
+ // Handle request to load libnuma symbol version 1.1 (API v1). If it fails
+ // load symbol from base version instead.
  void* os::Linux::libnuma_dlsym(void* handle, const char *name) {
 -  void *f = dlvsym(handle, name, "libnuma_1.1");
 -  if (f == NULL) {
@@ -73,6 +73,13 @@ index 3d64fc4..c72eb32 100644
 -  }
 -  return f;
 +  return dlsym(handle, name);
+ }
+ 
+ // Handle request to load libnuma symbol version 1.2 (API v2) only.
+ // Return NULL if the symbol is not defined in this particular version.
+ void* os::Linux::libnuma_v2_dlsym(void* handle, const char* name) {
+-  return dlvsym(handle, name, "libnuma_1.2");
++  return NULL;
  }
  
  bool os::Linux::libnuma_init() {
