@@ -1,0 +1,71 @@
+diff --git chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc
+index 14ba0a2..2cedb37 100644
+--- chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc
++++ chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc
+@@ -243,7 +243,7 @@ bool MallocDumpProvider::OnMemoryDump(const MemoryDumpArgs& args,
+   allocated_objects_count = main_heap_info.block_count;
+ #elif defined(OS_FUCHSIA)
+ // TODO(fuchsia): Port, see https://crbug.com/706592.
+-#else
++#elif defined(OS_LINUX) && defined(__GLIBC__)
+   struct mallinfo info = mallinfo();
+   DCHECK_GE(info.arena + info.hblkhd, info.uordblks);
+ 
+diff --git chromium-60.0.3112.78/content/child/content_child_helpers.cc chromium-60.0.3112.78/content/child/content_child_helpers.cc
+index 7ddeb4d..6f7253d 100644
+--- chromium-60.0.3112.78/content/child/content_child_helpers.cc
++++ chromium-60.0.3112.78/content/child/content_child_helpers.cc
+@@ -25,7 +25,7 @@ namespace content {
+ // though, this provides only a partial and misleading value.
+ // Unfortunately some telemetry benchmark rely on it and these need to
+ // be refactored before getting rid of this. See crbug.com/581365 .
+-#if defined(OS_LINUX) || defined(OS_ANDROID)
++#if (defined(OS_LINUX) && defined(__GLIBC__)) || defined(OS_ANDROID)
+ size_t GetMemoryUsageKB() {
+   struct mallinfo minfo = mallinfo();
+   uint64_t mem_usage =
+@@ -44,6 +44,10 @@ size_t GetMemoryUsageKB() {
+     isolate->GetHeapStatistics(&stat);
+   return mem_usage + (static_cast<uint64_t>(stat.total_heap_size()) >> 10);
+ }
++#elif defined(OS_LINUX)
++size_t GetMemoryUsageKB() {
++  return 0;
++}
+ #elif defined(OS_MACOSX)
+ size_t GetMemoryUsageKB() {
+   std::unique_ptr<base::ProcessMetrics> process_metrics(
+diff --git chromium-60.0.3112.78/content/renderer/render_thread_impl.cc chromium-60.0.3112.78/content/renderer/render_thread_impl.cc
+index 574acb3..a8bf346 100644
+--- chromium-60.0.3112.78/content/renderer/render_thread_impl.cc
++++ chromium-60.0.3112.78/content/renderer/render_thread_impl.cc
+@@ -1764,13 +1764,15 @@ bool RenderThreadImpl::GetRendererMemoryMetrics(
+       blink_stats.partition_alloc_total_allocated_bytes / 1024;
+   memory_metrics->blink_gc_kb =
+       blink_stats.blink_gc_total_allocated_bytes / 1024;
+-#if defined(OS_LINUX) || defined(OS_ANDROID)
++#if (defined(OS_LINUX) && defined(__GLIBC__)) || defined(OS_ANDROID)
+   struct mallinfo minfo = mallinfo();
+ #if defined(USE_TCMALLOC)
+   size_t malloc_usage = minfo.uordblks;
+ #else
+   size_t malloc_usage = minfo.hblkhd + minfo.arena;
+ #endif
++#elif defined(OS_LINUX)
++  size_t malloc_usage = 0;
+ #else
+   size_t malloc_usage = GetMallocUsage();
+ #endif
+diff --git chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+index dfeca51..e188d33 100644
+--- chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+@@ -130,7 +130,7 @@
+ /* #undef HAVE_MALLCTL */
+ 
+ /* Define to 1 if you have the `mallinfo' function. */
+-#define HAVE_MALLINFO 1
++/* #undef HAVE_MALLINFO */
+ 
+ /* Define to 1 if you have the <malloc.h> header file. */
+ #define HAVE_MALLOC_H 1

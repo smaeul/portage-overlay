@@ -5,12 +5,14 @@ warnings about the macro being redefined.
 
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -1069,19 +1069,6 @@ config("chromium_code") {
+@@ -1161,21 +1161,6 @@
        "__STDC_FORMAT_MACROS",
      ]
  
 -    if (!is_debug && !using_sanitizer &&
--        (!is_linux || !is_clang || is_official_build)) {
+-        (!is_linux || !is_clang || is_official_build) &&
+-        current_cpu != "s390x" && current_cpu != "s390" &&
+-        current_cpu != "ppc64" && current_cpu != "ppc64") {
 -      # _FORTIFY_SOURCE isn't really supported by Clang now, see
 -      # http://llvm.org/bugs/show_bug.cgi?id=16821.
 -      # It seems to work fine with Ubuntu 12 headers though, so use it in
