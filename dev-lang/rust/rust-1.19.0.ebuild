@@ -61,6 +61,8 @@ PATCHES=(
 	${FILESDIR}/0004-Presence-of-libraries-does-not-depend-on-architectur.patch
 	${FILESDIR}/0005-completely-remove-musl_root-and-its-c-library-overri.patch
 	${FILESDIR}/0006-liblibc.patch
+	${FILESDIR}/llvm-musl-fixes.patch
+	${FILESDIR}/llvm-nostatic.patch
 )
 
 S="${WORKDIR}/${MY_P}-src"
