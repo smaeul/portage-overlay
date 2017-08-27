@@ -1,3 +1,15 @@
+--- chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
++++ chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+@@ -202,6 +202,9 @@ ResultExpr EvaluateSyscallImpl(int fs_denied_errno,
+   if (sysno == __NR_prctl)
+     return RestrictPrctl();
+ 
++  if (sysno == __NR_set_tid_address)
++    return RestrictSetTIDAddress();
++
+ #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
+     defined(__aarch64__)
+   if (sysno == __NR_socketpair) {
 --- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
 +++ chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
 @@ -114,23 +114,13 @@
@@ -30,7 +42,30 @@
        .ElseIf((flags & (CLONE_VM | CLONE_THREAD)) == 0, Error(EPERM))
        .Else(CrashSIGSYSClone());
  }
---- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc.orig
+@@ -369,4 +369,10 @@ ResultExpr RestrictPrlimitToGetrlimit(pid_t target_pid) {
+       .Else(Error(EPERM));
+ }
+ 
++ResultExpr RestrictSetTIDAddress() {
++  const Arg<uintptr_t> address(0);
++  // Only allow clearing the TID address.
++  return If(address == 0, Allow()).Else(CrashSIGSYS());
++}
++
+ }  // namespace sandbox.
+--- chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
++++ chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+@@ -103,6 +103,9 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictGetRandom();
+ // Otherwise, fail gracefully; see crbug.com/160157.
+ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictPrlimitToGetrlimit(pid_t target_pid);
+ 
++// Restrict the address to NULL.
++SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictSetTIDAddress();
++
+ }  // namespace sandbox.
+ 
+ #endif  // SANDBOX_LINUX_SECCOMP_BPF_HELPERS_SYSCALL_PARAMETERS_RESTRICTIONS_H_
+--- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
 +++ chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
 @@ -494,6 +494,7 @@
      case __NR_mlock:

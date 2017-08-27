@@ -199,7 +199,7 @@ src_prepare() {
 		"${FILESDIR}/musl-headers.patch"
 		"${FILESDIR}/musl-mallinfo-r5.patch"
 		"${FILESDIR}/musl-pthread-r3.patch"
-		"${FILESDIR}/musl-sandbox-r2.patch"
+		"${FILESDIR}/musl-sandbox-r3.patch"
 		"${FILESDIR}/musl-secure_getenv.patch"
 		"${FILESDIR}/musl-siginfo.patch"
 		"${FILESDIR}/musl-socket.patch"
