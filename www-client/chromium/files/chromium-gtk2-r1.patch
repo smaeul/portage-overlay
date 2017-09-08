@@ -1,0 +1,28 @@
+diff --git chromium-61.0.3163.79/chrome/browser/ui/libgtkui/gtk_ui.cc
+index a38c6b8..d578b8a 100644
+--- chromium-61.0.3163.79/chrome/browser/ui/libgtkui/gtk_ui.cc.orig
++++ chromium-61.0.3163.79/chrome/browser/ui/libgtkui/gtk_ui.cc
+@@ -1048,6 +1048,7 @@ void GtkUi::ResetStyle() {
+   native_theme_->NotifyObservers();
+ }
+ 
++#if GTK_MAJOR_VERSION > 2
+ float GtkUi::GetRawDeviceScaleFactor() {
+   if (display::Display::HasForceDeviceScaleFactor())
+     return display::Display::GetForcedDeviceScaleFactor();
+@@ -1061,10 +1062,15 @@ float GtkUi::GetRawDeviceScaleFactor() {
+   // to 1 decimal to prevent rendering problems (crbug.com/485183).
+   return scale_factor < 1.2f ? 1.0f : roundf(scale_factor * 10) / 10;
+ }
++#endif
+ 
+ void GtkUi::UpdateDeviceScaleFactor() {
+   float old_device_scale_factor = device_scale_factor_;
++#if GTK_MAJOR_VERSION == 2
++  device_scale_factor_ = 1.0f;
++#else
+   device_scale_factor_ = GetRawDeviceScaleFactor();
++#endif
+   if (device_scale_factor_ != old_device_scale_factor) {
+     for (views::DeviceScaleFactorObserver& observer :
+          device_scale_factor_observer_list_) {

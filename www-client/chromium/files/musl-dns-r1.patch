@@ -1,22 +1,22 @@
-diff --git chromium-54.0.2840.59/net/dns/dns_config_service_posix.cc.orig chromium-54.0.2840.59/net/dns/dns_config_service_posix.cc
-index ba8a369..9eb8c07 100644
---- chromium-54.0.2840.59/net/dns/dns_config_service_posix.cc.orig
-+++ chromium-54.0.2840.59/net/dns/dns_config_service_posix.cc
-@@ -118,7 +118,7 @@ class DnsConfigWatcher {
- ConfigParsePosixResult ReadDnsConfig(DnsConfig* config) {
+diff --git chromium-61.0.3163.79/net/dns/dns_config_service_posix.cc
+index 03d0255..2cb06d7 100644
+--- chromium-61.0.3163.79/net/dns/dns_config_service_posix.cc.orig
++++ chromium-61.0.3163.79/net/dns/dns_config_service_posix.cc
+@@ -122,7 +122,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* config) {
    ConfigParsePosixResult result;
    config->unhandled_options = false;
--#if defined(OS_OPENBSD)
-+#if defined(OS_OPENBSD) || !defined(__GLIBC__)
+ // TODO(fuchsia): Use res_ninit() when it's implemented on Fuchsia.
+-#if defined(OS_OPENBSD) || defined(OS_FUCHSIA)
++#if defined(OS_OPENBSD) || defined(OS_FUCHSIA) || (defined(OS_LINUX) && !defined(__GLIBC__))
    // Note: res_ninit in glibc always returns 0 and sets RES_INIT.
    // res_init behaves the same way.
    memset(&_res, 0, sizeof(_res));
-@@ -141,7 +141,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* config) {
+@@ -145,7 +145,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* config) {
  #else
    res_nclose(&res);
  #endif  // defined(OS_MACOSX) || defined(OS_FREEBSD)
 -#endif  // defined(OS_OPENBSD)
-+#endif  // defined(OS_OPENBSD) || defined(__GLIBC__)
++#endif  // defined(OS_OPENBSD) || defined(OS_FUCHSIA) || (defined(OS_LINUX) && !defined(__GLIBC__))
  
  #if defined(OS_MACOSX) && !defined(OS_IOS)
    ConfigParsePosixResult error = DnsConfigWatcher::CheckDnsConfig();
@@ -29,7 +29,7 @@ index 74534e6..9ca2619 100644
  #include "net/dns/dns_reloader.h"
  
 -#if defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) && \
--    !defined(OS_ANDROID)
+-    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)
 +#if defined(__GLIBC__)
  
  #include <resolv.h>
@@ -50,7 +50,7 @@ index 8be7731..8412824 100644
    NetworkChangeNotifier::AddConnectionTypeObserver(this);
    NetworkChangeNotifier::AddDNSObserver(this);
 -#if defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) && \
--    !defined(OS_ANDROID)
+-    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)
 +#if defined(__GLIBC__)
    EnsureDnsReloaderInit();
  #endif
@@ -64,7 +64,7 @@ index 4bed222..90bead6 100644
    hints.ai_socktype = SOCK_STREAM;
  
 -#if defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) && \
--    !defined(OS_ANDROID)
+-    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)
 +#if defined(__GLIBC__)
    DnsReloaderMaybeReload();
  #endif

@@ -87,10 +87,10 @@ index cee5e1d..df6a895 100644
    return true;
  #else
    return false;
-diff --git chromium-60.0.3112.78/device/power_save_blocker/BUILD.gn chromium-60.0.3112.78/device/power_save_blocker/BUILD.gn
+diff --git chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn
 index 3d5a127..f8ea3e0 100644
---- chromium-60.0.3112.78/device/power_save_blocker/BUILD.gn
-+++ chromium-60.0.3112.78/device/power_save_blocker/BUILD.gn
+--- chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn
++++ chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn
 @@ -52,6 +52,9 @@ component("power_save_blocker") {
    if (is_chromeos || !use_x11 || !use_dbus) {
      sources -= [ "power_save_blocker_x11.cc" ]

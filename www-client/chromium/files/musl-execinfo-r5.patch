@@ -72,34 +72,37 @@ index 5d6ff89..3c1207c 100644
  void StackTrace::OutputToStream(std::ostream* os) const {
    StreamBacktraceOutputHandler handler(os);
    ProcessBacktrace(trace_, count_, &handler);
---- chromium-54.0.2840.59/third_party/WebKit/Source/platform/wtf/Assertions.cpp.orig	2016-05-08 08:02:03.230553120 +0200
-+++ chromium-54.0.2840.59/third_party/WebKit/Source/platform/wtf/Assertions.cpp	2016-05-08 08:02:35.822504255 +0200
-@@ -60,7 +60,7 @@
- #include <windows.h>
+diff --git chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/Assertions.cpp
+index 9bdece7..051a55b 100644
+--- chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/Assertions.cpp.orig
++++ chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/Assertions.cpp
+@@ -57,6 +57,6 @@
  #endif
  
--#if OS(MACOSX) || (OS(LINUX) && !defined(__UCLIBC__))
-+#if OS(MACOSX) || (OS(LINUX) && defined(__GLIBC__) && !defined(__UCLIBC__))
+-#if defined(OS_MACOSX) || (defined(OS_LINUX) && !defined(__UCLIBC__))
++#if defined(OS_MACOSX) || (defined(OS_LINUX) && defined(__GLIBC__) && !defined(__UCLIBC__))
  #include <cxxabi.h>
  #include <dlfcn.h>
  #include <execinfo.h>
---- chromium-54.0.2840.59/third_party/webrtc/base/checks.cc.orig	2016-05-08 08:03:04.398461275 +0200
-+++ chromium-54.0.2840.59/third_party/webrtc/base/checks.cc	2016-05-08 08:03:24.254431362 +0200
+diff --git chromium-61.0.3163.79/third_party/webrtc/rtc_base/checks.cc
+index 533240f..39eae84 100644
+--- chromium-61.0.3163.79/third_party/webrtc/rtc_base/checks.cc.orig
++++ chromium-61.0.3163.79/third_party/webrtc/rtc_base/checks.cc
 @@ -16,7 +16,7 @@
  #include <cstdio>
  #include <cstdlib>
  
 -#if defined(__GLIBCXX__) && !defined(__UCLIBC__)
-+#if defined(__GLIBCXX__) && defined(__GLIBC__) && !defined(__UCLIBC__)
++#if defined(__GLIBC__) && defined(__GLIBCXX__) && !defined(__UCLIBC__)
  #include <cxxabi.h>
  #include <execinfo.h>
  #endif
-@@ -60,7 +60,7 @@ void PrintError(const char* format, ...)
+@@ -60,7 +60,7 @@ void PrintError(const char* format, ...) {
  // to get usable symbols on Linux. This is copied from V8. Chromium has a more
  // advanced stace trace system; also more difficult to copy.
  void DumpBacktrace() {
 -#if defined(__GLIBCXX__) && !defined(__UCLIBC__)
-+#if defined(__GLIBCXX__) && defined(__GLIBC__) && !defined(__UCLIBC__)
++#if defined(__GLIBC__) && defined(__GLIBCXX__) && !defined(__UCLIBC__)
    void* trace[100];
    int size = backtrace(trace, sizeof(trace) / sizeof(*trace));
    char** symbols = backtrace_symbols(trace, size);

@@ -17,7 +17,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 ~arm ~arm64 ~x86"
-IUSE="component-build cups +dbus gnome-keyring +gtk3 +hangouts kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-libvpx +tcmalloc widevine"
+IUSE="component-build cups +dbus gnome-keyring +gtk3 +hangouts kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
 # Native Client binaries are compiled with different set of flags, bug #452066.
@@ -32,7 +32,7 @@ COMMON_DEPEND="
 	cups? ( >=net-print/cups-1.3.11:= )
 	dev-libs/expat:=
 	dev-libs/glib:2
-	<dev-libs/icu-59:=
+	system-icu? ( <dev-libs/icu-59:= )
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
 	>=dev-libs/nss-3.14.3:=
@@ -47,14 +47,22 @@ COMMON_DEPEND="
 	system-libvpx? ( media-libs/libvpx:=[postproc,svc] )
 	>=media-libs/openh264-1.6.0:=
 	pulseaudio? ( media-sound/pulseaudio:= )
-	system-ffmpeg? ( >=media-video/ffmpeg-3:= media-libs/opus:= )
+	system-ffmpeg? (
+		>=media-video/ffmpeg-3:=
+		|| (
+			media-video/ffmpeg[-samba]
+			>=net-fs/samba-4.5.10-r1[-debug(-)]
+		)
+		!=net-fs/samba-4.5.12
+		media-libs/opus:=
+	)
 	dbus? ( sys-apps/dbus:= )
 	sys-apps/pciutils:=
 	virtual/udev
 	x11-libs/cairo:=
 	x11-libs/gdk-pixbuf:2
 	!gtk3? ( x11-libs/gtk+:2 )
-	gtk3? ( x11-libs/gtk+:3 )
+	gtk3? ( x11-libs/gtk+:3[X] )
 	x11-libs/libX11:=
 	x11-libs/libXcomposite:=
 	x11-libs/libXcursor:=
@@ -93,7 +101,7 @@ DEPEND="${COMMON_DEPEND}
 	)
 	dev-lang/perl
 	>=dev-util/gperf-3.0.3
-	dev-util/ninja
+	>=dev-util/ninja-1.7.2
 	>=net-libs/nodejs-4.6.1
 	sys-apps/hwids[usb(+)]
 	tcmalloc? ( !<sys-apps/sandbox-2.11 )
@@ -142,6 +150,36 @@ theme that covers the appropriate MIME types, and configure this as your
 GTK+ icon theme.
 "
 
+PATCHES=(
+	"${FILESDIR}/${PN}-widevine-r1.patch"
+	"${FILESDIR}/${PN}-FORTIFY_SOURCE-r2.patch"
+	"${FILESDIR}/${PN}-gcc-r1.patch"
+	"${FILESDIR}/${PN}-gn-bootstrap-r14.patch"
+	"${FILESDIR}/${PN}-gtk2-r1.patch"
+	"${FILESDIR}/${PN}-atk-r1.patch"
+	"${FILESDIR}/${PN}-mojo-dep.patch"
+	"${FILESDIR}/${PN}-gcc5-r1.patch"
+	"${FILESDIR}/${PN}-optional-dbus-r1.patch"
+	"${FILESDIR}/musl-bootstrap-r1.patch"
+	"${FILESDIR}/musl-cdefs.patch"
+	"${FILESDIR}/musl-dlopen.patch"
+	"${FILESDIR}/musl-dns-r1.patch"
+	"${FILESDIR}/musl-execinfo-r5.patch"
+	"${FILESDIR}/musl-fpstate.patch"
+	"${FILESDIR}/musl-headers-r1.patch"
+	"${FILESDIR}/musl-mallinfo-r6.patch"
+	"${FILESDIR}/musl-pthread-r4.patch"
+	"${FILESDIR}/musl-sandbox-r3.patch"
+	"${FILESDIR}/musl-secure_getenv.patch"
+	"${FILESDIR}/musl-siginfo.patch"
+	"${FILESDIR}/musl-socket.patch"
+	"${FILESDIR}/musl-stacksize-r2.patch"
+	"${FILESDIR}/musl-stacktrace-r1.patch"
+	"${FILESDIR}/musl-syscall.patch"
+	"${FILESDIR}/musl-ucontext.patch"
+	"${FILESDIR}/musl-wordsize.patch"
+)
+
 pre_build_checks() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
 		local -x CPP="$(tc-getCXX) -E"
@@ -149,9 +187,9 @@ pre_build_checks() {
 			# bugs: #601654
 			die "At least clang 3.9.1 is required"
 		fi
-		if tc-is-gcc && ! version_is_at_least 4.8 "$(gcc-version)"; then
-			# bugs: #535730, #525374, #518668, #600288
-			die "At least gcc 4.8 is required"
+		if tc-is-gcc && ! version_is_at_least 5.0 "$(gcc-version)"; then
+			# bugs: #535730, #525374, #518668, #600288, #627356
+			die "At least gcc 5.0 is required"
 		fi
 	fi
 
@@ -183,33 +221,6 @@ pkg_setup() {
 }
 
 src_prepare() {
-	local PATCHES=(
-		"${FILESDIR}/${PN}-widevine-r1.patch"
-		"${FILESDIR}/${PN}-FORTIFY_SOURCE-r1.patch"
-		"${FILESDIR}/${PN}-gn-bootstrap-r8.patch"
-		"${FILESDIR}/${PN}-gtk2.patch"
-		"${FILESDIR}/${PN}-major-minor.patch"
-		"${FILESDIR}/${PN}-optional-dbus.patch"
-		"${FILESDIR}/musl-bootstrap-r1.patch"
-		"${FILESDIR}/musl-cdefs.patch"
-		"${FILESDIR}/musl-dlopen.patch"
-		"${FILESDIR}/musl-dns.patch"
-		"${FILESDIR}/musl-execinfo-r4.patch"
-		"${FILESDIR}/musl-fpstate.patch"
-		"${FILESDIR}/musl-headers.patch"
-		"${FILESDIR}/musl-mallinfo-r5.patch"
-		"${FILESDIR}/musl-pthread-r3.patch"
-		"${FILESDIR}/musl-sandbox-r3.patch"
-		"${FILESDIR}/musl-secure_getenv.patch"
-		"${FILESDIR}/musl-siginfo.patch"
-		"${FILESDIR}/musl-socket.patch"
-		"${FILESDIR}/musl-stacksize-r2.patch"
-		"${FILESDIR}/musl-stacktrace-r1.patch"
-		"${FILESDIR}/musl-syscall.patch"
-		"${FILESDIR}/musl-ucontext.patch"
-		"${FILESDIR}/musl-wordsize.patch"
-	)
-
 	default
 
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
@@ -236,10 +247,10 @@ src_prepare() {
 		third_party/WebKit
 		third_party/analytics
 		third_party/angle
-		third_party/angle/src/common/third_party/numerics
+		third_party/angle/src/common/third_party/base
+		third_party/angle/src/common/third_party/murmurhash
 		third_party/angle/src/third_party/compiler
 		third_party/angle/src/third_party/libXNVCtrl
-		third_party/angle/src/third_party/murmurhash
 		third_party/angle/src/third_party/trace_event
 		third_party/boringssl
 		third_party/brotli
@@ -321,7 +332,6 @@ src_prepare() {
 		third_party/swiftshader
 		third_party/swiftshader/third_party/llvm-subzero
 		third_party/swiftshader/third_party/subzero
-		third_party/tcmalloc
 		third_party/usrsctp
 		third_party/vulkan
 		third_party/vulkan-validation-layers
@@ -346,9 +356,15 @@ src_prepare() {
 	if ! use system-ffmpeg; then
 		keeplibs+=( third_party/ffmpeg third_party/opus )
 	fi
+	if ! use system-icu; then
+		keeplibs+=( third_party/icu )
+	fi
 	if ! use system-libvpx; then
 		keeplibs+=( third_party/libvpx )
 		keeplibs+=( third_party/libvpx/source/libvpx/third_party/x86inc )
+	fi
+	if use tcmalloc; then
+		keeplibs+=( third_party/tcmalloc )
 	fi
 
 	# Remove most bundled libraries. Some are still needed.
@@ -399,7 +415,6 @@ src_configure() {
 	local gn_system_libraries=(
 		flac
 		harfbuzz-ng
-		icu
 		libdrm
 		libjpeg
 		libpng
@@ -413,6 +428,9 @@ src_configure() {
 	)
 	if use system-ffmpeg; then
 		gn_system_libraries+=( ffmpeg opus )
+	fi
+	if use system-icu; then
+		gn_system_libraries+=( icu )
 	fi
 	if use system-libvpx; then
 		gn_system_libraries+=( libvpx )
@@ -443,7 +461,7 @@ src_configure() {
 	# Never use bundled gold binary. Disable gold linker flags for now.
 	# Do not use bundled clang.
 	# Trying to use gold results in linker crash.
-	myconf_gn+=" use_gold=false use_sysroot=false linux_use_bundled_binutils=false"
+	myconf_gn+=" use_gold=false use_sysroot=false linux_use_bundled_binutils=false use_custom_libcxx=false"
 
 	ffmpeg_branding="$(usex proprietary-codecs Chrome Chromium)"
 	myconf_gn+=" proprietary_codecs=$(usex proprietary-codecs true false)"
@@ -515,6 +533,7 @@ src_configure() {
 	if tc-is-cross-compiler; then
 		tc-export BUILD_{AR,CC,CXX,NM}
 		myconf_gn+=" host_toolchain=\"${FILESDIR}/toolchain:host\""
+		myconf_gn+=" v8_snapshot_toolchain=\"${FILESDIR}/toolchain:host\""
 	else
 		myconf_gn+=" host_toolchain=\"${FILESDIR}/toolchain:default\""
 	fi
@@ -561,8 +580,13 @@ src_compile() {
 	fi
 
 	# Build mksnapshot and pax-mark it.
-	eninja -C out/Release mksnapshot || die
-	pax-mark m out/Release/mksnapshot
+	if tc-is-cross-compiler; then
+		eninja -C out/Release host/mksnapshot || die
+		pax-mark m out/Release/host/mksnapshot
+	else
+		eninja -C out/Release mksnapshot || die
+		pax-mark m out/Release/mksnapshot
+	fi
 
 	# Even though ninja autodetects number of CPUs, we respect
 	# user's options, for debugging with -j 1 or any other reason.
@@ -620,8 +644,9 @@ src_install() {
 	doins out/Release/*.pak
 	doins out/Release/*.so
 
-	# Needed by bundled icu
-	# doins out/Release/icudtl.dat
+	if ! use system-icu; then
+		doins out/Release/icudtl.dat
+	fi
 
 	doins -r out/Release/locales
 	doins -r out/Release/resources
