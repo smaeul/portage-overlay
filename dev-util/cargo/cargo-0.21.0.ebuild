@@ -124,23 +124,43 @@ LICENSE="|| ( MIT Apache-2.0 )"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
-IUSE="bash-completion doc libressl"
+IUSE="bash-completion doc libressl static"
 
-COMMON_DEPEND="sys-libs/zlib
-	!libressl? ( dev-libs/openssl:0= )
-	libressl? ( <dev-libs/libressl-2.6.1:0= )
-	net-libs/libssh2
-	net-libs/http-parser"
-RDEPEND="${COMMON_DEPEND}
-	!dev-util/cargo-bin
-	net-misc/curl[ssl]"
-DEPEND="${COMMON_DEPEND}
-	>=virtual/rust-1.9.0
+DEPEND="
+    static? (
+		libressl? ( <dev-libs/libressl-2.6.1[static-libs] )
+		!libressl? ( dev-libs/openssl[static-libs] )
+		net-libs/http-parser[static-libs]
+        net-libs/libssh2[static-libs]
+        net-misc/curl[ssl,static-libs]
+		sys-libs/zlib[static-libs]
+    )
+    !static? (
+		libressl? ( <dev-libs/libressl-2.6.1 )
+		!libressl? ( dev-libs/openssl )
+		net-libs/http-parser
+        net-libs/libssh2
+        net-misc/curl[ssl]
+		sys-libs/zlib
+    )
 	dev-util/cmake
 	sys-apps/coreutils
 	sys-apps/diffutils
 	sys-apps/findutils
-	sys-apps/sed"
+	sys-apps/sed
+	>=virtual/rust-1.9.0
+"
+RDEPEND="
+	!dev-util/cargo-bin
+    !static? (
+		libressl? ( <dev-libs/libressl-2.6.1:0= )
+		!libressl? ( dev-libs/openssl:0= )
+		net-libs/http-parser:=
+        net-libs/libssh2:=
+        net-misc/curl:=[ssl]
+		sys-libs/zlib:=
+    )
+"
 
 src_prepare() {
 	default
@@ -152,7 +172,7 @@ src_prepare() {
 src_compile() {
 	export CARGO_HOME="${ECARGO_HOME}"
 	local cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CTARGET}/cargo/bin/cargo"
-	${cargo} build --release
+	${cargo} build --release || die
 
 	# Build HTML documentation
 	use doc && ${cargo} doc
