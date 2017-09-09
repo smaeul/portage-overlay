@@ -1,14 +1,16 @@
-From 43f5e8072d0246ddc7b1eb6618817d842e6566be Mon Sep 17 00:00:00 2001
+From c66da063b894e177fe27c4471ad5274d3269b559 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
-Date: Sat, 25 Feb 2017 23:01:19 -0600
-Subject: [PATCH] Presence of libraries does not depend on architecture
+Date: Sat, 2 Sep 2017 13:41:00 -0500
+Subject: [PATCH 01/21] Remove incorrect special case of mips-musl
 
+The libdl/librt/libpthread provided by musl are no-op (empty static
+libraries) on all architectures, mips included.
 ---
  src/libstd/build.rs | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/libstd/build.rs b/src/libstd/build.rs
-index f84662c3f868..1539260a17d0 100644
+index 2abd47ab8d..b2fdeac50e 100644
 --- a/src/libstd/build.rs
 +++ b/src/libstd/build.rs
 @@ -30,7 +30,7 @@ fn main() {
@@ -20,3 +22,6 @@ index f84662c3f868..1539260a17d0 100644
              println!("cargo:rustc-link-lib=dl");
              println!("cargo:rustc-link-lib=rt");
              println!("cargo:rustc-link-lib=pthread");
+-- 
+2.13.5
+

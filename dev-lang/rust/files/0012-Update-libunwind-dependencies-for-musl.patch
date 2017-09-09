@@ -1,0 +1,50 @@
+From dc1499191a02ff3ca5071332ee869d2d33915910 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 2 Sep 2017 13:41:00 -0500
+Subject: [PATCH 12/21] Update libunwind dependencies for musl
+
+Use libgcc_s when linking dynamically. Convert the static libunwind to
+static-nobundle, as libunwind.a is copied from musl_root and available
+in the library search path.
+---
+ src/libunwind/build.rs | 2 +-
+ src/libunwind/lib.rs   | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/libunwind/build.rs b/src/libunwind/build.rs
+index be9aa6c5d4..35035689c4 100644
+--- a/src/libunwind/build.rs
++++ b/src/libunwind/build.rs
+@@ -16,7 +16,7 @@ fn main() {
+ 
+     if target.contains("linux") {
+         if target.contains("musl") && !target.contains("mips") {
+-            println!("cargo:rustc-link-lib=static=unwind");
++            // musl is handled in lib.rs
+         } else if !target.contains("android") {
+             println!("cargo:rustc-link-lib=gcc_s");
+         }
+diff --git a/src/libunwind/lib.rs b/src/libunwind/lib.rs
+index d4d52322ad..1ff0a1e19d 100644
+--- a/src/libunwind/lib.rs
++++ b/src/libunwind/lib.rs
+@@ -15,6 +15,7 @@
+ #![deny(warnings)]
+ 
+ #![feature(cfg_target_vendor)]
++#![feature(link_cfg)]
+ #![feature(staged_api)]
+ #![feature(unwind_attributes)]
+ #![feature(static_nobundle)]
+@@ -28,3 +29,8 @@ extern crate libc;
+ mod libunwind;
+ #[cfg(not(target_env = "msvc"))]
+ pub use libunwind::*;
++
++#[cfg(target_env = "musl")]
++#[link(name = "unwind", kind = "static-nobundle", cfg(target_feature = "crt-static"))]
++#[link(name = "gcc_s", cfg(not(target_feature = "crt-static")))]
++extern {}
+-- 
+2.13.5
+

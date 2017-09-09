@@ -1,0 +1,26 @@
+From 9ee58ce944ca98597370385d24852611baa9307e Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 2 Sep 2017 13:41:00 -0500
+Subject: [PATCH 13/21] Do not assume libunwind.a is available
+
+---
+ src/libunwind/lib.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libunwind/lib.rs b/src/libunwind/lib.rs
+index 1ff0a1e19d..2f425d8e98 100644
+--- a/src/libunwind/lib.rs
++++ b/src/libunwind/lib.rs
+@@ -30,7 +30,7 @@ mod libunwind;
+ #[cfg(not(target_env = "msvc"))]
+ pub use libunwind::*;
+ 
+-#[cfg(target_env = "musl")]
+-#[link(name = "unwind", kind = "static-nobundle", cfg(target_feature = "crt-static"))]
++#[cfg(all(target_env = "musl", not(target_arch = "mips")))]
++#[link(name = "unwind", kind = "static", cfg(target_feature = "crt-static"))]
+ #[link(name = "gcc_s", cfg(not(target_feature = "crt-static")))]
+ extern {}
+-- 
+2.13.5
+

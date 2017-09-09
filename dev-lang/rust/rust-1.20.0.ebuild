@@ -31,7 +31,7 @@ DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
 
 SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.gz
-	http://portage.smaeul.xyz/distfiles/${RUST_STAGE0}.tar.gz
+	http://portage.smaeul.xyz/distfiles/${RUST_STAGE0}.tar.xz
 "
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
@@ -55,14 +55,28 @@ PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
 "
 
 PATCHES=(
-	${FILESDIR}/0001-Factor-out-helper-for-getting-C-runtime-linkage.patch
-	${FILESDIR}/0002-Link-libgcc_s-over-libunwind-on-musl.patch
-	${FILESDIR}/0003-Support-dynamic-linking-for-musl-based-targets.patch
-	${FILESDIR}/0004-Presence-of-libraries-does-not-depend-on-architectur.patch
-	${FILESDIR}/0005-completely-remove-musl_root-and-its-c-library-overri.patch
-	${FILESDIR}/0006-liblibc.patch
-	${FILESDIR}/llvm-musl-fixes.patch
-	${FILESDIR}/llvm-nostatic.patch
+	"${FILESDIR}/0001-Remove-incorrect-special-case-of-mips-musl.patch"
+	"${FILESDIR}/0002-Improve-explanation-of-musl_root.patch"
+	"${FILESDIR}/0003-Infer-a-default-musl_root-for-native-builds.patch"
+	"${FILESDIR}/0004-Copy-musl-startup-objects-before-building-std.patch"
+	"${FILESDIR}/0005-Introduce-crt_static-target-option-in-config.toml.patch"
+	"${FILESDIR}/0006-Inline-crt-static-choice-for-pc-windows-msvc.patch"
+	"${FILESDIR}/0007-Factor-out-a-helper-for-the-getting-C-runtime-linkag.patch"
+	"${FILESDIR}/0008-Introduce-temporary-target-feature-crt_static_respec.patch"
+	"${FILESDIR}/0009-Introduce-target-feature-crt_static_allows_dylibs.patch"
+	"${FILESDIR}/0010-Disable-PIE-when-linking-statically.patch"
+	"${FILESDIR}/0011-Tell-the-linker-when-we-want-to-link-a-static-execut.patch"
+	"${FILESDIR}/0012-Update-libunwind-dependencies-for-musl.patch"
+	"${FILESDIR}/0013-Do-not-assume-libunwind.a-is-available.patch"
+	"${FILESDIR}/0014-Support-dynamic-linking-for-musl-based-targets.patch"
+	"${FILESDIR}/0015-Update-ignored-tests-for-dynamic-musl.patch"
+	"${FILESDIR}/0016-Require-rlibs-for-dependent-crates-when-linking-stat.patch"
+	"${FILESDIR}/0017-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
+	"${FILESDIR}/0018-Native-library-linkage.patch"
+	"${FILESDIR}/0019-liblibc.patch"
+	"${FILESDIR}/0020-libunwind.patch"
+	"${FILESDIR}/llvm-musl-fixes.patch"
+	"${FILESDIR}/llvm-nostatic.patch"
 )
 
 S="${WORKDIR}/${MY_P}-src"
@@ -119,6 +133,7 @@ src_configure() {
 		[target.${CTARGET}]
 		cc = "$(tc-getCC)"
 		cxx = "$(tc-getCXX)"
+		crt_static = false
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
 		llvm-config = "$(get_llvm_prefix)/bin/llvm-config"

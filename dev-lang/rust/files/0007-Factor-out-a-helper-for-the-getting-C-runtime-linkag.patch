@@ -1,18 +1,19 @@
-From f63ee0c22732599f2cac1b743794f6b609263da7 Mon Sep 17 00:00:00 2001
+From 1b7526f786a7cc83e7c4849d8228886ea7f55408 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
-Date: Sat, 25 Feb 2017 22:33:07 -0600
-Subject: [PATCH] Factor out helper for getting C runtime linkage
+Date: Sat, 2 Sep 2017 13:41:00 -0500
+Subject: [PATCH 07/21] Factor out a helper for the getting C runtime linkage
 
+This commit makes no functional changes.
 ---
  src/librustc/session/mod.rs            | 16 ++++++++++++++++
  src/librustc_driver/target_features.rs | 16 +---------------
  2 files changed, 17 insertions(+), 15 deletions(-)
 
 diff --git a/src/librustc/session/mod.rs b/src/librustc/session/mod.rs
-index 827fa72f0340..caeace8d4e9a 100644
+index fe6b24f3e1..d36cc5c8ff 100644
 --- a/src/librustc/session/mod.rs
 +++ b/src/librustc/session/mod.rs
-@@ -396,6 +396,22 @@ impl Session {
+@@ -436,6 +436,22 @@ impl Session {
              .unwrap_or(self.opts.debug_assertions)
      }
  
@@ -36,7 +37,7 @@ index 827fa72f0340..caeace8d4e9a 100644
          self.opts.debuginfo != DebugInfoLevel::NoDebugInfo ||
          !self.target.target.options.eliminate_frame_pointer
 diff --git a/src/librustc_driver/target_features.rs b/src/librustc_driver/target_features.rs
-index bee61bb39802..4616db3ae874 100644
+index bee61bb398..4616db3ae8 100644
 --- a/src/librustc_driver/target_features.rs
 +++ b/src/librustc_driver/target_features.rs
 @@ -25,21 +25,7 @@ pub fn add_configuration(cfg: &mut ast::CrateConfig, sess: &Session) {
@@ -62,3 +63,6 @@ index bee61bb39802..4616db3ae874 100644
          cfg.insert((tf, Some(Symbol::intern("crt-static"))));
      }
  }
+-- 
+2.13.5
+
