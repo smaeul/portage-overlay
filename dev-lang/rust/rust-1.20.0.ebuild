@@ -40,7 +40,7 @@ IUSE="debug doc jemalloc system-llvm"
 REQUIRED_USE=""
 
 RDEPEND="
-	system-llvm? ( sys-devel/llvm:= )
+	system-llvm? ( sys-devel/llvm:4 )
 "
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
@@ -136,7 +136,7 @@ src_configure() {
 		crt_static = false
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
-		llvm-config = "$(get_llvm_prefix)/bin/llvm-config"
+		llvm-config = "$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
 	EOF
 }
 
