@@ -16,18 +16,13 @@ KEYWORDS=""
 IUSE=""
 
 RDEPEND="
-	>=sys-devel/clang-4.0.0:4=
-	>=sys-devel/llvm-4.0.0:4="
+	>=sys-devel/clang-4.0.0:5=
+"
 DEPEND="${RDEPEND}
-	dev-util/ninja
-	sys-devel/lld"
+	sys-devel/lld
+"
 
-CMAKE_MAKEFILE_GENERATOR="ninja"
 CMAKE_MIN_VERSION="2.8.5"
-
-PATCHES=(
-	"${FILESDIR}/zig-clang-path.patch"
-)
 
 src_install() {
 	cmake-utils_src_install
