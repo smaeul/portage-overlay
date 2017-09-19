@@ -153,7 +153,7 @@ src_install() {
 
 	rm "${D}/usr/lib/rustlib/components" || die
 	rm "${D}/usr/lib/rustlib/install.log" || die
-	rm "${D}/usr/lib/rustlib/manifest-rust-std-x86_64-unknown-linux-musl" || die
+	rm "${D}/usr/lib/rustlib/manifest-rust-std-${CTARGET}" || die
 	rm "${D}/usr/lib/rustlib/manifest-rustc" || die
 	rm "${D}/usr/lib/rustlib/rust-installer-version" || die
 	rm "${D}/usr/lib/rustlib/uninstall.sh" || die
