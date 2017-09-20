@@ -135,6 +135,8 @@ src_configure() {
 		cc = "$(tc-getCC)"
 		cxx = "$(tc-getCXX)"
 		crt_static = false
+		[dist]
+		src-tarball = false
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
 		llvm-config = "$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
