@@ -104,7 +104,6 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-util/ninja-1.7.2
 	>=net-libs/nodejs-4.6.1
 	sys-apps/hwids[usb(+)]
-	tcmalloc? ( !<sys-apps/sandbox-2.11 )
 	>=sys-devel/bison-2.4.3
 	sys-devel/flex
 	elibc_musl? ( sys-libs/queue )
