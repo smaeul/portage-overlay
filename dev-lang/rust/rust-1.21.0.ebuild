@@ -13,25 +13,35 @@ if [[ ${PV} = *beta* ]]; then
 	BETA_SNAPSHOT="${betaver:0:4}-${betaver:4:2}-${betaver:6:2}"
 	MY_P="rustc-beta"
 	SLOT="beta/${PV}"
-	SRC="${BETA_SNAPSHOT}/rustc-beta-src.tar.gz"
+	SRC="${BETA_SNAPSHOT}/rustc-beta-src.tar.xz"
 	KEYWORDS=""
 else
 	ABI_VER="$(get_version_component_range 1-2)"
 	SLOT="stable/${ABI_VER}"
 	MY_P="rustc-${PV}"
-	SRC="${MY_P}-src.tar.gz"
+	SRC="${MY_P}-src.tar.xz"
 	KEYWORDS="~amd64 ~arm ~x86"
 fi
 
 CTARGET=${CHOST/gentoo/unknown}
 STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).0"
-RUST_STAGE0="rust-${STAGE0_VERSION}-${CTARGET}"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
 
-SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.gz
-	http://portage.smaeul.xyz/distfiles/${RUST_STAGE0}.tar.xz
+SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
+	amd64? (
+		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-x86_64-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-x86_64-unknown-linux-musl.tar.xz )
+	)
+	arm? (
+		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-arm-unknown-linux-gnueabi.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-arm-unknown-linux-musleabi.tar.xz )
+	)
+	x86? (
+		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-i686-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-i686-unknown-linux-musl.tar.xz )
+	)
 "
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
@@ -55,28 +65,16 @@ PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
 "
 
 PATCHES=(
-	"${FILESDIR}/0001-Remove-incorrect-special-case-of-mips-musl.patch"
-	"${FILESDIR}/0002-Improve-explanation-of-musl_root.patch"
-	"${FILESDIR}/0003-Infer-a-default-musl_root-for-native-builds.patch"
-	"${FILESDIR}/0004-Copy-musl-startup-objects-before-building-std.patch"
-	"${FILESDIR}/0005-Introduce-crt_static-target-option-in-config.toml.patch"
-	"${FILESDIR}/0006-Inline-crt-static-choice-for-pc-windows-msvc.patch"
-	"${FILESDIR}/0007-Factor-out-a-helper-for-the-getting-C-runtime-linkag.patch"
-	"${FILESDIR}/0008-Introduce-temporary-target-feature-crt_static_respec.patch"
-	"${FILESDIR}/0009-Introduce-target-feature-crt_static_allows_dylibs.patch"
-	"${FILESDIR}/0010-Disable-PIE-when-linking-statically.patch"
-	"${FILESDIR}/0011-Tell-the-linker-when-we-want-to-link-a-static-execut.patch"
-	"${FILESDIR}/0012-Update-libunwind-dependencies-for-musl.patch"
-	"${FILESDIR}/0013-Do-not-assume-libunwind.a-is-available.patch"
-	"${FILESDIR}/0014-Support-dynamic-linking-for-musl-based-targets.patch"
-	"${FILESDIR}/0015-Update-ignored-tests-for-dynamic-musl.patch"
-	"${FILESDIR}/0016-Require-rlibs-for-dependent-crates-when-linking-stat.patch"
-	"${FILESDIR}/0017-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
-	"${FILESDIR}/0018-Native-library-linkage.patch"
-	"${FILESDIR}/0019-liblibc.patch"
-	"${FILESDIR}/0020-libunwind.patch"
+	"${FILESDIR}/0001-Explicitly-run-perl-for-OpenSSL-Configure.patch"
+	"${FILESDIR}/0002-Require-rlibs-for-dependent-crates-when-linking-stat.patch"
+	"${FILESDIR}/0003-Adjust-dependency-resolution-errors-to-be-more-consi.patch"
+	"${FILESDIR}/0004-Require-static-native-libraries-when-linking-static-.patch"
+	"${FILESDIR}/0005-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
+	"${FILESDIR}/0006-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
+	"${FILESDIR}/0007-Fix-LLVM-build.patch"
+	"${FILESDIR}/0008-Add-openssl-configuration-for-musl-targets.patch"
+	"${FILESDIR}/0009-liblibc.patch"
 	"${FILESDIR}/llvm-musl-fixes.patch"
-	"${FILESDIR}/llvm-nostatic.patch"
 )
 
 S="${WORKDIR}/${MY_P}-src"
@@ -94,7 +92,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	"${WORKDIR}/${RUST_STAGE0}/install.sh" \
+	"${WORKDIR}/rust-${STAGE0_VERSION}-${CTARGET}/install.sh" \
 		--prefix="${WORKDIR}/stage0" \
 		--components=rust-std-${CTARGET},rustc,cargo \
 		--disable-ldconfig \
@@ -127,14 +125,13 @@ src_configure() {
 		optimize = $(toml_usex !debug)
 		debug-assertions = $(toml_usex debug)
 		debuginfo = $(toml_usex debug)
-		debug-lines = $(toml_usex debug)
 		use-jemalloc = $(toml_usex jemalloc)
 		channel = "${SLOT%%/*}"
 		rpath = false
 		[target.${CTARGET}]
 		cc = "$(tc-getCC)"
 		cxx = "$(tc-getCXX)"
-		crt_static = false
+		crt-static = false
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
 		llvm-config = "$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
@@ -143,7 +140,12 @@ src_configure() {
 
 src_compile() {
 	export RUST_BACKTRACE=1
-	use system-llvm && export LLVM_LINK_SHARED=1
+	if use system-llvm; then
+		local llvm_config="$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
+
+		export LLVM_LINK_SHARED=1
+		export RUSTFLAGS="$RUSTFLAGS -Lnative=$("$llvm_config" --libdir)"
+	fi
 
 	./x.py build || die
 }

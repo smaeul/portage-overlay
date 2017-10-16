@@ -1,7 +1,7 @@
-From 39d673dea22becf6e73539045735eca63906d62b Mon Sep 17 00:00:00 2001
+From 1f9f168d318a0c87847b33afa9f13463c22a83ff Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Sep 2017 18:15:57 -0500
-Subject: [PATCH 16/21] Require rlibs for dependent crates when linking static
+Subject: [PATCH 2/8] Require rlibs for dependent crates when linking static
  executables
 
 This handles the case for `CrateTypeExecutable` and `+crt_static`. I
@@ -117,5 +117,5 @@ index 837ab4fd4a..8d9a72723f 100644
  
      let mut formats = FxHashMap();
 -- 
-2.13.5
+2.13.6
 

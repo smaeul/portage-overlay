@@ -1,28 +1,27 @@
-From 879b630238b5e312edd41528a93f2d52e4c77281 Mon Sep 17 00:00:00 2001
+From acf8cfe5fb5cd4b83c6e7b6eb6c7f8a98d6cb2f9 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 22:11:14 -0500
-Subject: [PATCH 17/21] Remove -nostdlib and musl_root from musl targets
+Subject: [PATCH 5/8] Remove -nostdlib and musl_root from musl targets
 
 ---
  configure                                        |  6 ----
- src/bootstrap/bin/rustc.rs                       | 10 ------
- src/bootstrap/cc.rs                              | 27 ++--------------
- src/bootstrap/compile.rs                         | 23 --------------
- src/bootstrap/config.rs                          | 40 ------------------------
- src/bootstrap/config.toml.example                |  6 ----
- src/bootstrap/lib.rs                             |  8 -----
- src/bootstrap/sanity.rs                          | 29 -----------------
- src/ci/docker/cross/Dockerfile                   |  5 +--
+ src/bootstrap/bin/rustc.rs                       | 10 -------
+ src/bootstrap/cc.rs                              | 27 ++----------------
+ src/bootstrap/compile.rs                         | 31 ---------------------
+ src/bootstrap/config.rs                          | 35 ------------------------
+ src/bootstrap/lib.rs                             |  8 ------
+ src/bootstrap/sanity.rs                          | 29 --------------------
+ src/ci/docker/cross/Dockerfile                   |  5 +---
  src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile |  1 -
  src/ci/docker/dist-x86_64-musl/Dockerfile        |  1 -
- src/librustc_back/target/linux_musl_base.rs      | 15 ---------
- 12 files changed, 4 insertions(+), 167 deletions(-)
+ src/librustc_back/target/linux_musl_base.rs      | 15 ----------
+ 12 files changed, 4 insertions(+), 170 deletions(-)
 
 diff --git a/configure b/configure
-index e08bcc0282..abbd38272f 100755
+index 664b473b2c..eead8a9b7b 100755
 --- a/configure
 +++ b/configure
-@@ -482,12 +482,6 @@ valopt armv7-linux-androideabi-ndk "" "armv7-linux-androideabi NDK standalone pa
+@@ -481,12 +481,6 @@ valopt armv7-linux-androideabi-ndk "" "armv7-linux-androideabi NDK standalone pa
  valopt aarch64-linux-android-ndk "" "aarch64-linux-android NDK standalone path"
  valopt x86_64-linux-android-ndk "" "x86_64-linux-android NDK standalone path"
  valopt nacl-cross-path  "" "NaCl SDK path (Pepper Canary is recommended). Must be absolute!"
@@ -34,9 +33,9 @@ index e08bcc0282..abbd38272f 100755
 -valopt musl-root-armv7 "" "armv7-unknown-linux-musleabihf install directory"
  valopt extra-filename "" "Additional data that is hashed and passed to the -C extra-filename flag"
  valopt qemu-armhf-rootfs "" "rootfs in qemu testing, you probably don't want to use this"
- valopt experimental-targets "" "experimental LLVM targets to build"
+ valopt qemu-aarch64-rootfs "" "rootfs in qemu testing, you probably don't want to use this"
 diff --git a/src/bootstrap/bin/rustc.rs b/src/bootstrap/bin/rustc.rs
-index bc48c8f902..9cfee02afe 100644
+index 0baca9e58f..7b12956f74 100644
 --- a/src/bootstrap/bin/rustc.rs
 +++ b/src/bootstrap/bin/rustc.rs
 @@ -30,7 +30,6 @@
@@ -64,10 +63,10 @@ index bc48c8f902..9cfee02afe 100644
          // cross compiling.
          if let Ok(s) = env::var("RUSTC_FLAGS") {
 diff --git a/src/bootstrap/cc.rs b/src/bootstrap/cc.rs
-index 7c7161916e..e79afbfb27 100644
+index 0f25da8a23..b808fd86da 100644
 --- a/src/bootstrap/cc.rs
 +++ b/src/bootstrap/cc.rs
-@@ -54,7 +54,7 @@ pub fn find(build: &mut Build) {
+@@ -53,7 +53,7 @@ pub fn find(build: &mut Build) {
          if let Some(cc) = config.and_then(|c| c.cc.as_ref()) {
              cfg.compiler(cc);
          } else {
@@ -76,7 +75,7 @@ index 7c7161916e..e79afbfb27 100644
          }
  
          let compiler = cfg.get_compiler();
-@@ -78,7 +78,7 @@ pub fn find(build: &mut Build) {
+@@ -74,7 +74,7 @@ pub fn find(build: &mut Build) {
          if let Some(cxx) = config.and_then(|c| c.cxx.as_ref()) {
              cfg.compiler(cxx);
          } else {
@@ -85,17 +84,17 @@ index 7c7161916e..e79afbfb27 100644
          }
          let compiler = cfg.get_compiler();
          build.verbose(&format!("CXX_{} = {:?}", host, compiler.path()));
-@@ -89,8 +89,7 @@ pub fn find(build: &mut Build) {
+@@ -85,8 +85,7 @@ pub fn find(build: &mut Build) {
  fn set_compiler(cfg: &mut gcc::Config,
                  gnu_compiler: &str,
-                 target: &str,
+                 target: Interned<String>,
 -                config: Option<&Target>,
 -                build: &Build) {
 +                config: Option<&Target>) {
-     match target {
+     match &*target {
          // When compiling for android we may have the NDK configured in the
          // config.toml in which case we look there. Otherwise the default
-@@ -126,26 +125,6 @@ fn set_compiler(cfg: &mut gcc::Config,
+@@ -122,26 +121,6 @@ fn set_compiler(cfg: &mut gcc::Config,
              }
          }
  
@@ -123,24 +122,37 @@ index 7c7161916e..e79afbfb27 100644
      }
  }
 diff --git a/src/bootstrap/compile.rs b/src/bootstrap/compile.rs
-index f83b1da7ab..a33e666937 100644
+index 335e1690a2..ab3a8a66ea 100644
 --- a/src/bootstrap/compile.rs
 +++ b/src/bootstrap/compile.rs
-@@ -82,31 +82,12 @@ pub fn std(build: &Build, target: &str, compiler: &Compiler) {
-             cargo.env("JEMALLOC_OVERRIDE", jemalloc);
-         }
-     }
--    if target.contains("musl") {
--        if let Some(p) = build.musl_root(target) {
--            cargo.env("MUSL_ROOT", p);
--            let libdir = build.sysroot_libdir(compiler, target);
+@@ -78,13 +78,6 @@ impl Step for Std {
+             });
+             println!("Uplifting stage1 std ({} -> {})", from.host, target);
+ 
+-            // Even if we're not building std this stage, the new sysroot must
+-            // still contain the musl startup objects.
+-            if target.contains("musl") && !target.contains("mips") {
+-                let libdir = builder.sysroot_libdir(compiler, target);
+-                copy_musl_third_party_objects(build, target, &libdir);
+-            }
+-
+             builder.ensure(StdLink {
+                 compiler: from,
+                 target_compiler: compiler,
+@@ -97,11 +90,6 @@ impl Step for Std {
+         println!("Building stage{} std artifacts ({} -> {})", compiler.stage,
+                 &compiler.host, target);
+ 
+-        if target.contains("musl") && !target.contains("mips") {
+-            let libdir = builder.sysroot_libdir(compiler, target);
 -            copy_musl_third_party_objects(build, target, &libdir);
 -        }
--    }
- 
-     run_cargo(build,
-               &mut cargo,
-               &libstd_stamp(build, &compiler, target));
+-
+         let out_dir = build.cargo_out(compiler, Mode::Libstd, target);
+         build.clear_if_dirty(&out_dir, &builder.rustc(compiler));
+         let mut cargo = builder.cargo(compiler, Mode::Libstd, target, "build");
+@@ -118,20 +106,6 @@ impl Step for Std {
+     }
  }
  
 -/// Copies the crt(1,i,n).o startup objects
@@ -149,31 +161,34 @@ index f83b1da7ab..a33e666937 100644
 -/// with a glibc-targeting toolchain, given we have the appropriate startup
 -/// files. As those shipped with glibc won't work, copy the ones provided by
 -/// musl so we have them on linux-gnu hosts.
--fn copy_musl_third_party_objects(build: &Build, target: &str, into: &Path) {
+-fn copy_musl_third_party_objects(build: &Build,
+-                                 target: Interned<String>,
+-                                 into: &Path) {
 -    for &obj in &["crt1.o", "crti.o", "crtn.o"] {
 -        copy(&build.musl_root(target).unwrap().join("lib").join(obj), &into.join(obj));
 -    }
 -}
 -
- /// Link all libstd rlibs/dylibs into the sysroot location.
- ///
- /// Links those artifacts generated by `compiler` to a the `stage` compiler's
-@@ -128,10 +109,6 @@ pub fn std_link(build: &Build,
-     let libdir = build.sysroot_libdir(target_compiler, target);
-     add_to_sysroot(&libdir, &libstd_stamp(build, compiler, target));
- 
--    if target.contains("musl") && !target.contains("mips") {
--        copy_musl_third_party_objects(build, target, &libdir);
+ /// Configure cargo to compile the standard library, adding appropriate env vars
+ /// and such.
+ pub fn std_cargo(build: &Build,
+@@ -173,11 +147,6 @@ pub fn std_cargo(build: &Build,
+             cargo.env("JEMALLOC_OVERRIDE", jemalloc);
+         }
+     }
+-    if target.contains("musl") {
+-        if let Some(p) = build.musl_root(target) {
+-            cargo.env("MUSL_ROOT", p);
+-        }
 -    }
--
-     if build.config.sanitizers && compiler.stage != 0 && target == "x86_64-apple-darwin" {
-         // The sanitizers are only built in stage1 or above, so the dylibs will
-         // be missing in stage0 and causes panic. See the `std()` function above
+ }
+ 
+ #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 diff --git a/src/bootstrap/config.rs b/src/bootstrap/config.rs
-index 4f4e02cf33..1e2e06cb08 100644
+index f43035fbfe..7f9cca3905 100644
 --- a/src/bootstrap/config.rs
 +++ b/src/bootstrap/config.rs
-@@ -97,8 +97,6 @@ pub struct Config {
+@@ -111,8 +111,6 @@ pub struct Config {
      pub low_priority: bool,
      pub channel: String,
      pub quiet_tests: bool,
@@ -182,7 +197,7 @@ index 4f4e02cf33..1e2e06cb08 100644
      pub prefix: Option<PathBuf>,
      pub sysconfdir: Option<PathBuf>,
      pub docdir: Option<PathBuf>,
-@@ -130,7 +128,6 @@ pub struct Target {
+@@ -144,7 +142,6 @@ pub struct Target {
      pub cxx: Option<PathBuf>,
      pub ndk: Option<PathBuf>,
      pub crt_static: Option<bool>,
@@ -190,7 +205,7 @@ index 4f4e02cf33..1e2e06cb08 100644
      pub qemu_rootfs: Option<PathBuf>,
  }
  
-@@ -236,7 +233,6 @@ struct Rust {
+@@ -259,7 +256,6 @@ struct Rust {
      default_linker: Option<String>,
      default_ar: Option<String>,
      channel: Option<String>,
@@ -198,7 +213,7 @@ index 4f4e02cf33..1e2e06cb08 100644
      rpath: Option<bool>,
      optimize_tests: Option<bool>,
      debuginfo_tests: Option<bool>,
-@@ -252,7 +248,6 @@ struct TomlTarget {
+@@ -277,7 +273,6 @@ struct TomlTarget {
      cxx: Option<String>,
      android_ndk: Option<String>,
      crt_static: Option<bool>,
@@ -206,23 +221,23 @@ index 4f4e02cf33..1e2e06cb08 100644
      qemu_rootfs: Option<String>,
  }
  
-@@ -377,7 +372,6 @@ impl Config {
-             set(&mut config.channel, rust.channel.clone());
+@@ -424,7 +419,6 @@ impl Config {
+             set(&mut config.ignore_git, rust.ignore_git);
              config.rustc_default_linker = rust.default_linker.clone();
              config.rustc_default_ar = rust.default_ar.clone();
 -            config.musl_root = rust.musl_root.clone().map(PathBuf::from);
  
              match rust.codegen_units {
                  Some(0) => config.rust_codegen_units = num_cpus::get() as u32,
-@@ -402,7 +396,6 @@ impl Config {
+@@ -449,7 +443,6 @@ impl Config {
                  target.cxx = cfg.cxx.clone().map(PathBuf::from);
                  target.cc = cfg.cc.clone().map(PathBuf::from);
                  target.crt_static = cfg.crt_static.clone();
 -                target.musl_root = cfg.musl_root.clone().map(PathBuf::from);
                  target.qemu_rootfs = cfg.qemu_rootfs.clone().map(PathBuf::from);
  
-                 config.target_config.insert(triple.clone(), target);
-@@ -518,39 +511,6 @@ impl Config {
+                 config.target_config.insert(INTERNER.intern_string(triple.clone()), target);
+@@ -564,34 +557,6 @@ impl Config {
                  "CFG_EXPERIMENTAL_TARGETS" if value.len() > 0 => {
                      self.llvm_experimental_targets = Some(value.to_string());
                  }
@@ -230,66 +245,44 @@ index 4f4e02cf33..1e2e06cb08 100644
 -                    self.musl_root = Some(parse_configure_path(value));
 -                }
 -                "CFG_MUSL_ROOT_X86_64" if value.len() > 0 => {
--                    let target = "x86_64-unknown-linux-musl".to_string();
--                    let target = self.target_config.entry(target)
--                                     .or_insert(Target::default());
+-                    let target = INTERNER.intern_str("x86_64-unknown-linux-musl");
+-                    let target = self.target_config.entry(target).or_insert(Target::default());
 -                    target.musl_root = Some(parse_configure_path(value));
 -                }
 -                "CFG_MUSL_ROOT_I686" if value.len() > 0 => {
--                    let target = "i686-unknown-linux-musl".to_string();
--                    let target = self.target_config.entry(target)
--                                     .or_insert(Target::default());
+-                    let target = INTERNER.intern_str("i686-unknown-linux-musl");
+-                    let target = self.target_config.entry(target).or_insert(Target::default());
 -                    target.musl_root = Some(parse_configure_path(value));
 -                }
 -                "CFG_MUSL_ROOT_ARM" if value.len() > 0 => {
--                    let target = "arm-unknown-linux-musleabi".to_string();
--                    let target = self.target_config.entry(target)
--                                     .or_insert(Target::default());
+-                    let target = INTERNER.intern_str("arm-unknown-linux-musleabi");
+-                    let target = self.target_config.entry(target).or_insert(Target::default());
 -                    target.musl_root = Some(parse_configure_path(value));
 -                }
 -                "CFG_MUSL_ROOT_ARMHF" if value.len() > 0 => {
--                    let target = "arm-unknown-linux-musleabihf".to_string();
--                    let target = self.target_config.entry(target)
--                                     .or_insert(Target::default());
+-                    let target = INTERNER.intern_str("arm-unknown-linux-musleabihf");
+-                    let target = self.target_config.entry(target).or_insert(Target::default());
 -                    target.musl_root = Some(parse_configure_path(value));
 -                }
 -                "CFG_MUSL_ROOT_ARMV7" if value.len() > 0 => {
--                    let target = "armv7-unknown-linux-musleabihf".to_string();
--                    let target = self.target_config.entry(target)
--                                     .or_insert(Target::default());
+-                    let target = INTERNER.intern_str("armv7-unknown-linux-musleabihf");
+-                    let target = self.target_config.entry(target).or_insert(Target::default());
 -                    target.musl_root = Some(parse_configure_path(value));
 -                }
                  "CFG_DEFAULT_AR" if value.len() > 0 => {
                      self.rustc_default_ar = Some(value.to_string());
                  }
-diff --git a/src/bootstrap/config.toml.example b/src/bootstrap/config.toml.example
-index 61946305a6..68e96a1aa4 100644
---- a/src/bootstrap/config.toml.example
-+++ b/src/bootstrap/config.toml.example
-@@ -296,12 +296,6 @@
- # only use static libraries. If unset, the target's default linkage is used.
- #crt-static = false
- 
--# The root location of the MUSL installation directory. The library directory
--# will also need to contain libunwind.a for an unwinding implementation. Note
--# that this option only makes sense for MUSL targets that produce statically
--# linked binaries
--#musl-root = "..."
--
- # =============================================================================
- # Distribution options
- #
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index 9203975480..31efbd0653 100644
+index 84a9e56b64..90f905163d 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -923,14 +923,6 @@ impl Build {
+@@ -665,14 +665,6 @@ impl Build {
          }
      }
  
 -    /// Returns the "musl root" for this `target`, if defined
--    fn musl_root(&self, target: &str) -> Option<&Path> {
--        self.config.target_config.get(target)
+-    fn musl_root(&self, target: Interned<String>) -> Option<&Path> {
+-        self.config.target_config.get(&target)
 -            .and_then(|t| t.musl_root.as_ref())
 -            .or(self.config.musl_root.as_ref())
 -            .map(|p| &**p)
@@ -297,9 +290,9 @@ index 9203975480..31efbd0653 100644
 -
      /// Returns whether the target will be tested using the `remote-test-client`
      /// and `remote-test-server` binaries.
-     fn remote_tested(&self, target: &str) -> bool {
+     fn remote_tested(&self, target: Interned<String>) -> bool {
 diff --git a/src/bootstrap/sanity.rs b/src/bootstrap/sanity.rs
-index ee2a5544b9..38560dedf3 100644
+index 54208d8bb5..e1ba41c165 100644
 --- a/src/bootstrap/sanity.rs
 +++ b/src/bootstrap/sanity.rs
 @@ -21,7 +21,6 @@
@@ -310,7 +303,7 @@ index ee2a5544b9..38560dedf3 100644
  use std::process::Command;
  use std::path::PathBuf;
  
-@@ -151,34 +150,6 @@ pub fn check(build: &mut Build) {
+@@ -168,34 +167,6 @@ pub fn check(build: &mut Build) {
              panic!("the iOS target is only supported on macOS");
          }
  
@@ -318,12 +311,12 @@ index ee2a5544b9..38560dedf3 100644
 -        if target.contains("musl") && !target.contains("mips") {
 -            // If this is a native target (host is also musl) and no musl-root is given,
 -            // fall back to the system toolchain in /usr before giving up
--            if build.musl_root(target).is_none() && &build.config.build == target {
+-            if build.musl_root(*target).is_none() && build.config.build == *target {
 -                let target = build.config.target_config.entry(target.clone())
 -                                 .or_insert(Default::default());
 -                target.musl_root = Some("/usr".into());
 -            }
--            match build.musl_root(target) {
+-            match build.musl_root(*target) {
 -                Some(root) => {
 -                    if fs::metadata(root.join("lib/libc.a")).is_err() {
 -                        panic!("couldn't find libc.a in musl dir: {}",
@@ -346,10 +339,10 @@ index ee2a5544b9..38560dedf3 100644
              // There are three builds of cmake on windows: MSVC, MinGW, and
              // Cygwin. The Cygwin build does not have generators for Visual
 diff --git a/src/ci/docker/cross/Dockerfile b/src/ci/docker/cross/Dockerfile
-index 70dfbb53da..95474ebfd6 100644
+index a83bbe9c60..0d931e4314 100644
 --- a/src/ci/docker/cross/Dockerfile
 +++ b/src/ci/docker/cross/Dockerfile
-@@ -57,10 +57,7 @@ ENV STAGING_DIR=/tmp
+@@ -59,10 +59,7 @@ ENV STAGING_DIR=/tmp
  
  ENV RUST_CONFIGURE_ARGS \
        --enable-extended \
@@ -362,10 +355,10 @@ index 70dfbb53da..95474ebfd6 100644
  
  # sccache
 diff --git a/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile b/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile
-index 036dce2a73..b230021948 100644
+index efde3ff529..518ece660b 100644
 --- a/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile
 +++ b/src/ci/docker/dist-i586-gnu-i686-musl/Dockerfile
-@@ -30,7 +30,6 @@ RUN sh /scripts/sccache.sh
+@@ -25,7 +25,6 @@ RUN sh /scripts/sccache.sh
  
  ENV RUST_CONFIGURE_ARGS \
        --target=i686-unknown-linux-musl,i586-unknown-linux-gnu \
@@ -374,10 +367,10 @@ index 036dce2a73..b230021948 100644
  
  # Newer binutils broke things on some vms/distros (i.e., linking against
 diff --git a/src/ci/docker/dist-x86_64-musl/Dockerfile b/src/ci/docker/dist-x86_64-musl/Dockerfile
-index eebc283e96..6ffb33ebb2 100644
+index 91ed6bfe1f..9859cfeee9 100644
 --- a/src/ci/docker/dist-x86_64-musl/Dockerfile
 +++ b/src/ci/docker/dist-x86_64-musl/Dockerfile
-@@ -30,7 +30,6 @@ RUN sh /scripts/sccache.sh
+@@ -25,7 +25,6 @@ RUN sh /scripts/sccache.sh
  
  ENV RUST_CONFIGURE_ARGS \
        --target=x86_64-unknown-linux-musl \
@@ -419,5 +412,5 @@ index 6e5e139715..d99cb55cc5 100644
      base.crt_static_default = true;
      // These targets allow the user to choose between static and dynamic linking.
 -- 
-2.13.5
+2.13.6
 
