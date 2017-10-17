@@ -1,4 +1,4 @@
-From 963789f0c79d08579bda8acb9881611b06a4b978 Mon Sep 17 00:00:00 2001
+From ede5ae2d6278c7309601d2bb2dde55e5c91fbac2 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:04:29 -0500
 Subject: [PATCH 7/8] Fix LLVM build

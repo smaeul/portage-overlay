@@ -1,4 +1,4 @@
-From b180e426de3ec6226f263ffd675e0900aae99c6d Mon Sep 17 00:00:00 2001
+From b6ace9145b6ec3540b17c7253ed3b042eb8aee5e Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
 Subject: [PATCH 4/8] Require static native libraries when linking static
@@ -9,7 +9,7 @@ Subject: [PATCH 4/8] Require static native libraries when linking static
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/src/librustc_trans/back/link.rs b/src/librustc_trans/back/link.rs
-index 5de48fbce9..ead60bc9e0 100644
+index 5de48fbce9..4b4b5846af 100644
 --- a/src/librustc_trans/back/link.rs
 +++ b/src/librustc_trans/back/link.rs
 @@ -1312,8 +1312,8 @@ fn add_upstream_rust_crates(cmd: &mut Linker,
@@ -30,7 +30,7 @@ index 5de48fbce9..ead60bc9e0 100644
 -                NativeLibraryKind::NativeUnknown => cmd.link_dylib(&lib.name.as_str()),
 +                NativeLibraryKind::NativeUnknown => {
 +                    // When creating executables, match library linkage to that of the executable.
-+                    if sess.crt_static() && !sess.target.target.options.crt_static_allows_dylibs {
++                    if crate_type == config::CrateTypeExecutable && sess.crt_static() {
 +                        cmd.link_staticlib(&lib.name.as_str())
 +                    } else {
 +                        cmd.link_dylib(&lib.name.as_str())

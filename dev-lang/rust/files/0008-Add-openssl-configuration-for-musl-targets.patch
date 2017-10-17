@@ -1,4 +1,4 @@
-From 94d2f97a86cfcf70e06c00db88c3a529c592cb93 Mon Sep 17 00:00:00 2001
+From 6fe9d7428e87bd13d96895cc56568104fe2cc112 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 11 Sep 2017 11:21:56 -0500
 Subject: [PATCH 8/8] Add openssl configuration for musl targets
