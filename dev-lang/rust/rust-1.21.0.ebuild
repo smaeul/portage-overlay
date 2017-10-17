@@ -23,7 +23,23 @@ else
 	KEYWORDS="~amd64 ~arm ~x86"
 fi
 
-CTARGET=${CHOST/gentoo/unknown}
+case "${CHOST}" in
+	armv7a-hardfloat-*)
+		RUSTARCH=armv7 ;;
+	arm*)
+		RUSTARCH=arm ;;
+	*)
+		RUSTARCH=${CHOST%%-*} ;;
+esac
+case "${CHOST}" in
+	armv7a-hardfloat-*)
+		RUSTLIBC=${ELIBC}eabihf ;;
+	arm*)
+		RUSTLIBC=${ELIBC}eabi ;;
+	*)
+		RUSTLIBC=${ELIBC} ;;
+esac
+RUSTHOST=${RUSTARCH}-unknown-${KERNEL}-${RUSTLIBC}
 STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
@@ -35,8 +51,14 @@ SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
 		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-x86_64-unknown-linux-musl.tar.xz )
 	)
 	arm? (
-		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-arm-unknown-linux-gnueabi.tar.xz )
-		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-arm-unknown-linux-musleabi.tar.xz )
+		elibc_glibc? (
+			https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-arm-unknown-linux-gnueabi.tar.xz
+			https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-armv7-unknown-linux-gnueabihf.tar.xz
+		)
+		elibc_musl? (
+			https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-arm-unknown-linux-musleabi.tar.xz
+			https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-armv7-unknown-linux-musleabihf.tar.xz
+		)
 	)
 	x86? (
 		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-i686-unknown-linux-gnu.tar.xz )
@@ -92,9 +114,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	"${WORKDIR}/rust-${STAGE0_VERSION}-${CTARGET}/install.sh" \
+	"${WORKDIR}/rust-${STAGE0_VERSION}-${RUSTHOST}/install.sh" \
 		--prefix="${WORKDIR}/stage0" \
-		--components=rust-std-${CTARGET},rustc,cargo \
+		--components=rust-std-${RUSTHOST},rustc,cargo \
 		--disable-ldconfig \
 		|| die
 }
@@ -104,9 +126,9 @@ src_configure() {
 		[llvm]
 		ninja = true
 		[build]
-		build = "${CTARGET}"
-		host = ["${CTARGET}"]
-		target = ["${CTARGET}"]
+		build = "${RUSTHOST}"
+		host = ["${RUSTHOST}"]
+		target = ["${RUSTHOST}"]
 		cargo = "${WORKDIR}/stage0/bin/cargo"
 		rustc = "${WORKDIR}/stage0/bin/rustc"
 		docs = $(toml_usex doc)
@@ -128,7 +150,7 @@ src_configure() {
 		use-jemalloc = $(toml_usex jemalloc)
 		channel = "${SLOT%%/*}"
 		rpath = false
-		[target.${CTARGET}]
+		[target.${RUSTHOST}]
 		cc = "$(tc-getCC)"
 		cxx = "$(tc-getCXX)"
 		crt-static = false
@@ -157,7 +179,7 @@ src_install() {
 
 	rm "${D}/usr/lib/rustlib/components" || die
 	rm "${D}/usr/lib/rustlib/install.log" || die
-	rm "${D}/usr/lib/rustlib/manifest-rust-std-${CTARGET}" || die
+	rm "${D}/usr/lib/rustlib/manifest-rust-std-${RUSTHOST}" || die
 	rm "${D}/usr/lib/rustlib/manifest-rustc" || die
 	rm "${D}/usr/lib/rustlib/rust-installer-version" || die
 	rm "${D}/usr/lib/rustlib/uninstall.sh" || die
