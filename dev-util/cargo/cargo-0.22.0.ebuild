@@ -124,8 +124,24 @@ ws2_32-sys-0.2.1
 
 inherit bash-completion-r1 cargo versionator
 
+case "${CHOST}" in
+	armv7a-hardfloat-*)
+		CARGOARCH=armv7 ;;
+	arm*)
+		CARGOARCH=arm ;;
+	*)
+		CARGOARCH=${CHOST%%-*} ;;
+esac
+case "${CHOST}" in
+	armv7a-hardfloat-*)
+		CARGOLIBC=${ELIBC/glibc/gnu}eabihf ;;
+	arm*)
+		CARGOLIBC=${ELIBC/glibc/gnu}eabi ;;
+	*)
+		CARGOLIBC=${ELIBC/glibc/gnu} ;;
+esac
+CARGOHOST=${CARGOARCH}-unknown-${KERNEL}-${CARGOLIBC}
 CARGO_SNAPSHOT_VERSION="0.$(($(get_version_component_range 2) - 1)).0"
-CTARGET=${CHOST/gentoo/unknown}
 
 DESCRIPTION="The Rust's package manager"
 HOMEPAGE="http://crates.io"
@@ -203,7 +219,7 @@ src_prepare() {
 
 src_compile() {
 	export CARGO_HOME="${ECARGO_HOME}"
-	local cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CTARGET}/cargo/bin/cargo"
+	local cargo="${WORKDIR}/cargo-${CARGO_SNAPSHOT_VERSION}-${CARGOHOST}/cargo/bin/cargo"
 	${cargo} build --release || die
 
 	# Build HTML documentation
