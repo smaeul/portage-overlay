@@ -33,11 +33,11 @@ case "${CHOST}" in
 esac
 case "${CHOST}" in
 	armv7a-hardfloat-*)
-		RUSTLIBC=${ELIBC}eabihf ;;
+		RUSTLIBC=${ELIBC/glibc/gnu}eabihf ;;
 	arm*)
-		RUSTLIBC=${ELIBC}eabi ;;
+		RUSTLIBC=${ELIBC/glibc/gnu}eabi ;;
 	*)
-		RUSTLIBC=${ELIBC} ;;
+		RUSTLIBC=${ELIBC/glibc/gnu} ;;
 esac
 RUSTHOST=${RUSTARCH}-unknown-${KERNEL}-${RUSTLIBC}
 STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).0"
