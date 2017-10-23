@@ -8,7 +8,7 @@ CHROMIUM_LANGS="am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
 	hi hr hu id it ja kn ko lt lv ml mr ms nb nl pl pt-BR pt-PT ro ru sk sl sr
 	sv sw ta te th tr uk vi zh-CN zh-TW"
 
-inherit check-reqs chromium-2 eutils gnome2-utils flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 readme.gentoo-r1 toolchain-funcs versionator virtualx xdg-utils
+inherit check-reqs chromium-2 eutils gnome2-utils flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 readme.gentoo-r1 toolchain-funcs versionator xdg-utils
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="http://chromium.org/"
@@ -20,19 +20,13 @@ KEYWORDS="amd64 ~arm ~arm64 ~x86"
 IUSE="component-build cups +dbus gnome-keyring +gtk3 +hangouts kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
-# Native Client binaries are compiled with different set of flags, bug #452066.
-QA_FLAGS_IGNORED=".*\.nexe"
-
-# Native Client binaries may be stripped by the build system, which uses the
-# right tools for it, bug #469144 .
-QA_PRESTRIPPED=".*\.nexe"
-
 COMMON_DEPEND="
 	app-arch/bzip2:=
 	cups? ( >=net-print/cups-1.3.11:= )
 	dev-libs/expat:=
 	dev-libs/glib:2
-	system-icu? ( <dev-libs/icu-59:= )
+	system-icu? ( >=dev-libs/icu-59:= )
+	>=dev-libs/libxml2-2.9.4-r3:=[icu]
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
 	>=dev-libs/nss-3.14.3:=
@@ -152,13 +146,10 @@ GTK+ icon theme.
 PATCHES=(
 	"${FILESDIR}/${PN}-widevine-r1.patch"
 	"${FILESDIR}/${PN}-FORTIFY_SOURCE-r2.patch"
-	"${FILESDIR}/${PN}-gcc-r1.patch"
-	"${FILESDIR}/${PN}-gn-bootstrap-r14.patch"
-	"${FILESDIR}/${PN}-gtk2-r1.patch"
-	"${FILESDIR}/${PN}-atk-r1.patch"
-	"${FILESDIR}/${PN}-mojo-dep.patch"
-	"${FILESDIR}/${PN}-gcc5-r1.patch"
-	"${FILESDIR}/${PN}-optional-dbus-r1.patch"
+	"${FILESDIR}/${PN}-gcc5-r3.patch"
+	"${FILESDIR}/${PN}-gn-bootstrap-r17.patch"
+	"${FILESDIR}/${PN}-gtk2-r2.patch"
+	"${FILESDIR}/${PN}-optional-dbus-r2.patch"
 	"${FILESDIR}/musl-bootstrap-r1.patch"
 	"${FILESDIR}/musl-cdefs.patch"
 	"${FILESDIR}/musl-dlopen.patch"
@@ -267,6 +258,7 @@ src_prepare() {
 		third_party/ced
 		third_party/cld_2
 		third_party/cld_3
+		third_party/crc32c
 		third_party/cros_system_api
 		third_party/devscripts
 		third_party/dom_distiller_js
@@ -294,7 +286,7 @@ src_prepare() {
 		third_party/libsrtp
 		third_party/libudev
 		third_party/libwebm
-		third_party/libxml
+		third_party/libxml/chromium
 		third_party/libyuv
 		third_party/lss
 		third_party/lzma_sdk
@@ -303,7 +295,7 @@ src_prepare() {
 		third_party/modp_b64
 		third_party/mt19937ar
 		third_party/node
-		third_party/node/node_modules/vulcanize/third_party/UglifyJS2
+		third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2
 		third_party/openmax_dl
 		third_party/ots
 		third_party/pdfium
@@ -312,7 +304,7 @@ src_prepare() {
 		third_party/pdfium/third_party/build
 		third_party/pdfium/third_party/bigint
 		third_party/pdfium/third_party/freetype
-		third_party/pdfium/third_party/lcms2-2.6
+		third_party/pdfium/third_party/lcms
 		third_party/pdfium/third_party/libopenjpeg20
 		third_party/pdfium/third_party/libpng16
 		third_party/pdfium/third_party/libtiff
@@ -323,6 +315,7 @@ src_prepare() {
 		third_party/qcms
 		third_party/sfntly
 		third_party/skia
+		third_party/skia/third_party/gif
 		third_party/skia/third_party/vulkan
 		third_party/smhasher
 		third_party/spirv-headers
@@ -405,7 +398,6 @@ src_configure() {
 	# TODO: freetype (https://bugs.chromium.org/p/pdfium/issues/detail?id=733).
 	# TODO: use_system_hunspell (upstream changes needed).
 	# TODO: use_system_libsrtp (bug #459932).
-	# TODO: xml (bug #616818).
 	# TODO: use_system_protobuf (bug #525560).
 	# TODO: use_system_ssl (http://crbug.com/58087).
 	# TODO: use_system_sqlite (http://crbug.com/22208).
@@ -418,6 +410,7 @@ src_configure() {
 		libjpeg
 		libpng
 		libwebp
+		libxml
 		libxslt
 		openh264
 		re2
@@ -527,14 +520,14 @@ src_configure() {
 	tc-export AR CC CXX NM
 
 	# Define a custom toolchain for GN
-	myconf_gn+=" custom_toolchain=\"${FILESDIR}/toolchain:default\""
+	myconf_gn+=" custom_toolchain=\"//build/toolchain/linux/unbundle:default\""
 
 	if tc-is-cross-compiler; then
 		tc-export BUILD_{AR,CC,CXX,NM}
-		myconf_gn+=" host_toolchain=\"${FILESDIR}/toolchain:host\""
-		myconf_gn+=" v8_snapshot_toolchain=\"${FILESDIR}/toolchain:host\""
+		myconf_gn+=" host_toolchain=\"//build/toolchain/linux/unbundle:host\""
+		myconf_gn+=" v8_snapshot_toolchain=\"//build/toolchain/linux/unbundle:host\""
 	else
-		myconf_gn+=" host_toolchain=\"${FILESDIR}/toolchain:default\""
+		myconf_gn+=" host_toolchain=\"//build/toolchain/linux/unbundle:default\""
 	fi
 
 	# https://bugs.gentoo.org/588596
@@ -559,10 +552,6 @@ src_configure() {
 		chromium/scripts/generate_gn.py || die
 		popd > /dev/null || die
 	fi
-
-	third_party/libaddressinput/chromium/tools/update-strings.py || die
-
-	touch chrome/test/data/webui/i18n_process_css_test.html || die
 
 	bootstrap_gn
 
@@ -605,13 +594,6 @@ src_install() {
 	fi
 
 	doexe out/Release/chromedriver
-
-	# if ! use arm; then
-	#	doexe out/Release/nacl_helper{,_bootstrap} || die
-	#	insinto "${CHROMIUM_HOME}"
-	#	doins out/Release/nacl_irt_*.nexe || die
-	#	doins out/Release/libppGoogleNaClPluginChrome.so || die
-	# fi
 
 	local sedargs=( -e "s:/usr/lib/:/usr/$(get_libdir)/:g" )
 	sed "${sedargs[@]}" "${FILESDIR}/chromium-launcher-r3.sh" > chromium-launcher.sh || die

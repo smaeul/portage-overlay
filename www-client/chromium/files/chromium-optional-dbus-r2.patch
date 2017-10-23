@@ -72,9 +72,9 @@ index cee5e1d..df6a895 100644
 @@ -77,7 +77,7 @@ bool BluetoothAdapterFactory::IsBluetoothSupported() {
    if (default_adapter.Get())
      return true;
- #if defined(OS_ANDROID) || defined(OS_CHROMEOS) || defined(OS_WIN) || \
--    defined(OS_LINUX) || defined(OS_MACOSX)
-+    (defined(OS_LINUX) && defined(USE_DBUS)) || defined(OS_MACOSX)
+-#if defined(OS_ANDROID) || defined(OS_WIN) || defined(OS_LINUX) || \
++#if defined(OS_ANDROID) || defined(OS_WIN) || (defined(OS_LINUX) && defined(USE_DBUS)) || \
+     defined(OS_MACOSX)
    return true;
  #else
    return false;
@@ -82,8 +82,8 @@ index cee5e1d..df6a895 100644
    return base::win::GetVersion() >= base::win::VERSION_WIN10;
  #elif defined(OS_MACOSX)
    return base::mac::IsAtLeastOS10_10();
--#elif defined(OS_LINUX) || defined(OS_CHROMEOS)
-+#elif (defined(OS_LINUX) && defined(USE_DBUS)) || defined(OS_CHROMEOS)
+-#elif defined(OS_LINUX)
++#elif (defined(OS_LINUX) && defined(USE_DBUS))
    return true;
  #else
    return false;

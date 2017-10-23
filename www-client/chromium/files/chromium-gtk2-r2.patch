@@ -1,0 +1,69 @@
+diff --git chromium-61.0.3163.79/chrome/browser/ui/libgtkui/gtk_ui.cc
+index a38c6b8..d578b8a 100644
+--- chromium-61.0.3163.79/chrome/browser/ui/libgtkui/gtk_ui.cc.orig
++++ chromium-61.0.3163.79/chrome/browser/ui/libgtkui/gtk_ui.cc
+@@ -279,6 +279,7 @@ int indicators_count;
+ // The unknown content type.
+ const char* kUnknownContentType = "application/octet-stream";
+ 
++#if GTK_MAJOR_VERSION > 2 || defined(USE_GCONF)
+ std::unique_ptr<NavButtonLayoutManager> CreateNavButtonLayoutManager(
+     GtkUi* gtk_ui) {
+ #if GTK_MAJOR_VERSION == 3
+@@ -290,6 +291,7 @@ std::unique_ptr<NavButtonLayoutManager> CreateNavButtonLayoutManager(
+ #endif
+   return nullptr;
+ }
++#endif
+ 
+ // Returns a gfx::FontRenderParams corresponding to GTK's configuration.
+ gfx::FontRenderParams GetGtkFontRenderParams() {
+@@ -472,8 +474,10 @@ void GtkUi::Initialize() {
+       &GetPdfPaperSizeDeviceUnitsGtk);
+ #endif
+ 
++#if GTK_MAJOR_VERSION > 2 || defined(USE_GCONF)
+   // We must build this after GTK gets initialized.
+   nav_button_layout_manager_ = CreateNavButtonLayoutManager(this);
++#endif
+ 
+   indicators_count = 0;
+ 
+@@ -1048,6 +1048,7 @@ void GtkUi::ResetStyle() {
+   native_theme_->NotifyObservers();
+ }
+ 
++#if GTK_MAJOR_VERSION > 2
+ float GtkUi::GetRawDeviceScaleFactor() {
+   if (display::Display::HasForceDeviceScaleFactor())
+     return display::Display::GetForcedDeviceScaleFactor();
+@@ -1061,10 +1062,15 @@ float GtkUi::GetRawDeviceScaleFactor() {
+   // to 1 decimal to prevent rendering problems (crbug.com/485183).
+   return scale_factor < 1.2f ? 1.0f : roundf(scale_factor * 10) / 10;
+ }
++#endif
+ 
+ void GtkUi::UpdateDeviceScaleFactor() {
+   float old_device_scale_factor = device_scale_factor_;
++#if GTK_MAJOR_VERSION == 2
++  device_scale_factor_ = 1.0f;
++#else
+   device_scale_factor_ = GetRawDeviceScaleFactor();
++#endif
+   if (device_scale_factor_ != old_device_scale_factor) {
+     for (views::DeviceScaleFactorObserver& observer :
+          device_scale_factor_observer_list_) {
+diff --git chromium-62.0.3202.62/chrome/browser/ui/libgtkui/gtk_ui.h.orig chromium-62.0.3202.62/chrome/browser/ui/libgtkui/gtk_ui.h
+index 3048cf8..a50bdab 100644
+--- chromium-62.0.3202.62/chrome/browser/ui/libgtkui/gtk_ui.h.orig
++++ chromium-62.0.3202.62/chrome/browser/ui/libgtkui/gtk_ui.h
+@@ -171,7 +171,9 @@ class GtkUi : public views::LinuxUI {
+   gfx::Font::Weight default_font_weight_ = gfx::Font::Weight::NORMAL;
+   gfx::FontRenderParams default_font_render_params_;
+ 
++#if GTK_MAJOR_VERSION > 2 || defined(USE_GCONF)
+   std::unique_ptr<NavButtonLayoutManager> nav_button_layout_manager_;
++#endif
+ 
+   // Frame button layout state.  If |nav_buttons_set_| is false, then
+   // |leading_buttons_| and |trailing_buttons_| are meaningless.
