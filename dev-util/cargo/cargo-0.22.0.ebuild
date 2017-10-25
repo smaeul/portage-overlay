@@ -15,6 +15,7 @@ backtrace-sys-0.1.12
 bitflags-0.7.0
 bitflags-0.9.1
 bufstream-0.1.3
+cc-1.0.0
 cfg-if-0.1.2
 cmake-0.1.24
 conv-0.3.3
@@ -69,9 +70,9 @@ num-iter-0.1.34
 num-rational-0.1.39
 num-traits-0.1.40
 num_cpus-1.6.2
-openssl-0.9.15
+openssl-0.9.20
 openssl-probe-0.1.1
-openssl-sys-0.9.15
+openssl-sys-0.9.20
 percent-encoding-1.0.0
 pkg-config-0.3.9
 psapi-sys-0.1.0
@@ -172,50 +173,32 @@ LICENSE="|| ( MIT Apache-2.0 )"
 SLOT="0"
 KEYWORDS="~amd64 ~arm ~x86"
 
-IUSE="bash-completion doc libressl static"
+IUSE="bash-completion doc libressl"
 
+COMMON_DEPEND="
+	libressl? (
+		>=dev-libs/libressl-2.5.0:=
+		<dev-libs/libressl-2.6.3:=
+	)
+	!libressl? ( dev-libs/openssl:0= )
+	net-libs/http-parser:=
+	net-libs/libssh2:=
+	net-misc/curl:=[ssl]
+	sys-libs/zlib:=
+"
 DEPEND="
-    static? (
-		libressl? ( <dev-libs/libressl-2.6.1[static-libs] )
-		!libressl? ( dev-libs/openssl[static-libs] )
-		net-libs/http-parser[static-libs]
-        net-libs/libssh2[static-libs]
-        net-misc/curl[ssl,static-libs]
-		sys-libs/zlib[static-libs]
-    )
-    !static? (
-		libressl? ( <dev-libs/libressl-2.6.1 )
-		!libressl? ( dev-libs/openssl )
-		net-libs/http-parser
-        net-libs/libssh2
-        net-misc/curl[ssl]
-		sys-libs/zlib
-    )
+	${COMMON_DEPEND}
 	dev-util/cmake
-	sys-apps/coreutils
-	sys-apps/diffutils
-	sys-apps/findutils
-	sys-apps/sed
 	>=virtual/rust-1.9.0
 "
 RDEPEND="
+	${COMMON_DEPEND}
 	!dev-util/cargo-bin
-    !static? (
-		libressl? ( <dev-libs/libressl-2.6.1:0= )
-		!libressl? ( dev-libs/openssl:0= )
-		net-libs/http-parser:=
-        net-libs/libssh2:=
-        net-misc/curl:=[ssl]
-		sys-libs/zlib:=
-    )
 "
 
-src_prepare() {
-	default
-
-	# libressl needs a newer version of openssl-sys
-	use libressl && rm Cargo.lock
-}
+PATCHES=(
+	"${FILESDIR}/${P}-libressl-2.6.2.patch"
+)
 
 src_compile() {
 	export CARGO_HOME="${ECARGO_HOME}"
