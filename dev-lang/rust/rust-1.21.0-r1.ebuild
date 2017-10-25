@@ -96,6 +96,7 @@ PATCHES=(
 	"${FILESDIR}/0007-Fix-LLVM-build.patch"
 	"${FILESDIR}/0008-Add-openssl-configuration-for-musl-targets.patch"
 	"${FILESDIR}/0009-liblibc.patch"
+	"${FILESDIR}/0010-static-linking-default.patch"
 	"${FILESDIR}/llvm-musl-fixes.patch"
 )
 
