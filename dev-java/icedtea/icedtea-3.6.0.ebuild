@@ -13,16 +13,16 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="b5485d6bc171.tar.xz"
-JAXP_TARBALL="c8bf6508b7a5.tar.xz"
-JAXWS_TARBALL="4fb919272935.tar.xz"
-JDK_TARBALL="db0baea3a4f0.tar.xz"
-LANGTOOLS_TARBALL="74bbbc7a8bd3.tar.xz"
-OPENJDK_TARBALL="80ab5dd98579.tar.xz"
-NASHORN_TARBALL="bad6bd2d128e.tar.xz"
-HOTSPOT_TARBALL="ecaa25cbc662.tar.xz"
-SHENANDOAH_TARBALL="26bb4cd21d34.tar.xz"
-AARCH32_TARBALL="b93c39bf2bcf.tar.xz"
+CORBA_TARBALL="13a5a8a3c66f.tar.xz"
+JAXP_TARBALL="947a7b1ce48b.tar.xz"
+JAXWS_TARBALL="eafb356c44d0.tar.xz"
+JDK_TARBALL="a05e38417041.tar.xz"
+LANGTOOLS_TARBALL="61a1c711f7ab.tar.xz"
+OPENJDK_TARBALL="eb577ed6ec93.tar.xz"
+NASHORN_TARBALL="a2d2fc80c97a.tar.xz"
+HOTSPOT_TARBALL="9bad7d4825fb.tar.xz"
+SHENANDOAH_TARBALL="7eeed7dc4676.tar.xz"
+AARCH32_TARBALL="7b008fa0fb6d.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -127,7 +127,7 @@ RDEPEND="${COMMON_DEP}
 	selinux? ( sec-policy/selinux-java )"
 
 # ca-certificates, perl and openssl are used for the cacerts keystore generation
-# perl is needed for running the SystemTap tests
+# perl is needed for running the SystemTap tests and the bootstrap javac
 # lsb-release is used to obtain distro information for the version & crash dump output
 # attr is needed for xattr.h which defines the extended attribute syscalls used by NIO2
 # x11-libs/libXt is needed for headers only (Intrinsic.h, IntrinsicP.h, Shell.h, StringDefs.h)
