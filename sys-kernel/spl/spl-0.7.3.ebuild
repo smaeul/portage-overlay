@@ -56,7 +56,7 @@ pkg_setup() {
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
-		{ kernel_is le 4 13 || die "Linux 4.13 is the latest supported version."; }
+		{ kernel_is le 4 14 || die "Linux 4.14 is the latest supported version."; }
 }
 
 src_prepare() {
