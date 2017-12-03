@@ -3,7 +3,7 @@
 # $Id$
 
 EAPI=6
-PYTHON_COMPAT=( python2_7 python3_4 )
+PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
 
 inherit cron eutils multilib python-any-r1 toolchain-funcs
 
