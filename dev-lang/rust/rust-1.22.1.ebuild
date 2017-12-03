@@ -87,16 +87,14 @@ PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
 "
 
 PATCHES=(
-	"${FILESDIR}/0001-Explicitly-run-perl-for-OpenSSL-Configure.patch"
-	"${FILESDIR}/0002-Require-rlibs-for-dependent-crates-when-linking-stat.patch"
-	"${FILESDIR}/0003-Adjust-dependency-resolution-errors-to-be-more-consi.patch"
-	"${FILESDIR}/0004-Require-static-native-libraries-when-linking-static-.patch"
-	"${FILESDIR}/0005-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
-	"${FILESDIR}/0006-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
-	"${FILESDIR}/0007-Fix-LLVM-build.patch"
-	"${FILESDIR}/0008-Add-openssl-configuration-for-musl-targets.patch"
-	"${FILESDIR}/0009-liblibc.patch"
-	"${FILESDIR}/0010-static-linking-default.patch"
+	"${FILESDIR}/0001-Require-static-native-libraries-when-linking-static-.patch"
+	"${FILESDIR}/0002-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
+	"${FILESDIR}/0003-Switch-musl-targets-to-link-dynamically-by-default.patch"
+	"${FILESDIR}/0004-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
+	"${FILESDIR}/0005-Fix-LLVM-build.patch"
+	"${FILESDIR}/0006-Fix-rustdoc-for-cross-targets.patch"
+	"${FILESDIR}/0007-Add-openssl-configuration-for-musl-targets.patch"
+	"${FILESDIR}/0008-liblibc.patch"
 	"${FILESDIR}/llvm-musl-fixes.patch"
 )
 

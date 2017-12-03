@@ -1,17 +1,17 @@
-From 6fe9d7428e87bd13d96895cc56568104fe2cc112 Mon Sep 17 00:00:00 2001
+From b9c6c9f17c3dddf51e3e81df1e8bc74bf3b8f3e0 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 11 Sep 2017 11:21:56 -0500
-Subject: [PATCH 8/8] Add openssl configuration for musl targets
+Subject: [PATCH 7/7] Add openssl configuration for musl targets
 
 ---
  src/bootstrap/native.rs | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/native.rs b/src/bootstrap/native.rs
-index 58148c7c8b..6cd5b011a5 100644
+index c4e8063031..ce645b7313 100644
 --- a/src/bootstrap/native.rs
 +++ b/src/bootstrap/native.rs
-@@ -401,17 +401,22 @@ impl Step for Openssl {
+@@ -403,8 +403,11 @@ impl Step for Openssl {
              "arm-linux-androideabi" => "android",
              "arm-unknown-linux-gnueabi" => "linux-armv4",
              "arm-unknown-linux-gnueabihf" => "linux-armv4",
@@ -24,8 +24,9 @@ index 58148c7c8b..6cd5b011a5 100644
              "i686-apple-darwin" => "darwin-i386-cc",
              "i686-linux-android" => "android-x86",
              "i686-unknown-freebsd" => "BSD-x86-elf",
-             "i686-unknown-linux-gnu" => "linux-elf",
+@@ -412,9 +415,11 @@ impl Step for Openssl {
              "i686-unknown-linux-musl" => "linux-elf",
+             "i686-unknown-netbsd" => "BSD-x86-elf",
              "mips-unknown-linux-gnu" => "linux-mips32",
 +            "mips-unknown-linux-musl" => "linux-mips32",
              "mips64-unknown-linux-gnuabi64" => "linux64-mips64",

@@ -1,3 +1,12 @@
+From f60814ca5d1191f6c4dc56d7df01c0a264512995 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Thu, 30 Nov 2017 08:15:51 -0600
+Subject: [PATCH 3/7] Switch musl targets to link dynamically by default
+
+---
+ src/librustc_back/target/linux_musl_base.rs | 2 --
+ 1 file changed, 2 deletions(-)
+
 diff --git a/src/librustc_back/target/linux_musl_base.rs b/src/librustc_back/target/linux_musl_base.rs
 index d99cb55cc5..bb786bf0f3 100644
 --- a/src/librustc_back/target/linux_musl_base.rs
@@ -11,3 +20,6 @@ index d99cb55cc5..bb786bf0f3 100644
      // These targets allow the user to choose between static and dynamic linking.
      base.crt_static_respected = true;
  
+-- 
+2.13.6
+
