@@ -33,6 +33,7 @@ RDEPEND="${COMMON_DEPEND}
 AT_M4DIR="config"
 AUTOTOOLS_IN_SOURCE_BUILD="1"
 DOCS=( AUTHORS DISCLAIMER )
+PATCHES="${FILESDIR}/${P}-linux-4.14.patch"
 
 pkg_setup() {
 	CONFIG_CHECK="
@@ -72,6 +73,8 @@ src_prepare() {
 		{ sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" "${S}/META" || die "Could not set Gentoo release"; }
 
 	autotools-utils_src_prepare
+
+	eautoreconf
 }
 
 src_configure() {
