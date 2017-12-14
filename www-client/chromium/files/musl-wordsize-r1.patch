@@ -1,5 +1,5 @@
---- chromium/breakpad/src/common/linux/elf_core_dump.h
-+++ chromium/breakpad/src/common/linux/elf_core_dump.h
+--- chromium-63.0.3239.84/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
++++ chromium-63.0.3239.84/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
 @@ -36,6 +36,7 @@
  #include <elf.h>
  #include <link.h>

@@ -58,15 +58,15 @@
    static base::span<const gfx::Rect> shape(
 --- a/services/viz/public/cpp/compositing/quads_struct_traits.h
 +++ b/services/viz/public/cpp/compositing/quads_struct_traits.h
-@@ -284,7 +284,7 @@
- 
-   static base::span<const float> vertex_opacity(const cc::DrawQuad& input) {
-     const cc::TextureDrawQuad* quad = cc::TextureDrawQuad::MaterialCast(&input);
+@@ -303,7 +303,7 @@ struct StructTraits<viz::mojom::TextureQuadStateDataView, viz::DrawQuad> {
+   static base::span<const float> vertex_opacity(const viz::DrawQuad& input) {
+     const viz::TextureDrawQuad* quad =
+         viz::TextureDrawQuad::MaterialCast(&input);
 -    return quad->vertex_opacity;
 +    return base::make_span(quad->vertex_opacity);
    }
- 
-   static bool y_flipped(const cc::DrawQuad& input) {
+
+   static bool y_flipped(const viz::DrawQuad& input) {
 --- a/third_party/WebKit/Source/platform/exported/WebCORS.cpp
 +++ b/third_party/WebKit/Source/platform/exported/WebCORS.cpp
 @@ -480,7 +480,7 @@ WebString AccessControlErrorString(

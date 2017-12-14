@@ -319,7 +319,7 @@ index b7ba6cd..491ef26 100644
 @@ -608,19 +642,28 @@ bool NetworkingPrivateLinux::DisableNetworkType(const std::string& type) {
  }
  
- bool NetworkingPrivateLinux::RequestScan() {
+ bool NetworkingPrivateLinux::RequestScan(const std::string& /* type */) {
 +#if defined(USE_DBUS)
    return GetNetworksForScanRequest();
 +#else

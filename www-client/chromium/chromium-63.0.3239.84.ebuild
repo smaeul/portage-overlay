@@ -25,7 +25,7 @@ COMMON_DEPEND="
 	cups? ( >=net-print/cups-1.3.11:= )
 	dev-libs/expat:=
 	dev-libs/glib:2
-	system-icu? ( >=dev-libs/icu-59:= )
+	system-icu? ( >=dev-libs/icu-59 <dev-libs/icu-60:= )
 	>=dev-libs/libxml2-2.9.4-r3:=[icu]
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
@@ -35,7 +35,7 @@ COMMON_DEPEND="
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
-	>=media-libs/harfbuzz-1.4.2:=[icu(-)]
+	>=media-libs/harfbuzz-1.5.0:=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
 	system-libvpx? ( media-libs/libvpx:=[postproc,svc] )
@@ -146,16 +146,18 @@ GTK+ icon theme.
 PATCHES=(
 	"${FILESDIR}/${PN}-widevine-r1.patch"
 	"${FILESDIR}/${PN}-FORTIFY_SOURCE-r2.patch"
-	"${FILESDIR}/${PN}-gcc5-r3.patch"
-	"${FILESDIR}/${PN}-gn-bootstrap-r17.patch"
+	"${FILESDIR}/${PN}-gcc5-r4.patch"
+	"${FILESDIR}/${PN}-clang-r1.patch"
+	"${FILESDIR}/${PN}-webrtc-r0.patch"
+	"${FILESDIR}/${PN}-gcc5-r5.patch"
 	"${FILESDIR}/${PN}-gtk2-r2.patch"
-	"${FILESDIR}/${PN}-optional-dbus-r2.patch"
+	"${FILESDIR}/${PN}-optional-dbus-r3.patch"
 	"${FILESDIR}/musl-bootstrap-r1.patch"
 	"${FILESDIR}/musl-cdefs.patch"
 	"${FILESDIR}/musl-dlopen.patch"
 	"${FILESDIR}/musl-dns-r1.patch"
 	"${FILESDIR}/musl-execinfo-r5.patch"
-	"${FILESDIR}/musl-fpstate.patch"
+	"${FILESDIR}/musl-fpstate-r1.patch"
 	"${FILESDIR}/musl-headers-r1.patch"
 	"${FILESDIR}/musl-mallinfo-r6.patch"
 	"${FILESDIR}/musl-pthread-r4.patch"
@@ -166,8 +168,8 @@ PATCHES=(
 	"${FILESDIR}/musl-stacksize-r2.patch"
 	"${FILESDIR}/musl-stacktrace-r1.patch"
 	"${FILESDIR}/musl-syscall.patch"
-	"${FILESDIR}/musl-ucontext.patch"
-	"${FILESDIR}/musl-wordsize.patch"
+	"${FILESDIR}/musl-ucontext-r1.patch"
+	"${FILESDIR}/musl-wordsize-r1.patch"
 )
 
 pre_build_checks() {
@@ -229,7 +231,6 @@ src_prepare() {
 		base/third_party/valgrind
 		base/third_party/xdg_mime
 		base/third_party/xdg_user_dirs
-		breakpad/src/third_party/curl
 		chrome/third_party/mozilla_security_manager
 		courgette/third_party
 		net/third_party/mozilla_security_manager
@@ -238,23 +239,26 @@ src_prepare() {
 		third_party/analytics
 		third_party/angle
 		third_party/angle/src/common/third_party/base
-		third_party/angle/src/common/third_party/murmurhash
+		third_party/angle/src/common/third_party/smhasher
 		third_party/angle/src/third_party/compiler
 		third_party/angle/src/third_party/libXNVCtrl
 		third_party/angle/src/third_party/trace_event
+		third_party/blink
 		third_party/boringssl
+		third_party/breakpad
+		third_party/breakpad/breakpad/src/third_party/curl
 		third_party/brotli
 		third_party/cacheinvalidation
 		third_party/catapult
+		third_party/catapult/common/py_vulcanize/third_party/rcssmin
+		third_party/catapult/common/py_vulcanize/third_party/rjsmin
 		third_party/catapult/third_party/polymer
-		third_party/catapult/third_party/py_vulcanize
-		third_party/catapult/third_party/py_vulcanize/third_party/rcssmin
-		third_party/catapult/third_party/py_vulcanize/third_party/rjsmin
 		third_party/catapult/tracing/third_party/d3
 		third_party/catapult/tracing/third_party/gl-matrix
 		third_party/catapult/tracing/third_party/jszip
 		third_party/catapult/tracing/third_party/mannwhitneyu
 		third_party/catapult/tracing/third_party/oboe
+		third_party/catapult/tracing/third_party/pako
 		third_party/ced
 		third_party/cld_2
 		third_party/cld_3
@@ -405,7 +409,8 @@ src_configure() {
 	# libevent: https://bugs.gentoo.org/593458
 	local gn_system_libraries=(
 		flac
-		harfbuzz-ng
+		# Need harfbuzz_from_pkgconfig target
+		#harfbuzz-ng
 		libdrm
 		libjpeg
 		libpng
@@ -428,6 +433,9 @@ src_configure() {
 		gn_system_libraries+=( libvpx )
 	fi
 	build/linux/unbundle/replace_gn_files.py --system-libraries "${gn_system_libraries[@]}" || die
+
+	# See dependency logic in third_party/BUILD.gn
+	myconf_gn+=" use_system_harfbuzz=true"
 
 	# Optional dependencies.
 	myconf_gn+=" enable_hangout_services_extension=$(usex hangouts true false)"
@@ -562,23 +570,26 @@ src_configure() {
 }
 
 src_compile() {
-	local ninja_targets="chrome chromedriver"
-	if use suid; then
-		ninja_targets+=" chrome_sandbox"
-	fi
-
 	# Build mksnapshot and pax-mark it.
-	if tc-is-cross-compiler; then
-		eninja -C out/Release host/mksnapshot || die
-		pax-mark m out/Release/host/mksnapshot
-	else
-		eninja -C out/Release mksnapshot || die
-		pax-mark m out/Release/mksnapshot
-	fi
+	local x
+	for x in mksnapshot v8_context_snapshot_generator; do
+		if tc-is-cross-compiler; then
+			eninja -C out/Release "host/${x}"
+			pax-mark m "out/Release/host/${x}"
+		else
+			eninja -C out/Release "${x}"
+			pax-mark m "out/Release/${x}"
+		fi
+	done
+
+	# Work around circular dep issue
+	# https://chromium-review.googlesource.com/c/chromium/src/+/617768
+	eninja -C out/Release gen/ui/accessibility/ax_enums.h
 
 	# Even though ninja autodetects number of CPUs, we respect
 	# user's options, for debugging with -j 1 or any other reason.
-	eninja -C out/Release ${ninja_targets} || die
+	eninja -C out/Release chrome chromedriver
+	use suid && eninja -C out/Release chrome_sandbox
 
 	pax-mark m out/Release/chrome
 }
@@ -634,9 +645,6 @@ src_install() {
 
 	insinto "${CHROMIUM_HOME}/swiftshader"
 	doins out/Release/swiftshader/*.so
-
-	newman out/Release/chrome.1 chromium.1
-	newman out/Release/chrome.1 chromium-browser.1
 
 	# Install icons and desktop entry.
 	local branding size
