@@ -1,7 +1,7 @@
-From f60814ca5d1191f6c4dc56d7df01c0a264512995 Mon Sep 17 00:00:00 2001
+From 77f657181d30e7195188b2d0c6cd55c11aa079ac Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Thu, 30 Nov 2017 08:15:51 -0600
-Subject: [PATCH 3/7] Switch musl targets to link dynamically by default
+Subject: [PATCH 3/8] Switch musl targets to link dynamically by default
 
 ---
  src/librustc_back/target/linux_musl_base.rs | 2 --

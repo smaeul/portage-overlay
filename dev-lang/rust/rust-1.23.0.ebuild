@@ -40,7 +40,7 @@ case "${CHOST}" in
 		RUSTLIBC=${ELIBC/glibc/gnu} ;;
 esac
 RUSTHOST=${RUSTARCH}-unknown-${KERNEL}-${RUSTLIBC}
-STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).0"
+STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
@@ -78,7 +78,7 @@ DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
 	>=sys-devel/gcc-4.7
 	!system-llvm? (
-		dev-util/cmake
+		>=dev-util/cmake-3.4.3
 		dev-util/ninja
 	)
 "
@@ -94,7 +94,8 @@ PATCHES=(
 	"${FILESDIR}/0005-Fix-LLVM-build.patch"
 	"${FILESDIR}/0006-Fix-rustdoc-for-cross-targets.patch"
 	"${FILESDIR}/0007-Add-openssl-configuration-for-musl-targets.patch"
-	"${FILESDIR}/0008-liblibc.patch"
+	"${FILESDIR}/0008-Don-t-pass-CFLAGS-to-the-C-compiler.patch"
+	"${FILESDIR}/0009-liblibc.patch"
 	"${FILESDIR}/llvm-musl-fixes.patch"
 )
 
@@ -143,25 +144,30 @@ src_configure() {
 		python = "${EPYTHON}"
 		locked-deps = true
 		vendor = true
-		verbose = 2
+		verbose = 0
+		sanitizers = false
+		profiler = false
 		[install]
 		prefix = "${EPREFIX}/usr"
-		docdir = "share/doc/${P}"
 		libdir = "$(get_libdir)"
+		docdir = "share/doc/${P}"
 		mandir = "share/${P}/man"
 		[rust]
 		optimize = $(toml_usex !debug)
 		debug-assertions = $(toml_usex debug)
 		debuginfo = $(toml_usex debug)
 		use-jemalloc = $(toml_usex jemalloc)
+		backtrace = $(toml_usex debug)
+		default-linker = "$(tc-getCC)"
 		channel = "${SLOT%%/*}"
 		rpath = false
+		codegen-tests = $(toml_usex debug)
+		dist-src = $(toml_usex debug)
 		[dist]
 		src-tarball = false
 		[target.${RUSTHOST}]
 		cc = "$(tc-getCC)"
 		cxx = "$(tc-getCXX)"
-		crt-static = false
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
 		llvm-config = "$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
@@ -175,19 +181,27 @@ src_compile() {
 src_install() {
 	env DESTDIR="${D}" ./x.py install || die
 
-	rm "${D}/usr/lib/rustlib/components" || die
-	rm "${D}/usr/lib/rustlib/install.log" || die
-	rm "${D}/usr/lib/rustlib/manifest-rust-std-${RUSTHOST}" || die
-	rm "${D}/usr/lib/rustlib/manifest-rustc" || die
-	rm "${D}/usr/lib/rustlib/rust-installer-version" || die
-	rm "${D}/usr/lib/rustlib/uninstall.sh" || die
+	rm "${D}/usr/$(get_libdir)/rustlib/components" || die
+	rm "${D}/usr/$(get_libdir)/rustlib/install.log" || die
+	rm "${D}/usr/$(get_libdir)/rustlib/manifest-rust-std-${RUSTHOST}" || die
+	rm "${D}/usr/$(get_libdir)/rustlib/manifest-rustc" || die
+	rm "${D}/usr/$(get_libdir)/rustlib/rust-installer-version" || die
+	rm "${D}/usr/$(get_libdir)/rustlib/uninstall.sh" || die
 
 	mv "${D}/usr/bin/rustc" "${D}/usr/bin/rustc-${PV}" || die
 	mv "${D}/usr/bin/rustdoc" "${D}/usr/bin/rustdoc-${PV}" || die
 	mv "${D}/usr/bin/rust-gdb" "${D}/usr/bin/rust-gdb-${PV}" || die
 	mv "${D}/usr/bin/rust-lldb" "${D}/usr/bin/rust-lldb-${PV}" || die
 
-	dodoc COPYRIGHT
+	if use doc; then
+		rm "${D}/usr/$(get_libdir)/rustlib/manifest-rust-docs" || die
+		dodir "/usr/share/doc/${P}"
+		mv "${D}/usr/share/doc/rust"/* "${D}/usr/share/doc/${P}" || die
+		rmdir "${D}/usr/share/doc/rust" || die
+	fi
+
+	rm "${D}/usr/share/doc/${P}/LICENSE-APACHE" || die
+	rm "${D}/usr/share/doc/${P}/LICENSE-MIT" || die
 
 	cat <<-EOF > "${T}"/50${P}
 		MANPATH="/usr/share/${P}/man"
@@ -207,8 +221,8 @@ src_install() {
 pkg_postinst() {
 	eselect rust update --if-unset
 
-	elog "Rust installs a helper script for calling GDB now,"
-	elog "for your convenience it is installed under /usr/bin/rust-gdb-${PV}."
+	elog "Rust installs a helper script for calling GDB and LLDB,"
+	elog "for your convenience it is installed under /usr/bin/rust-{gdb,lldb}-${PV}."
 
 	if has_version app-editors/emacs || has_version app-editors/emacs-vcs; then
 		elog "install app-emacs/rust-mode to get emacs support for rust."

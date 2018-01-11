@@ -1,19 +1,19 @@
-From 675017ba59b1b7b6b4fbf1091af8f84112bd7daa Mon Sep 17 00:00:00 2001
+From 1fa880e13931269c187319f0d535ef194c098894 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:04:29 -0500
-Subject: [PATCH 5/7] Fix LLVM build
+Subject: [PATCH 5/8] Fix LLVM build
 
 ---
  src/bootstrap/lib.rs | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index 9c209952fe..c29fe3f41b 100644
+index edb7d3ce43..7ee3cd3e22 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -622,7 +622,8 @@ impl Build {
+@@ -636,7 +636,8 @@ impl Build {
          // cc-rs because the build scripts will determine that for themselves.
-         let mut base = self.cc[&target].0.args().iter()
+         let mut base = self.cc[&target].args().iter()
                             .map(|s| s.to_string_lossy().into_owned())
 -                           .filter(|s| !s.starts_with("-O") && !s.starts_with("/O"))
 +                           .filter(|s| !s.starts_with("-O") && !s.starts_with("/O")

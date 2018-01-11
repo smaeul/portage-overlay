@@ -1,7 +1,7 @@
-From 84aa074af3827b236cb4c10ce63186b0ca8ed8dc Mon Sep 17 00:00:00 2001
+From da75097b4c83ee27358136c67cdf1c9c3ba795f7 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
-Subject: [PATCH 6/7] Fix rustdoc for cross targets
+Subject: [PATCH 6/8] Fix rustdoc for cross targets
 
 musl can't handle wrong-architecture libraries in LD_LIBRARY_PATH.
 ---
@@ -9,7 +9,7 @@ musl can't handle wrong-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index d7d72d5dd5..50be8d2852 100644
+index 4e975adc97..a9df1b71ce 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
 @@ -27,9 +27,6 @@ fn main() {
