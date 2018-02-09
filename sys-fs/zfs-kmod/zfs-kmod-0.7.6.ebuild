@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="5"
@@ -10,7 +10,7 @@ if [ ${PV} == "9999" ]; then
 else
 	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
 	S="${WORKDIR}/zfs-${PV}"
-	KEYWORDS=" ~amd64"
+	KEYWORDS="~amd64"
 fi
 
 inherit flag-o-matic linux-info linux-mod toolchain-funcs autotools-utils
@@ -39,7 +39,8 @@ AUTOTOOLS_IN_SOURCE_BUILD="1"
 DOCS=( AUTHORS COPYRIGHT DISCLAIMER README.markdown )
 
 pkg_setup() {
-	CONFIG_CHECK="!DEBUG_LOCK_ALLOC
+	CONFIG_CHECK="
+		!DEBUG_LOCK_ALLOC
 		EFI_PARTITION
 		IOSCHED_NOOP
 		MODULES
@@ -65,7 +66,7 @@ pkg_setup() {
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
-		{ kernel_is le 4 14 || die "Linux 4.14 is the latest supported version."; }
+		{ kernel_is le 4 15 || die "Linux 4.15 is the latest supported version."; }
 }
 
 src_prepare() {
