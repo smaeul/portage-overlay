@@ -1,0 +1,45 @@
+diff --git chromium-65.0.3325.146/chrome/browser/notifications/notification_display_service_impl.cc
+index cf8fb8b..4ebd523 100644
+--- chromium-65.0.3325.146/chrome/browser/notifications/notification_display_service_impl.cc.orig
++++ chromium-65.0.3325.146/chrome/browser/notifications/notification_display_service_impl.cc
+@@ -226,9 +226,13 @@ void NotificationDisplayServiceImpl::Display(
+   }
+ 
+   NotificationPlatformBridge* bridge =
++#if BUILDFLAG(ENABLE_NATIVE_NOTIFICATIONS)
+       NotificationPlatformBridge::CanHandleType(notification_type)
+           ? bridge_
+           : message_center_bridge_.get();
++#else
++          message_center_bridge_.get();
++#endif
+   DCHECK(bridge);
+ 
+   bridge->Display(notification_type, GetProfileId(profile_),
+@@ -251,9 +255,13 @@ void NotificationDisplayServiceImpl::Close(
+   }
+ 
+   NotificationPlatformBridge* bridge =
++#if BUILDFLAG(ENABLE_NATIVE_NOTIFICATIONS)
+       NotificationPlatformBridge::CanHandleType(notification_type)
+           ? bridge_
+           : message_center_bridge_.get();
++#else
++          message_center_bridge_.get();
++#endif
+   DCHECK(bridge);
+ 
+   bridge->Close(GetProfileId(profile_), notification_id);
+@@ -273,10 +281,12 @@ void NotificationDisplayServiceImpl::GetDisplayed(
+ 
+ void NotificationDisplayServiceImpl::OnNotificationPlatformBridgeReady(
+     bool success) {
++#if BUILDFLAG(ENABLE_NATIVE_NOTIFICATIONS)
+   if (base::FeatureList::IsEnabled(features::kNativeNotifications)) {
+     UMA_HISTOGRAM_BOOLEAN("Notifications.UsingNativeNotificationCenter",
+                           success);
+   }
++#endif
+ 
+   if (!success) {
+     // Fall back to the message center if initialization failed. Initialization

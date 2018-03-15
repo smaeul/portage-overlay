@@ -1,0 +1,12 @@
+diff --git chromium-65.0.3325.146/tools/gn/scope.cc
+index 145d6ad..c51197d 100644
+--- chromium-65.0.3325.146/tools/gn/scope.cc.orig
++++ chromium-65.0.3325.146/tools/gn/scope.cc
+@@ -206,7 +206,6 @@ const Template* Scope::GetTemplate(const std::string& name) const {
+ void Scope::MarkUsed(const base::StringPiece& ident) {
+   RecordMap::iterator found = values_.find(ident);
+   if (found == values_.end()) {
+-    NOTREACHED();
+     return;
+   }
+   found->second.used = true;
