@@ -48,18 +48,6 @@ index 58be690..49d3923 100644
  #endif
  
  int NET_Timeout(int s, long timeout);
-diff --git openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c.orig openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c
-index 1788944..75d95a0 100644
---- openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c.orig
-+++ openjdk/jdk/src/solaris/native/java/net/NetworkInterface.c
-@@ -47,7 +47,6 @@
- 
- #if defined(__linux__)
- #include <sys/ioctl.h>
--#include <bits/ioctls.h>
- #include <sys/utsname.h>
- #include <stdio.h>
- #endif
 diff --git openjdk/jdk/src/solaris/native/java/net/linux_close.c.orig openjdk/jdk/src/solaris/native/java/net/linux_close.c
 index 2d3dfe2..c8a0235 100644
 --- openjdk/jdk/src/solaris/native/java/net/linux_close.c.orig
