@@ -8,7 +8,7 @@ DESCRIPTION="Vanilla Linux kernel (binary package)"
 HOMEPAGE="https://www.kernel.org"
 
 LICENSE="GPL-2"
-SLOT="0"
+SLOT="${PV}"
 KEYWORDS="amd64 x86"
 
 DEPEND="
@@ -27,8 +27,6 @@ src_compile() {
 }
 
 src_install() {
-	dobin usr/gen_init_cpio
-
 	mkdir "${ED%/}/boot" || die
 	installkernel "${KVER}" arch/x86/boot/bzImage System.map "${ED%/}/boot" || die
 
