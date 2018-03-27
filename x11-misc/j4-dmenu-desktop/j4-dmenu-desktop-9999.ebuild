@@ -15,12 +15,13 @@ SLOT="0"
 KEYWORDS=""
 IUSE="test"
 
-DEPEND=""
+DEPEND="test? ( dev-cpp/catch )"
 RDEPEND="x11-misc/dmenu"
 
 src_configure() {
 	local mycmakeargs=(
-		$(cmake-utils_use_no test TESTS)
+		-DWITH_GIT_CATCH=OFF
+		$(cmake-utils_use test WITH_TESTS)
 	)
 	cmake-utils_src_configure
 }
