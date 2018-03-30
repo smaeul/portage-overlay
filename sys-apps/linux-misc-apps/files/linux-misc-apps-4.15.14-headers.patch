@@ -1,0 +1,46 @@
+diff --git linux-4.15/samples/mei/mei-amt-version.c
+--- linux-4.15/samples/mei/mei-amt-version.c.orig
++++ linux-4.15/samples/mei/mei-amt-version.c
+@@ -73,7 +73,8 @@
+ #include <errno.h>
+ #include <stdint.h>
+ #include <stdbool.h>
+-#include <bits/wordsize.h>
++#include <sys/select.h>
++#include <sys/time.h>
+ #include <linux/mei.h>
+ 
+ /*****************************************************************************
+diff --git linux-4.15/tools/power/x86/turbostat/turbostat.c
+--- linux-4.15/tools/power/x86/turbostat/turbostat.c.orig
++++ linux-4.15/tools/power/x86/turbostat/turbostat.c
+@@ -43,6 +43,7 @@
+ #include <cpuid.h>
+ #include <linux/capability.h>
+ #include <errno.h>
++#include <limits.h>
+ 
+ char *proc_stat = "/proc/stat";
+ FILE *outf;
+diff --git linux-4.15/tools/thermal/tmon/sysfs.c
+--- linux-4.15/tools/thermal/tmon/sysfs.c.orig
++++ linux-4.15/tools/thermal/tmon/sysfs.c
+@@ -27,6 +27,7 @@
+ #include <syslog.h>
+ #include <sys/time.h>
+ #include <errno.h>
++#include <pthread.h>
+ 
+ #include "tmon.h"
+ 
+diff --git linux-4.15/tools/thermal/tmon/tui.c
+--- linux-4.15/tools/thermal/tmon/tui.c.orig
++++ linux-4.15/tools/thermal/tmon/tui.c
+@@ -27,6 +27,7 @@
+ #include <panel.h>
+ #include <pthread.h>
+ #include <signal.h>
++#include <sys/time.h>
+ 
+ #include "tmon.h"
+ 
