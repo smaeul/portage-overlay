@@ -1,4 +1,4 @@
-From 77f657181d30e7195188b2d0c6cd55c11aa079ac Mon Sep 17 00:00:00 2001
+From b02bdc170e02f3ee226728ddd912b5d4171677d2 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Thu, 30 Nov 2017 08:15:51 -0600
 Subject: [PATCH 3/8] Switch musl targets to link dynamically by default
@@ -21,5 +21,5 @@ index d99cb55cc5..bb786bf0f3 100644
      base.crt_static_respected = true;
  
 -- 
-2.13.6
+2.16.1
 

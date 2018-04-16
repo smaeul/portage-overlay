@@ -1,4 +1,4 @@
-From c386995b5515ca3116e249876ec7916e64f18a90 Mon Sep 17 00:00:00 2001
+From d1cc6048465f4cc7a06495b424693aa0c27f3137 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 10 Jan 2018 13:36:41 -0600
 Subject: [PATCH 8/8] Don't pass CFLAGS to the C++ compiler
@@ -8,10 +8,10 @@ Subject: [PATCH 8/8] Don't pass CFLAGS to the C++ compiler
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/src/bootstrap/builder.rs b/src/bootstrap/builder.rs
-index c76900882b..008a0a0410 100644
+index fcb78c479f..55848d6971 100644
 --- a/src/bootstrap/builder.rs
 +++ b/src/bootstrap/builder.rs
-@@ -583,7 +583,7 @@ impl<'a> Builder<'a> {
+@@ -689,7 +689,7 @@ impl<'a> Builder<'a> {
  
              let cflags = self.cflags(target).join(" ");
              cargo.env(format!("CFLAGS_{}", target), cflags.clone())
@@ -20,7 +20,7 @@ index c76900882b..008a0a0410 100644
  
              if let Some(ar) = self.ar(target) {
                  let ranlib = format!("{} s", ar.display());
-@@ -595,9 +595,7 @@ impl<'a> Builder<'a> {
+@@ -701,9 +701,7 @@ impl<'a> Builder<'a> {
  
              if let Ok(cxx) = self.cxx(target) {
                  cargo.env(format!("CXX_{}", target), cxx)
@@ -32,5 +32,5 @@ index c76900882b..008a0a0410 100644
          }
  
 -- 
-2.13.6
+2.16.1
 

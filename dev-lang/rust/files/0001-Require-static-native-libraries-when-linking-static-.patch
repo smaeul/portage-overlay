@@ -1,4 +1,4 @@
-From abd07ed6ab514ef00d450640a659861af06f308e Mon Sep 17 00:00:00 2001
+From 9da9c2f708e0de229a22a2fa8caf34d4c1d6346b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
 Subject: [PATCH 1/8] Require static native libraries when linking static
@@ -9,10 +9,10 @@ Subject: [PATCH 1/8] Require static native libraries when linking static
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/src/librustc_trans/back/link.rs b/src/librustc_trans/back/link.rs
-index e0eef1f576..e46b25f987 100644
+index 87464ab0d0..395ee2a03b 100644
 --- a/src/librustc_trans/back/link.rs
 +++ b/src/librustc_trans/back/link.rs
-@@ -1302,8 +1302,8 @@ fn add_upstream_rust_crates(cmd: &mut Linker,
+@@ -1329,8 +1329,8 @@ fn add_upstream_rust_crates(cmd: &mut Linker,
      }
  }
  
@@ -23,7 +23,7 @@ index e0eef1f576..e46b25f987 100644
  // dependencies. We've got two cases then:
  //
  // 1. The upstream crate is an rlib. In this case we *must* link in the
-@@ -1343,7 +1343,14 @@ fn add_upstream_native_libraries(cmd: &mut Linker,
+@@ -1370,7 +1370,14 @@ fn add_upstream_native_libraries(cmd: &mut Linker,
                  continue
              }
              match lib.kind {
@@ -40,5 +40,5 @@ index e0eef1f576..e46b25f987 100644
                  NativeLibraryKind::NativeStaticNobundle => {
                      // Link "static-nobundle" native libs only if the crate they originate from
 -- 
-2.13.6
+2.16.1
 

@@ -1,12 +1,12 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-LLVM_MAX_SLOT=4
+LLVM_MAX_SLOT=6
 PYTHON_COMPAT=( python2_7 )
 
-inherit python-any-r1 versionator toolchain-funcs llvm
+inherit llvm multiprocessing python-any-r1 versionator toolchain-funcs
 
 if [[ ${PV} = *beta* ]]; then
 	betaver=${PV//*beta}
@@ -20,7 +20,7 @@ else
 	SLOT="stable/${ABI_VER}"
 	MY_P="rustc-${PV}"
 	SRC="${MY_P}-src.tar.xz"
-	KEYWORDS="~amd64 ~arm ~x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 fi
 
 case "${CHOST}" in
@@ -40,51 +40,58 @@ case "${CHOST}" in
 		RUSTLIBC=${ELIBC/glibc/gnu} ;;
 esac
 RUSTHOST=${RUSTARCH}-unknown-${KERNEL}-${RUSTLIBC}
-STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0"
+
+RUST_STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).1"
+
+CARGO_DEPEND_VERSION="0.$(($(get_version_component_range 2) + 1)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
 
 SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
 	amd64? (
-		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-x86_64-unknown-linux-gnu.tar.xz )
-		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-x86_64-unknown-linux-musl.tar.xz )
+		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${RUST_STAGE0_VERSION}-x86_64-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${RUST_STAGE0_VERSION}-x86_64-unknown-linux-musl.tar.xz )
 	)
 	arm? (
 		elibc_glibc? (
-			https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-arm-unknown-linux-gnueabi.tar.xz
-			https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-armv7-unknown-linux-gnueabihf.tar.xz
+			https://static.rust-lang.org/dist/rust-${RUST_STAGE0_VERSION}-arm-unknown-linux-gnueabi.tar.xz
+			https://static.rust-lang.org/dist/rust-${RUST_STAGE0_VERSION}-armv7-unknown-linux-gnueabihf.tar.xz
 		)
 		elibc_musl? (
-			https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-arm-unknown-linux-musleabi.tar.xz
-			https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-armv7-unknown-linux-musleabihf.tar.xz
+			https://portage.smaeul.xyz/distfiles/rust-${RUST_STAGE0_VERSION}-arm-unknown-linux-musleabi.tar.xz
+			https://portage.smaeul.xyz/distfiles/rust-${RUST_STAGE0_VERSION}-armv7-unknown-linux-musleabihf.tar.xz
 		)
 	)
+	arm64? (
+		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${RUST_STAGE0_VERSION}-aarch64-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${RUST_STAGE0_VERSION}-aarch64-unknown-linux-musl.tar.xz )
+	)
 	x86? (
-		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${STAGE0_VERSION}-i686-unknown-linux-gnu.tar.xz )
-		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${STAGE0_VERSION}-i686-unknown-linux-musl.tar.xz )
+		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${RUST_STAGE0_VERSION}-i686-unknown-linux-gnu.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${RUST_STAGE0_VERSION}-i686-unknown-linux-musl.tar.xz )
 	)
 "
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
 
-IUSE="debug doc jemalloc system-llvm"
-REQUIRED_USE=""
+IUSE="debug doc extended jemalloc system-llvm"
 
-RDEPEND="
-	system-llvm? ( sys-devel/llvm:4 )
-"
+RDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
+		jemalloc? ( dev-libs/jemalloc )
+		system-llvm? ( sys-devel/llvm )"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
-	>=sys-devel/gcc-4.7
+	|| (
+		>=sys-devel/gcc-4.7
+		>=sys-devel/clang-3.5
+	)
 	!system-llvm? (
-		>=dev-util/cmake-3.4.3
+		dev-util/cmake
 		dev-util/ninja
 	)
 "
-PDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
-	|| ( dev-util/cargo dev-util/cargo-bin )
-"
+PDEPEND="!extended? ( >=dev-util/cargo-${CARGO_DEPEND_VERSION} )"
 
 PATCHES=(
 	"${FILESDIR}/0001-Require-static-native-libraries-when-linking-static-.patch"
@@ -96,7 +103,7 @@ PATCHES=(
 	"${FILESDIR}/0007-Add-openssl-configuration-for-musl-targets.patch"
 	"${FILESDIR}/0008-Don-t-pass-CFLAGS-to-the-C-compiler.patch"
 	"${FILESDIR}/0009-liblibc.patch"
-	"${FILESDIR}/llvm-musl-fixes.patch"
+	"${FILESDIR}/0010-llvm.patch"
 )
 
 S="${WORKDIR}/${MY_P}-src"
@@ -121,7 +128,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	"${WORKDIR}/rust-${STAGE0_VERSION}-${RUSTHOST}/install.sh" \
+	"${WORKDIR}/rust-${RUST_STAGE0_VERSION}-${RUSTHOST}/install.sh" \
 		--prefix="${WORKDIR}/stage0" \
 		--components=rust-std-${RUSTHOST},rustc,cargo \
 		--disable-ldconfig \
@@ -132,6 +139,9 @@ src_configure() {
 	cat <<- EOF > "${S}"/config.toml
 		[llvm]
 		ninja = true
+		optimize = $(toml_usex !debug)
+		release-debuginfo = $(toml_usex debug)
+		assertions = $(toml_usex debug)
 		[build]
 		build = "${RUSTHOST}"
 		host = ["${RUSTHOST}"]
@@ -147,6 +157,7 @@ src_configure() {
 		verbose = 0
 		sanitizers = false
 		profiler = false
+		extended = $(toml_usex extended)
 		[install]
 		prefix = "${EPREFIX}/usr"
 		libdir = "$(get_libdir)"
@@ -154,20 +165,21 @@ src_configure() {
 		mandir = "share/${P}/man"
 		[rust]
 		optimize = $(toml_usex !debug)
-		debug-assertions = $(toml_usex debug)
 		debuginfo = $(toml_usex debug)
+		debug-assertions = $(toml_usex debug)
 		use-jemalloc = $(toml_usex jemalloc)
-		backtrace = $(toml_usex debug)
 		default-linker = "$(tc-getCC)"
 		channel = "${SLOT%%/*}"
 		rpath = false
 		codegen-tests = $(toml_usex debug)
-		dist-src = $(toml_usex debug)
+		dist-src = false
 		[dist]
 		src-tarball = false
 		[target.${RUSTHOST}]
 		cc = "$(tc-getCC)"
 		cxx = "$(tc-getCXX)"
+		linker = "$(tc-getCC)"
+		ar = "$(tc-getAR)"
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
 		llvm-config = "$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
@@ -175,7 +187,7 @@ src_configure() {
 }
 
 src_compile() {
-	./x.py build || die
+	./x.py build --config="${S}"/config.toml -j$(makeopts_jobs) || die
 }
 
 src_install() {
@@ -200,6 +212,7 @@ src_install() {
 		rmdir "${D}/usr/share/doc/rust" || die
 	fi
 
+	dodoc COPYRIGHT
 	rm "${D}/usr/share/doc/${P}/LICENSE-APACHE" || die
 	rm "${D}/usr/share/doc/${P}/LICENSE-MIT" || die
 
