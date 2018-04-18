@@ -41,7 +41,7 @@ case "${CHOST}" in
 esac
 RUSTHOST=${RUSTARCH}-unknown-${KERNEL}-${RUSTLIBC}
 
-RUST_STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).1"
+RUST_STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0"
 
 CARGO_DEPEND_VERSION="0.$(($(get_version_component_range 2) + 1)).0"
 
