@@ -12,7 +12,8 @@ inherit check-reqs chromium-2 eutils gnome2-utils flag-o-matic multilib ninja-ut
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="http://chromium.org/"
-SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz"
+SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz
+	https://dev.gentoo.org/~floppym/dist/${P}-blink.tar.xz"
 
 LICENSE="BSD"
 SLOT="0"
@@ -154,27 +155,28 @@ PATCHES=(
 	"${FILESDIR}/chromium-webrtc-r0.patch"
 	"${FILESDIR}/chromium-memcpy-r0.patch"
 	"${FILESDIR}/chromium-clang-r2.patch"
-	"${FILESDIR}/chromium-gn-r0.patch"
 	"${FILESDIR}/chromium-math.h-r0.patch"
-	"${FILESDIR}/chromium-clang-r3.patch"
 	"${FILESDIR}/chromium-stdint.patch"
+	"${FILESDIR}/chromium-clang-r4.patch"
+	"${FILESDIR}/chromium-ffmpeg-r1.patch"
 	"${FILESDIR}/chromium-ffmpeg-clang.patch"
 	"${FILESDIR}/chromium-fixes-r0.patch"
 	"${FILESDIR}/chromium-gn-2-r0.patch"
 	"${FILESDIR}/chromium-gtk2-r3.patch"
 	"${FILESDIR}/chromium-optional-atk-r0.patch"
 	"${FILESDIR}/chromium-optional-dbus-r3.patch"
-	"${FILESDIR}/musl-bootstrap-r1.patch"
+	"${FILESDIR}/musl-bootstrap-r2.patch"
 	"${FILESDIR}/musl-cdefs.patch"
 	"${FILESDIR}/musl-dlopen.patch"
 	"${FILESDIR}/musl-dns-r1.patch"
-	"${FILESDIR}/musl-execinfo-r5.patch"
+	"${FILESDIR}/musl-execinfo-r6.patch"
 	"${FILESDIR}/musl-fpstate-r1.patch"
 	"${FILESDIR}/musl-headers-r1.patch"
+	"${FILESDIR}/musl-libcpp.patch"
 	"${FILESDIR}/musl-mallinfo-r6.patch"
 	"${FILESDIR}/musl-pthread-r4.patch"
 	"${FILESDIR}/musl-sandbox-r3.patch"
-	"${FILESDIR}/musl-secure_getenv.patch"
+	"${FILESDIR}/musl-secure_getenv-r1.patch"
 	"${FILESDIR}/musl-siginfo.patch"
 	"${FILESDIR}/musl-socket.patch"
 	"${FILESDIR}/musl-stacksize-r2.patch"
@@ -243,6 +245,8 @@ src_prepare() {
 		base/third_party/valgrind
 		base/third_party/xdg_mime
 		base/third_party/xdg_user_dirs
+		buildtools/third_party/libc++
+		buildtools/third_party/libc++abi
 		chrome/third_party/mozilla_security_manager
 		courgette/third_party
 		net/third_party/mozilla_security_manager
@@ -255,6 +259,10 @@ src_prepare() {
 		third_party/angle/src/third_party/compiler
 		third_party/angle/src/third_party/libXNVCtrl
 		third_party/angle/src/third_party/trace_event
+		third_party/angle/third_party/glslang
+		third_party/angle/third_party/spirv-headers
+		third_party/angle/third_party/spirv-tools
+		third_party/angle/third_party/vulkan-validation-layers
 		third_party/blink
 		third_party/boringssl
 		third_party/boringssl/src/third_party/fiat
@@ -297,6 +305,7 @@ src_prepare() {
 		third_party/libXNVCtrl
 		third_party/libaddressinput
 		third_party/libaom
+		third_party/libaom/source/libaom/third_party/x86inc
 		third_party/libjingle
 		third_party/libphonenumber
 		third_party/libsecret
@@ -312,7 +321,6 @@ src_prepare() {
 		third_party/mesa
 		third_party/metrics_proto
 		third_party/modp_b64
-		third_party/mt19937ar
 		third_party/node
 		third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2
 		third_party/openmax_dl
@@ -320,13 +328,13 @@ src_prepare() {
 		third_party/pdfium
 		third_party/pdfium/third_party/agg23
 		third_party/pdfium/third_party/base
-		third_party/pdfium/third_party/build
 		third_party/pdfium/third_party/bigint
 		third_party/pdfium/third_party/freetype
 		third_party/pdfium/third_party/lcms
 		third_party/pdfium/third_party/libopenjpeg20
 		third_party/pdfium/third_party/libpng16
 		third_party/pdfium/third_party/libtiff
+		third_party/pdfium/third_party/skia_shared
 		third_party/ply
 		third_party/polymer
 		third_party/protobuf
@@ -344,6 +352,7 @@ src_prepare() {
 		third_party/swiftshader
 		third_party/swiftshader/third_party/llvm-subzero
 		third_party/swiftshader/third_party/subzero
+		third_party/unrar
 		third_party/usrsctp
 		third_party/vulkan
 		third_party/vulkan-validation-layers
@@ -411,12 +420,12 @@ src_configure() {
 
 	if ! tc-is-clang; then
 		# Force clang since gcc is pretty broken at the moment.
-		CC=clang
-		CXX=clang++
+		CC=${CHOST}-clang
+		CXX=${CHOST}-clang++
 		strip-unsupported-flags
 	fi
 
-	if true; then
+	if tc-is-clang; then
 		myconf_gn+=" is_clang=true clang_use_chrome_plugins=false"
 	else
 		myconf_gn+=" is_clang=false"
@@ -621,10 +630,6 @@ src_compile() {
 			pax-mark m "out/Release/${x}"
 		fi
 	done
-
-	# Work around circular dep issue
-	# https://chromium-review.googlesource.com/c/chromium/src/+/617768
-	eninja -C out/Release gen/ui/accessibility/ax_enums.h
 
 	# Even though ninja autodetects number of CPUs, we respect
 	# user's options, for debugging with -j 1 or any other reason.
