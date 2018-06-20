@@ -1,7 +1,7 @@
-diff --git chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/StackUtil.cpp
+diff --git chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/stack_util.cc
 index 13c3f90..fb9bee7 100644
---- chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/StackUtil.cpp.orig
-+++ chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/StackUtil.cpp
+--- chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/stack_util.cc.orig
++++ chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/stack_util.cc
 @@ -28,7 +28,7 @@ size_t GetUnderestimatedStackSize() {
  // FIXME: On Mac OSX and Linux, this method cannot estimate stack size
  // correctly for the main thread.

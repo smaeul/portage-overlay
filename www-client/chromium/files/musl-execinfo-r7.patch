@@ -72,10 +72,10 @@ index 5d6ff89..3c1207c 100644
  void StackTrace::OutputToStream(std::ostream* os) const {
    StreamBacktraceOutputHandler handler(os);
    ProcessBacktrace(trace_, count_, &handler);
-diff --git chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/Assertions.cpp
+diff --git chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/assertions.cc
 index 9bdece7..051a55b 100644
---- chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/Assertions.cpp.orig
-+++ chromium-61.0.3163.79/third_party/WebKit/Source/platform/wtf/Assertions.cpp
+--- chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/assertions.cc.orig
++++ chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/assertions.cc
 @@ -57,6 +57,6 @@
  #endif
  
