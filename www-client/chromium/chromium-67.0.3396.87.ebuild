@@ -46,7 +46,7 @@ COMMON_DEPEND="
 	>=media-libs/openh264-1.6.0:=
 	pulseaudio? ( media-sound/pulseaudio:= )
 	system-ffmpeg? (
-		>=media-video/ffmpeg-4:=
+		>=media-video/ffmpeg-3.3.6:=
 		|| (
 			media-video/ffmpeg[-samba]
 			>=net-fs/samba-4.5.10-r1[-debug(-)]
@@ -120,7 +120,6 @@ Some web pages may require additional fonts to display properly.
 Try installing some of the following packages if some characters
 are not displayed properly:
 - media-fonts/arphicfonts
-- media-fonts/bitstream-cyberbit
 - media-fonts/droid
 - media-fonts/ipamonafont
 - media-fonts/noto
