@@ -13,16 +13,16 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="872ca6c060bb.tar.xz"
-JAXP_TARBALL="154d73707643.tar.xz"
-JAXWS_TARBALL="3f0a3aea44b4.tar.xz"
-JDK_TARBALL="80cebaab0ba5.tar.xz"
-LANGTOOLS_TARBALL="0a2dce555d35.tar.xz"
-OPENJDK_TARBALL="644bdc77dd18.tar.xz"
-NASHORN_TARBALL="136ab780f038.tar.xz"
-HOTSPOT_TARBALL="074a569c30e4.tar.xz"
-SHENANDOAH_TARBALL="773364cde857.tar.xz"
-AARCH32_TARBALL="1cd346521065.tar.xz"
+CORBA_TARBALL="75fd375dd38a.tar.xz"
+JAXP_TARBALL="2b279bb3475b.tar.xz"
+JAXWS_TARBALL="c54a27559acb.tar.xz"
+JDK_TARBALL="9c9ff65b03b6.tar.xz"
+LANGTOOLS_TARBALL="21524ad5b914.tar.xz"
+OPENJDK_TARBALL="499b993b345a.tar.xz"
+NASHORN_TARBALL="bb3e3345d3ec.tar.xz"
+HOTSPOT_TARBALL="cb5711bf53d9.tar.xz"
+SHENANDOAH_TARBALL="c44a9eef4985.tar.xz"
+AARCH32_TARBALL="bd08b7f27e11.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -67,7 +67,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
 IUSE="+alsa cacao +cups doc examples +gtk headless-awt
 	jamvm +jbootstrap kerberos libressl nsplugin pax_kernel +pch
-	pulseaudio sctp selinux shenandoah smartcard +source +sunec test +webstart zero"
+	pulseaudio sctp selinux shenandoah smartcard +source +sunec +system-lcms test +webstart zero"
 
 REQUIRED_USE="gtk? ( !headless-awt )"
 
@@ -86,26 +86,23 @@ X_COMMON_DEP="
 	>=x11-libs/libXtst-1.0.3
 	x11-libs/libXcomposite"
 X_DEPEND="
+	x11-base/xorg-proto
 	>=x11-libs/libXau-1.0.3
 	>=x11-libs/libXdmcp-1.0.2
-	>=x11-libs/libXinerama-1.0.2
-	x11-proto/inputproto
-	>=x11-proto/xextproto-7.1.1
-	x11-proto/xineramaproto
-	x11-proto/xproto"
+	>=x11-libs/libXinerama-1.0.2"
 
 # The Javascript requirement is obsolete; OpenJDK 8+ has Nashorn
 COMMON_DEP="
 	>=dev-libs/glib-2.26:2=
 	media-libs/fontconfig:1.0=
 	>=media-libs/freetype-2.5.3:2=
-	>=media-libs/lcms-2.5:2=
 	>=sys-libs/zlib-1.2.3
 	virtual/jpeg:0=
 	kerberos? ( virtual/krb5 )
 	sctp? ( net-misc/lksctp-tools )
 	smartcard? ( sys-apps/pcsc-lite )
-	sunec? ( >=dev-libs/nss-3.16.1-r1 )"
+	sunec? ( >=dev-libs/nss-3.16.1-r1 )
+	system-lcms? ( >=media-libs/lcms-2.9:2= )"
 
 # Gtk+ will move to COMMON_DEP in time; PR1982
 # gsettings-desktop-schemas will be needed for native proxy support; PR1976
@@ -192,13 +189,19 @@ src_unpack() {
 }
 
 src_configure() {
-	ln -s "${FILESDIR}/${PN}-3.2.0-gnuconfig.patch" patches || die
-	ln -s "${FILESDIR}/${PN}-3.5.0-hotspot.patch" patches || die
-	ln -s "${FILESDIR}/${PN}-3.4.0-jdk.patch" patches || die
-	ln -s "${FILESDIR}/${PN}8-gcc-triples.patch" patches || die
+	# Link MUSL patches into icedtea build tree
+	ln -s "${FILESDIR}/${PN}8-hotspot-musl.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-hotspot-noagent-musl.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-hotspot-uclibc-fixes.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-execinfo.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-fix-libjvm-load.patch" patches || die
-	ln -s "${FILESDIR}/${PN}8-hotspot-noagent-musl.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-jdk-fix-ipv6-init.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-jdk-musl.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-autoconf-config.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-gcc-triple.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.5.0-hotspot.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.4.0-jdk.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.4.0-jdk-globals.patch" patches || die
 
 	# For bootstrap builds as the sandbox control file might not yet exist.
 	addpredict /proc/self/coredump_filter
@@ -206,19 +209,26 @@ src_configure() {
 	# icedtea doesn't like some locales. #330433 #389717
 	export LANG="C" LC_ALL="C"
 
-	DISTRIBUTION_PATCHES=""
-	DISTRIBUTION_PATCHES+="patches/${PN}-3.2.0-gnuconfig.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}-3.5.0-hotspot.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}8-gcc-triples.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-execinfo.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-libjvm-load.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-noagent-musl.patch "
-
-	export DISTRIBUTION_PATCHES
-
 	local cacao_config config hotspot_port hs_config jamvm_config use_cacao use_jamvm use_zero zero_config
 	local vm=$(java-pkg_get-current-vm)
+
+	# Export MUSL patches for configure
+	DISTRIBUTION_PATCHES=""
+
+	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-musl.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-noagent-musl.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-uclibc-fixes.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-execinfo.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-libjvm-load.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-jdk-fix-ipv6-init.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-musl.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-autoconf-config.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-gcc-triple.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.5.0-hotspot.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk-globals.patch "
+
+	export DISTRIBUTION_PATCHES
 
 	# gcj-jdk ensures ecj is present.
 	if use jbootstrap || has "${vm}" gcj-jdk; then
@@ -247,9 +257,6 @@ src_configure() {
 	# In-tree JIT ports are available for amd64, arm, arm64, ppc64 (be&le), SPARC and x86.
 	if { use amd64 || use arm || use arm64 || use ppc64 || use sparc || use x86; }; then
 		hotspot_port="yes"
-
-		# Work around stack alignment issue, bug #647954.
-		use x86 && append-flags -mincoming-stack-boundary=2
 	fi
 
 	# Always use HotSpot as the primary VM if available. #389521 #368669 #357633 ...
@@ -337,14 +344,14 @@ src_configure() {
 		--htmldir="${EPREFIX}/usr/share/doc/${PF}/html" \
 		--with-pkgversion="Gentoo ${PF}" \
 		--disable-downloading --disable-Werror --disable-tests \
-		--enable-system-lcms --enable-system-jpeg \
-		--enable-system-zlib --disable-systemtap-tests \
-		--enable-improved-font-rendering \
+		--disable-systemtap-tests --enable-improved-font-rendering \
+		--enable-system-jpeg --enable-system-zlib \
 		$(use_enable headless-awt headless) \
 		$(use_enable !headless-awt system-gif) \
 		$(use_enable !headless-awt system-png) \
 		$(use_enable doc docs) \
 		$(use_enable kerberos system-kerberos) \
+		$(use_enable system-lcms) \
 		$(use_with pax_kernel pax "${EPREFIX}/usr/sbin/paxmark.sh") \
 		$(use_enable sctp system-sctp) \
 		$(use_enable smartcard system-pcsc) \
@@ -413,5 +420,12 @@ pkg_preinst() {
 	gnome2_icon_savelist
 }
 
-pkg_postinst() { gnome2_icon_cache_update; }
-pkg_postrm() { gnome2_icon_cache_update; }
+pkg_postinst() {
+	gnome2_icon_cache_update
+	java-vm-2_pkg_postinst
+}
+
+pkg_postrm() {
+	gnome2_icon_cache_update
+	java-vm-2_pkg_postrm
+}
