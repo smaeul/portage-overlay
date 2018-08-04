@@ -6,9 +6,9 @@ EAPI=6
 
 inherit cmake-utils git-r3
 
-DESCRIPTION=""
+DESCRIPTION="Robust, optimal, and clear programming language"
 HOMEPAGE="http://ziglang.org/"
-EGIT_REPO_URI="https://github.com/andrewrk/zig"
+EGIT_REPO_URI="https://github.com/ziglang/zig"
 
 LICENSE="MIT"
 SLOT="0"
@@ -16,7 +16,7 @@ KEYWORDS=""
 IUSE=""
 
 RDEPEND="
-	>=sys-devel/clang-4.0.0:5=
+	sys-devel/clang:6=
 "
 DEPEND="${RDEPEND}
 	sys-devel/lld
