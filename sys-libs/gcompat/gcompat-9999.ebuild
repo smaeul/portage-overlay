@@ -7,7 +7,7 @@ inherit git-r3
 
 DESCRIPTION="glibc and LSB Compatibility Layer for musl libc"
 HOMEPAGE="https://code.foxkit.us/adelie/gcompat"
-EGIT_REPO_URI="https://code.foxkit.us/smaeul/gcompat.git"
+EGIT_REPO_URI="https://code.foxkit.us/adelie/gcompat.git"
 
 LICENSE="UoI-NCSA"
 SLOT="0"
