@@ -8,7 +8,7 @@ CHROMIUM_LANGS="am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
 	hi hr hu id it ja kn ko lt lv ml mr ms nb nl pl pt-BR pt-PT ro ru sk sl sr
 	sv sw ta te th tr uk vi zh-CN zh-TW"
 
-inherit check-reqs chromium-2 eutils gnome2-utils flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 readme.gentoo-r1 toolchain-funcs versionator xdg-utils
+inherit check-reqs chromium-2 eutils gnome2-utils flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="http://chromium.org/"
@@ -46,12 +46,12 @@ COMMON_DEPEND="
 	>=media-libs/openh264-1.6.0:=
 	pulseaudio? ( media-sound/pulseaudio:= )
 	system-ffmpeg? (
-		>=media-video/ffmpeg-3.3.6:=
+		>=media-video/ffmpeg-4:=
 		|| (
 			media-video/ffmpeg[-samba]
 			>=net-fs/samba-4.5.10-r1[-debug(-)]
 		)
-		!=net-fs/samba-4.5.12
+		!=net-fs/samba-4.5.12-r0
 		media-libs/opus:=
 	)
 	dbus? ( sys-apps/dbus:= )
@@ -81,7 +81,6 @@ COMMON_DEPEND="
 "
 # For nvidia-drivers blocker, see bug #413637 .
 RDEPEND="${COMMON_DEPEND}
-	!=www-client/chromium-9999
 	!<www-plugins/chrome-binary-plugins-57
 	x11-misc/xdg-utils
 	virtual/opengl
@@ -136,19 +135,21 @@ GTK+ icon theme.
 
 PATCHES=(
 	"${FILESDIR}/chromium-widevine-r2.patch"
-	"${FILESDIR}/chromium-compiler-r0.patch"
+	"${FILESDIR}/chromium-compiler-r2.patch"
 	"${FILESDIR}/chromium-webrtc-r0.patch"
 	"${FILESDIR}/chromium-ffmpeg-r1.patch"
-	"${FILESDIR}/chromium-ffmpeg-clang.patch"
-	"${FILESDIR}/chromium-fixes-r1.patch"
+	"${FILESDIR}/chromium-libjpeg-r0.patch"
+	"${FILESDIR}/chromium-cors-string-r0.patch"
+	"${FILESDIR}/chromium-libwebp-shim-r0.patch"
+	"${FILESDIR}/chromium-ffmpeg-ebp-r1.patch"
 	"${FILESDIR}/chromium-gn-2-r0.patch"
 	"${FILESDIR}/chromium-gtk2-r3.patch"
 	"${FILESDIR}/chromium-optional-atk-r0.patch"
-	"${FILESDIR}/chromium-optional-dbus-r3.patch"
+	"${FILESDIR}/chromium-optional-dbus-r4.patch"
 	"${FILESDIR}/musl-bootstrap-r2.patch"
-	"${FILESDIR}/musl-cdefs-r1.patch"
+	"${FILESDIR}/musl-cdefs-r2.patch"
 	"${FILESDIR}/musl-dlopen.patch"
-	"${FILESDIR}/musl-dns-r1.patch"
+	"${FILESDIR}/musl-dns-r2.patch"
 	"${FILESDIR}/musl-execinfo-r7.patch"
 	"${FILESDIR}/musl-fpstate-r1.patch"
 	"${FILESDIR}/musl-headers-r1.patch"
@@ -230,8 +231,11 @@ src_prepare() {
 		buildtools/third_party/libc++abi
 		chrome/third_party/mozilla_security_manager
 		courgette/third_party
+		net/third_party/http2
 		net/third_party/mozilla_security_manager
 		net/third_party/nss
+		net/third_party/quic
+		net/third_party/spdy
 		third_party/WebKit
 		third_party/analytics
 		third_party/angle
@@ -292,11 +296,11 @@ src_prepare() {
 		third_party/libXNVCtrl
 		third_party/libaddressinput
 		third_party/libaom
-		third_party/libaom/source/libaom/third_party/x86inc
 		third_party/libjingle
 		third_party/libphonenumber
 		third_party/libsecret
 		third_party/libsrtp
+		third_party/libsync
 		third_party/libudev
 		third_party/libwebm
 		third_party/libxml/chromium
@@ -322,16 +326,20 @@ src_prepare() {
 		third_party/pdfium/third_party/libpng16
 		third_party/pdfium/third_party/libtiff
 		third_party/pdfium/third_party/skia_shared
+		third_party/perfetto
 		third_party/ply
 		third_party/polymer
 		third_party/protobuf
 		third_party/protobuf/third_party/six
+		third_party/pyjson5
 		third_party/qcms
+		third_party/rnnoise
 		third_party/s2cellid
 		third_party/sfntly
 		third_party/simplejson
 		third_party/skia
 		third_party/skia/third_party/gif
+		third_party/skia/third_party/skcms
 		third_party/skia/third_party/vulkan
 		third_party/smhasher
 		third_party/spirv-headers
@@ -353,6 +361,7 @@ src_prepare() {
 		url/third_party/mozilla
 		v8/src/third_party/valgrind
 		v8/src/third_party/utf8-decoder
+		v8/third_party/antlr4
 		v8/third_party/inspector_protocol
 
 		# gyp -> gn leftovers
