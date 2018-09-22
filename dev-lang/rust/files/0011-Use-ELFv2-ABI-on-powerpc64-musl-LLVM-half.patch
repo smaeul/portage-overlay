@@ -1,0 +1,29 @@
+From ebce31b3b5113b7dd2b7633fa0965f25026e8016 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 8 Aug 2018 22:06:09 -0500
+Subject: [PATCH 11/14] Use ELFv2 ABI on powerpc64 musl (LLVM half)
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ src/rustllvm/PassWrapper.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/rustllvm/PassWrapper.cpp b/src/rustllvm/PassWrapper.cpp
+index d5410feb25..9acd03d122 100644
+--- a/src/rustllvm/PassWrapper.cpp
++++ b/src/rustllvm/PassWrapper.cpp
+@@ -399,6 +399,11 @@ extern "C" LLVMTargetMachineRef LLVMRustCreateTargetMachine(
+     Options.ThreadModel = ThreadModel::Single;
+   }
+ 
++  if (Trip.getArch() == llvm::Triple::ArchType::ppc64 &&
++      Trip.getEnvironment() == llvm::Triple::EnvironmentType::Musl) {
++    Options.MCOptions.ABIName = "elfv2";
++  }
++
+ #if LLVM_VERSION_GE(6, 0)
+   Optional<CodeModel::Model> CM;
+ #else
+-- 
+2.16.4
+

@@ -41,7 +41,7 @@ case "${CHOST}" in
 esac
 RUSTHOST=${RUSTARCH}-unknown-${KERNEL}-${RUSTLIBC}
 
-RUST_STAGE0_VERSION="1.$(($(get_version_component_range 2) - 0)).0"
+RUST_STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).0"
 
 CARGO_DEPEND_VERSION="0.$(($(get_version_component_range 2) + 1)).0"
 
@@ -51,7 +51,7 @@ HOMEPAGE="https://www.rust-lang.org/"
 SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
 	amd64? (
 		elibc_glibc? ( https://static.rust-lang.org/dist/rust-${RUST_STAGE0_VERSION}-x86_64-unknown-linux-gnu.tar.xz )
-		elibc_musl? ( https://portage.smaeul.xyz/distfiles/rust-${RUST_STAGE0_VERSION}-x86_64-unknown-linux-musl.tar.xz )
+		elibc_musl? ( https://portage.smaeul.xyz/distfiles/bootstrap/rust-${RUST_STAGE0_VERSION}-x86_64-unknown-linux-musl.tar.xz )
 	)
 	arm? (
 		elibc_glibc? (
@@ -75,9 +75,19 @@ SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
 
-IUSE="debug doc extended jemalloc system-llvm"
+IUSE="debug doc extended jemalloc libressl system-llvm"
 
 RDEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
+		extended? (
+			libressl? ( dev-libs/libressl:0= )
+			!libressl? ( dev-libs/openssl:0= )
+			net-libs/http-parser:=
+			net-libs/libssh2:=
+			net-misc/curl:=[ssl]
+			sys-libs/zlib:=
+			!dev-util/rustfmt
+			!dev-util/cargo
+		)
 		jemalloc? ( dev-libs/jemalloc )
 		system-llvm? ( sys-devel/llvm )"
 DEPEND="${RDEPEND}
@@ -102,9 +112,15 @@ PATCHES=(
 	"${FILESDIR}/0006-Fix-rustdoc-for-cross-targets.patch"
 	"${FILESDIR}/0007-Add-openssl-configuration-for-musl-targets.patch"
 	"${FILESDIR}/0008-Don-t-pass-CFLAGS-to-the-C-compiler.patch"
-	"${FILESDIR}/0009-liblibc.patch"
-	"${FILESDIR}/0010-llvm.patch"
+	"${FILESDIR}/0009-Support-big-endian-powerpc64-musl.patch"
+	"${FILESDIR}/0011-Use-ELFv2-ABI-on-powerpc64-musl-LLVM-half.patch"
+	"${FILESDIR}/0012-Use-ELFv2-ABI-on-powerpc64-musl-Rust-half.patch"
+	"${FILESDIR}/0013-Disable-OpenSSL-assembly-for-powerpc64-musl.patch"
+	"${FILESDIR}/0014-Support-powerpc-musl.patch"
+	"${FILESDIR}/0015-liblibc.patch"
+	"${FILESDIR}/0016-llvm.patch"
 )
+	#"${FILESDIR}/0010-Update-libc-to-0.2.43.patch"
 
 S="${WORKDIR}/${MY_P}-src"
 
@@ -129,7 +145,8 @@ src_prepare() {
 	default
 
 	"${WORKDIR}/rust-${RUST_STAGE0_VERSION}-${RUSTHOST}/install.sh" \
-		--prefix="${WORKDIR}/stage0" \
+		--destdir="${WORKDIR}/stage0" \
+		--prefix=/ \
 		--components=rust-std-${RUSTHOST},rustc,cargo \
 		--disable-ldconfig \
 		|| die
@@ -171,7 +188,7 @@ src_configure() {
 		default-linker = "$(tc-getCC)"
 		channel = "${SLOT%%/*}"
 		rpath = false
-		codegen-tests = $(toml_usex debug)
+		optimize-tests = $(toml_usex !debug)
 		dist-src = false
 		[dist]
 		src-tarball = false
@@ -193,17 +210,17 @@ src_compile() {
 src_install() {
 	env DESTDIR="${D}" ./x.py install || die
 
+	mv "${D}/usr/bin/rustc" "${D}/usr/bin/rustc-${PV}" || die
+	mv "${D}/usr/bin/rustdoc" "${D}/usr/bin/rustdoc-${PV}" || die
+	mv "${D}/usr/bin/rust-gdb" "${D}/usr/bin/rust-gdb-${PV}" || die
+	mv "${D}/usr/bin/rust-lldb" "${D}/usr/bin/rust-lldb-${PV}" || die
+
 	rm "${D}/usr/$(get_libdir)/rustlib/components" || die
 	rm "${D}/usr/$(get_libdir)/rustlib/install.log" || die
 	rm "${D}/usr/$(get_libdir)/rustlib/manifest-rust-std-${RUSTHOST}" || die
 	rm "${D}/usr/$(get_libdir)/rustlib/manifest-rustc" || die
 	rm "${D}/usr/$(get_libdir)/rustlib/rust-installer-version" || die
 	rm "${D}/usr/$(get_libdir)/rustlib/uninstall.sh" || die
-
-	mv "${D}/usr/bin/rustc" "${D}/usr/bin/rustc-${PV}" || die
-	mv "${D}/usr/bin/rustdoc" "${D}/usr/bin/rustdoc-${PV}" || die
-	mv "${D}/usr/bin/rust-gdb" "${D}/usr/bin/rust-gdb-${PV}" || die
-	mv "${D}/usr/bin/rust-lldb" "${D}/usr/bin/rust-lldb-${PV}" || die
 
 	if use doc; then
 		rm "${D}/usr/$(get_libdir)/rustlib/manifest-rust-docs" || die
@@ -212,9 +229,21 @@ src_install() {
 		rmdir "${D}/usr/share/doc/rust" || die
 	fi
 
-	dodoc COPYRIGHT
+	if use extended; then
+		rm "${D}/usr/$(get_libdir)/rustlib/manifest-cargo" || die
+		rm "${D}/usr/$(get_libdir)/rustlib/manifest-rls-preview" || die
+		rm "${D}/usr/$(get_libdir)/rustlib/manifest-rust-analysis-$(rust_host ${ARCH})" || die
+		rm "${D}/usr/$(get_libdir)/rustlib/manifest-rust-src" || die
+		rm "${D}/usr/$(get_libdir)/rustlib/manifest-rustfmt-preview" || die
+
+		rm "${D}/usr/share/doc/${P}/LICENSE-APACHE.old" || die
+		rm "${D}/usr/share/doc/${P}/LICENSE-MIT.old" || die
+	fi
+
 	rm "${D}/usr/share/doc/${P}/LICENSE-APACHE" || die
 	rm "${D}/usr/share/doc/${P}/LICENSE-MIT" || die
+
+	docompress "/usr/share/${P}/man"
 
 	cat <<-EOF > "${T}"/50${P}
 		MANPATH="/usr/share/${P}/man"

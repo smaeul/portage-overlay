@@ -1,0 +1,44 @@
+From fb4c89a8e6e73aacf0997b8efd120ea163aaf9d6 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 8 Aug 2018 22:06:18 -0500
+Subject: [PATCH 12/14] Use ELFv2 ABI on powerpc64 musl (Rust half)
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ src/librustc_target/abi/call/powerpc64.rs | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/src/librustc_target/abi/call/powerpc64.rs b/src/librustc_target/abi/call/powerpc64.rs
+index 0c5ec77a39..20546557ec 100644
+--- a/src/librustc_target/abi/call/powerpc64.rs
++++ b/src/librustc_target/abi/call/powerpc64.rs
+@@ -14,6 +14,7 @@
+ 
+ use abi::call::{FnType, ArgType, Reg, RegKind, Uniform};
+ use abi::{Align, Endian, HasDataLayout, LayoutOf, TyLayout, TyLayoutMethods};
++use spec::HasTargetSpec;
+ 
+ #[derive(Debug, Clone, Copy, PartialEq)]
+ enum ABI {
+@@ -136,10 +137,16 @@ fn classify_arg_ty<'a, Ty, C>(cx: C, arg: &mut ArgType<'a, Ty>, abi: ABI)
+ 
+ pub fn compute_abi_info<'a, Ty, C>(cx: C, fty: &mut FnType<'a, Ty>)
+     where Ty: TyLayoutMethods<'a, C> + Copy,
+-          C: LayoutOf<Ty = Ty, TyLayout = TyLayout<'a, Ty>> + HasDataLayout
++          C: LayoutOf<Ty = Ty, TyLayout = TyLayout<'a, Ty>> + HasDataLayout + HasTargetSpec
+ {
+     let abi = match cx.data_layout().endian {
+-        Endian::Big => ELFv1,
++        Endian::Big => {
++            if cx.target_spec().target_env == "musl" {
++                ELFv2
++            } else {
++                ELFv1
++            }
++        }
+         Endian::Little => ELFv2,
+     };
+ 
+-- 
+2.16.4
+

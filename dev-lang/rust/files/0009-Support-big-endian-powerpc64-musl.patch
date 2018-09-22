@@ -1,0 +1,94 @@
+From 81e16a4066a36f74971a650e503c006fa30e9df2 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Tue, 7 Aug 2018 21:59:15 -0500
+Subject: [PATCH 09/14] Support big-endian powerpc64 musl
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+ src/bootstrap/native.rs                            |  1 +
+ src/librustc_target/spec/mod.rs                    |  1 +
+ .../spec/powerpc64_unknown_linux_musl.rs           | 35 ++++++++++++++++++++++
+ src/tools/build-manifest/src/main.rs               |  1 +
+ 4 files changed, 38 insertions(+)
+ create mode 100644 src/librustc_target/spec/powerpc64_unknown_linux_musl.rs
+
+diff --git a/src/bootstrap/native.rs b/src/bootstrap/native.rs
+index 69c9e8cdb4..b8089a4879 100644
+--- a/src/bootstrap/native.rs
++++ b/src/bootstrap/native.rs
+@@ -621,6 +621,7 @@ impl Step for Openssl {
+             "powerpc-unknown-linux-gnuspe" => "linux-ppc",
+             "powerpc-unknown-netbsd" => "BSD-generic32",
+             "powerpc64-unknown-linux-gnu" => "linux-ppc64",
++            "powerpc64-unknown-linux-musl" => "linux-ppc64",
+             "powerpc64le-unknown-linux-gnu" => "linux-ppc64le",
+             "s390x-unknown-linux-gnu" => "linux64-s390x",
+             "sparc-unknown-linux-gnu" => "linux-sparcv9",
+diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
+index e54cd77312..0bf9920d5f 100644
+--- a/src/librustc_target/spec/mod.rs
++++ b/src/librustc_target/spec/mod.rs
+@@ -273,6 +273,7 @@ supported_targets! {
+     ("powerpc-unknown-linux-gnu", powerpc_unknown_linux_gnu),
+     ("powerpc-unknown-linux-gnuspe", powerpc_unknown_linux_gnuspe),
+     ("powerpc64-unknown-linux-gnu", powerpc64_unknown_linux_gnu),
++    ("powerpc64-unknown-linux-musl", powerpc64_unknown_linux_musl),
+     ("powerpc64le-unknown-linux-gnu", powerpc64le_unknown_linux_gnu),
+     ("s390x-unknown-linux-gnu", s390x_unknown_linux_gnu),
+     ("sparc-unknown-linux-gnu", sparc_unknown_linux_gnu),
+diff --git a/src/librustc_target/spec/powerpc64_unknown_linux_musl.rs b/src/librustc_target/spec/powerpc64_unknown_linux_musl.rs
+new file mode 100644
+index 0000000000..24ff9e0ecd
+--- /dev/null
++++ b/src/librustc_target/spec/powerpc64_unknown_linux_musl.rs
+@@ -0,0 +1,35 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::{LinkerFlavor, Target, TargetResult};
++
++pub fn target() -> TargetResult {
++    let mut base = super::linux_musl_base::opts();
++    base.cpu = "ppc64".to_string();
++    base.pre_link_args.get_mut(&LinkerFlavor::Gcc).unwrap().push("-m64".to_string());
++    base.max_atomic_width = Some(64);
++
++    // see #36994
++    base.exe_allocation_crate = None;
++
++    Ok(Target {
++        llvm_target: "powerpc64-unknown-linux-musl".to_string(),
++        target_endian: "big".to_string(),
++        target_pointer_width: "64".to_string(),
++        target_c_int_width: "32".to_string(),
++        data_layout: "E-m:e-i64:64-n32:64".to_string(),
++        arch: "powerpc64".to_string(),
++        target_os: "linux".to_string(),
++        target_env: "musl".to_string(),
++        target_vendor: "unknown".to_string(),
++        linker_flavor: LinkerFlavor::Gcc,
++        options: base,
++    })
++}
+diff --git a/src/tools/build-manifest/src/main.rs b/src/tools/build-manifest/src/main.rs
+index 91a44fdd42..c5c42d6057 100644
+--- a/src/tools/build-manifest/src/main.rs
++++ b/src/tools/build-manifest/src/main.rs
+@@ -87,6 +87,7 @@ static TARGETS: &'static [&'static str] = &[
+     "powerpc-unknown-linux-gnu",
+     "powerpc-unknown-linux-gnuspe",
+     "powerpc64-unknown-linux-gnu",
++    "powerpc64-unknown-linux-musl",
+     "powerpc64le-unknown-linux-gnu",
+     "s390x-unknown-linux-gnu",
+     "sparc-unknown-linux-gnu",
+-- 
+2.16.4
+
