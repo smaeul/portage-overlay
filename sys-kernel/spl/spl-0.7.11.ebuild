@@ -38,7 +38,6 @@ DOCS=( AUTHORS DISCLAIMER )
 pkg_setup() {
 	CONFIG_CHECK="
 		!DEBUG_LOCK_ALLOC
-		!GRKERNSEC_RANDSTRUCT
 		KALLSYMS
 		MODULES
 		!PAX_KERNEXEC_PLUGIN_METHOD_OR
@@ -57,7 +56,7 @@ pkg_setup() {
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
-		{ kernel_is le 4 17 || die "Linux 4.17 is the latest supported version."; }
+		{ kernel_is le 4 18 || die "Linux 4.18 is the latest supported version."; }
 }
 
 src_prepare() {
