@@ -1,5 +1,7 @@
---- chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
-+++ chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+index 46a54ed..d8b8094 100644
+--- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
++++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
 @@ -202,6 +202,9 @@ ResultExpr EvaluateSyscallImpl(int fs_denied_errno,
    if (sysno == __NR_prctl)
      return RestrictPrctl();
@@ -10,9 +12,11 @@
  #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
      defined(__aarch64__)
    if (sysno == __NR_socketpair) {
---- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
-+++ chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
-@@ -114,23 +114,13 @@
+diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+index 2577f02..37fa09b 100644
+--- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
++++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+@@ -129,23 +129,13 @@ namespace sandbox {
  // CLONE_VM, nor CLONE_THREAD, which includes all fork() implementations.
  ResultExpr RestrictCloneToThreadsAndEPERMFork() {
    const Arg<unsigned long> flags(0);
@@ -42,8 +46,8 @@
        .ElseIf((flags & (CLONE_VM | CLONE_THREAD)) == 0, Error(EPERM))
        .Else(CrashSIGSYSClone());
  }
-@@ -369,4 +369,10 @@ ResultExpr RestrictPrlimitToGetrlimit(pid_t target_pid) {
-       .Else(Error(EPERM));
+@@ -383,4 +373,10 @@ ResultExpr RestrictPrlimit(pid_t target_pid) {
+   return If(AnyOf(pid == 0, pid == target_pid), Allow()).Else(Error(EPERM));
  }
  
 +ResultExpr RestrictSetTIDAddress() {
@@ -53,11 +57,13 @@
 +}
 +
  }  // namespace sandbox.
---- chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
-+++ chromium-60.0.3112.78/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+index 71c5609..5d5ebfc 100644
+--- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
++++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
 @@ -103,6 +103,9 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictGetRandom();
- // Otherwise, fail gracefully; see crbug.com/160157.
- SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictPrlimitToGetrlimit(pid_t target_pid);
+ // gracefully; see crbug.com/160157.
+ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictPrlimit(pid_t target_pid);
  
 +// Restrict the address to NULL.
 +SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictSetTIDAddress();
@@ -65,9 +71,11 @@
  }  // namespace sandbox.
  
  #endif  // SANDBOX_LINUX_SECCOMP_BPF_HELPERS_SYSCALL_PARAMETERS_RESTRICTIONS_H_
---- chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
-+++ chromium-54.0.2840.34/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
-@@ -494,6 +494,7 @@
+diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+index 9f1cdef..a330d9a 100644
+--- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
++++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+@@ -496,6 +496,7 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
      case __NR_mlock:
      case __NR_munlock:
      case __NR_munmap:
@@ -75,7 +83,7 @@
        return true;
      case __NR_madvise:
      case __NR_mincore:
-@@ -509,7 +510,6 @@
+@@ -511,7 +512,6 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
      case __NR_modify_ldt:
  #endif
      case __NR_mprotect:

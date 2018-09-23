@@ -1,8 +1,8 @@
-diff --git chromium-60.0.3112.78/base/debug/stack_trace_posix.cc.orig chromium-60.0.3112.78/base/debug/stack_trace_posix.cc
-index 5d6ff89..3c1207c 100644
---- chromium-60.0.3112.78/base/debug/stack_trace_posix.cc.orig
-+++ chromium-60.0.3112.78/base/debug/stack_trace_posix.cc
-@@ -26,7 +26,7 @@
+diff --git chromium-69.0.3497.100/base/debug/stack_trace_posix.cc
+index f3f05da..fc2a96f 100644
+--- chromium-69.0.3497.100/base/debug/stack_trace_posix.cc
++++ chromium-69.0.3497.100/base/debug/stack_trace_posix.cc
+@@ -27,7 +27,7 @@
  #if !defined(USE_SYMBOLIZE)
  #include <cxxabi.h>
  #endif
@@ -11,7 +11,7 @@ index 5d6ff89..3c1207c 100644
  #include <execinfo.h>
  #endif
  
-@@ -80,7 +80,7 @@ void DemangleSymbols(std::string* text) {
+@@ -85,7 +85,7 @@ void DemangleSymbols(std::string* text) {
    // Note: code in this function is NOT async-signal safe (std::string uses
    // malloc internally).
  
@@ -20,7 +20,7 @@ index 5d6ff89..3c1207c 100644
    std::string::size_type search_from = 0;
    while (search_from < text->size()) {
      // Look for the start of a mangled symbol, from search_from.
-@@ -115,7 +115,7 @@ void DemangleSymbols(std::string* text) {
+@@ -120,7 +120,7 @@ void DemangleSymbols(std::string* text) {
        search_from = mangled_start + 2;
      }
    }
@@ -29,8 +29,8 @@ index 5d6ff89..3c1207c 100644
  }
  #endif  // !defined(USE_SYMBOLIZE)
  
-@@ -127,7 +127,7 @@ class BacktraceOutputHandler {
-   virtual ~BacktraceOutputHandler() {}
+@@ -132,7 +132,7 @@ class BacktraceOutputHandler {
+   virtual ~BacktraceOutputHandler() = default;
  };
  
 -#if !defined(__UCLIBC__) && !defined(_AIX)
@@ -38,7 +38,7 @@ index 5d6ff89..3c1207c 100644
  void OutputPointer(void* pointer, BacktraceOutputHandler* handler) {
    // This should be more than enough to store a 64-bit number in hex:
    // 16 hex digits + 1 for null-terminator.
-@@ -204,7 +204,7 @@ void ProcessBacktrace(void *const *trace,
+@@ -209,7 +209,7 @@ void ProcessBacktrace(void *const *trace,
    }
  #endif  // defined(USE_SYMBOLIZE)
  }
@@ -47,7 +47,7 @@ index 5d6ff89..3c1207c 100644
  
  void PrintToStderr(const char* output) {
    // NOTE: This code MUST be async-signal safe (it's used by in-process
-@@ -721,7 +721,7 @@ StackTrace::StackTrace(size_t count) {
+@@ -800,7 +800,7 @@ StackTrace::StackTrace(size_t count) {
  // NOTE: This code MUST be async-signal safe (it's used by in-process
  // stack dumping signal handler). NO malloc or stdio is allowed here.
  
@@ -56,7 +56,7 @@ index 5d6ff89..3c1207c 100644
    count = std::min(arraysize(trace_), count);
  
    // Though the backtrace API man page does not list any possible negative
-@@ -736,13 +736,13 @@ void StackTrace::Print() const {
+@@ -815,13 +815,13 @@ void StackTrace::Print() const {
    // NOTE: This code MUST be async-signal safe (it's used by in-process
    // stack dumping signal handler). NO malloc or stdio is allowed here.
  
@@ -72,11 +72,12 @@ index 5d6ff89..3c1207c 100644
  void StackTrace::OutputToStream(std::ostream* os) const {
    StreamBacktraceOutputHandler handler(os);
    ProcessBacktrace(trace_, count_, &handler);
-diff --git chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/assertions.cc
-index 9bdece7..051a55b 100644
---- chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/assertions.cc.orig
-+++ chromium-67.0.3396.87/third_party/blink/renderer/platform/wtf/assertions.cc
-@@ -57,6 +57,6 @@
+diff --git chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
+index c7ecc7f..1284614 100644
+--- chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
++++ chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
+@@ -48,7 +48,7 @@
+ #include <windows.h>
  #endif
  
 -#if defined(OS_MACOSX) || (defined(OS_LINUX) && !defined(__UCLIBC__))
@@ -84,10 +85,10 @@ index 9bdece7..051a55b 100644
  #include <cxxabi.h>
  #include <dlfcn.h>
  #include <execinfo.h>
-diff --git chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
-index 154fefe..9f04b23 100644
---- chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h.orig
-+++ chromium-59.0.3071.86/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+diff --git chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+index e14edbd..dfeca51 100644
+--- chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
 @@ -14,7 +14,7 @@
  #define ENABLE_CRASH_OVERRIDES 1
  

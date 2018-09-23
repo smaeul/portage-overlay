@@ -1,5 +1,7 @@
---- chromium-63.0.3239.84/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
-+++ chromium-63.0.3239.84/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
+diff --git chromium-69.0.3497.100/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
+index d03c7a8..78ca9dd 100644
+--- chromium-69.0.3497.100/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
++++ chromium-69.0.3497.100/third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
 @@ -36,6 +36,7 @@
  #include <elf.h>
  #include <link.h>
@@ -8,7 +10,7 @@
  
  #include "common/memory_range.h"
  
-@@ -51,9 +52,9 @@
+@@ -51,9 +52,9 @@ class ElfCoreDump {
    typedef ElfW(Phdr) Phdr;
    typedef ElfW(Word) Word;
    typedef ElfW(Addr) Addr;

@@ -1,8 +1,8 @@
-diff --git chromium-60.0.3112.78/chrome/browser/BUILD.gn chromium-60.0.3112.78/chrome/browser/BUILD.gn
-index c79b28b..22ad72a 100644
---- chromium-60.0.3112.78/chrome/browser/BUILD.gn
-+++ chromium-60.0.3112.78/chrome/browser/BUILD.gn
-@@ -3858,14 +3858,18 @@ split_static_library("browser") {
+diff --git chromium-69.0.3497.100/chrome/browser/BUILD.gn
+index b5d398f..2e53724 100644
+--- chromium-69.0.3497.100/chrome/browser/BUILD.gn
++++ chromium-69.0.3497.100/chrome/browser/BUILD.gn
+@@ -3215,13 +3215,17 @@ jumbo_split_static_library("browser") {
        "first_run/upgrade_util_linux.cc",
        "first_run/upgrade_util_linux.h",
        "icon_loader_auralinux.cc",
@@ -12,7 +12,6 @@ index c79b28b..22ad72a 100644
        "shell_integration_linux.cc",
        "shell_integration_linux.h",
        "speech/tts_linux.cc",
-       "web_applications/web_app_linux.cc",
      ]
 +    if (use_dbus) {
 +      sources += [
@@ -21,13 +20,13 @@ index c79b28b..22ad72a 100644
 +      ]
 +    }
  
-     if (enable_native_notifications) {
-       sources += [
-diff --git chromium-60.0.3112.78/chrome/browser/chrome_browser_main_linux.cc chromium-60.0.3112.78/chrome/browser/chrome_browser_main_linux.cc
-index 1fc00fa..caa5719 100644
---- chromium-60.0.3112.78/chrome/browser/chrome_browser_main_linux.cc
-+++ chromium-60.0.3112.78/chrome/browser/chrome_browser_main_linux.cc
-@@ -82,7 +82,7 @@ void ChromeBrowserMainPartsLinux::PostProfileInit() {
+     deps += [ "//third_party/speech-dispatcher" ]
+ 
+diff --git chromium-69.0.3497.100/chrome/browser/chrome_browser_main_linux.cc
+index 3a26947..50c9452 100644
+--- chromium-69.0.3497.100/chrome/browser/chrome_browser_main_linux.cc
++++ chromium-69.0.3497.100/chrome/browser/chrome_browser_main_linux.cc
+@@ -93,7 +93,7 @@ void ChromeBrowserMainPartsLinux::PostProfileInit() {
  }
  
  void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
@@ -36,7 +35,7 @@ index 1fc00fa..caa5719 100644
    bluez::DBusThreadManagerLinux::Initialize();
    bluez::BluezDBusManager::Initialize(
        bluez::DBusThreadManagerLinux::Get()->GetSystemBus(), false);
-@@ -92,7 +92,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
+@@ -103,7 +103,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
  }
  
  void ChromeBrowserMainPartsLinux::PostDestroyThreads() {
@@ -45,11 +44,11 @@ index 1fc00fa..caa5719 100644
    bluez::BluezDBusManager::Shutdown();
    bluez::DBusThreadManagerLinux::Shutdown();
  #endif
-diff --git chromium-60.0.3112.78/chrome/browser/password_manager/password_store_factory.cc chromium-60.0.3112.78/chrome/browser/password_manager/password_store_factory.cc
-index 84e4f05..03f6127 100644
---- chromium-60.0.3112.78/chrome/browser/password_manager/password_store_factory.cc
-+++ chromium-60.0.3112.78/chrome/browser/password_manager/password_store_factory.cc
-@@ -200,6 +200,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
+diff --git chromium-69.0.3497.100/chrome/browser/password_manager/password_store_factory.cc
+index a234d58..465853e 100644
+--- chromium-69.0.3497.100/chrome/browser/password_manager/password_store_factory.cc
++++ chromium-69.0.3497.100/chrome/browser/password_manager/password_store_factory.cc
+@@ -203,6 +203,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
    std::unique_ptr<PasswordStoreX::NativeBackend> backend;
    if (selected_backend == os_crypt::SelectedLinuxBackend::KWALLET ||
        selected_backend == os_crypt::SelectedLinuxBackend::KWALLET5) {
@@ -57,7 +56,7 @@ index 84e4f05..03f6127 100644
      VLOG(1) << "Trying KWallet for password storage.";
      base::nix::DesktopEnvironment used_desktop_env =
          selected_backend == os_crypt::SelectedLinuxBackend::KWALLET
-@@ -212,6 +213,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
+@@ -215,6 +216,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
      } else {
        backend.reset();
      }
@@ -65,11 +64,12 @@ index 84e4f05..03f6127 100644
    } else if (selected_backend == os_crypt::SelectedLinuxBackend::GNOME_ANY ||
               selected_backend ==
                   os_crypt::SelectedLinuxBackend::GNOME_KEYRING ||
-diff --git chromium-60.0.3112.78/device/bluetooth/bluetooth_adapter_factory.cc chromium-60.0.3112.78/device/bluetooth/bluetooth_adapter_factory.cc
-index cee5e1d..df6a895 100644
---- chromium-60.0.3112.78/device/bluetooth/bluetooth_adapter_factory.cc
-+++ chromium-60.0.3112.78/device/bluetooth/bluetooth_adapter_factory.cc
-@@ -77,7 +77,7 @@ bool BluetoothAdapterFactory::IsBluetoothSupported() {
+diff --git chromium-69.0.3497.100/device/bluetooth/bluetooth_adapter_factory.cc
+index 8ec9492..fecfb7d 100644
+--- chromium-69.0.3497.100/device/bluetooth/bluetooth_adapter_factory.cc
++++ chromium-69.0.3497.100/device/bluetooth/bluetooth_adapter_factory.cc
+@@ -76,7 +76,7 @@ bool BluetoothAdapterFactory::IsBluetoothSupported() {
+   // instance even on platforms that would otherwise not support it.
    if (default_adapter.Get())
      return true;
 -#if defined(OS_ANDROID) || defined(OS_WIN) || defined(OS_LINUX) || \
@@ -77,7 +77,6 @@ index cee5e1d..df6a895 100644
      defined(OS_MACOSX)
    return true;
  #else
-   return false;
 @@ -99,7 +99,7 @@ bool BluetoothAdapterFactory::IsLowEnergySupported() {
    return base::win::GetVersion() >= base::win::VERSION_WIN10;
  #elif defined(OS_MACOSX)
@@ -87,25 +86,11 @@ index cee5e1d..df6a895 100644
    return true;
  #else
    return false;
-diff --git chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn
-index 3d5a127..f8ea3e0 100644
---- chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn
-+++ chromium-60.0.3112.78/services/device/wake_lock/power_save_blocker/BUILD.gn
-@@ -52,6 +52,9 @@ component("power_save_blocker") {
-   if (is_chromeos || !use_x11 || !use_dbus) {
-     sources -= [ "power_save_blocker_x11.cc" ]
-   }
-+  if (!is_chromeos && use_x11 && !use_dbus) {
-+    sources += [ "power_save_blocker_ozone.cc" ]
-+  }
- 
-   if (is_android) {
-     deps += [ ":jni_headers" ]
-diff --git chromium-60.0.3112.78/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc chromium-60.0.3112.78/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
-index 515838f..59360ec 100644
---- chromium-60.0.3112.78/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
-+++ chromium-60.0.3112.78/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
-@@ -1316,7 +1316,7 @@ void BluetoothLowEnergyCreateServiceFunction::DoWork() {
+diff --git chromium-69.0.3497.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+index f201275..8efdfbe 100644
+--- chromium-69.0.3497.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
++++ chromium-69.0.3497.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+@@ -1326,7 +1326,7 @@ void BluetoothLowEnergyCreateServiceFunction::DoWork() {
  // TODO: Ideally this should be handled by our feature system, so that this
  // code doesn't even compile on OSes it isn't being used on, but currently this
  // is not possible.
@@ -114,15 +99,15 @@ index 515838f..59360ec 100644
    base::WeakPtr<device::BluetoothLocalGattService> service =
        device::BluetoothLocalGattService::Create(
            event_router_->adapter(),
-@@ -1337,6 +1337,7 @@ template class BLEPeripheralExtensionFunction<
-     apibtle::CreateCharacteristic::Params>;
+@@ -1355,6 +1355,7 @@ bool BluetoothLowEnergyCreateCharacteristicFunction::ParseParams() {
+ }
  
  void BluetoothLowEnergyCreateCharacteristicFunction::DoWork() {
 +#if !defined(OS_LINUX) || defined(USE_DBUS)
    device::BluetoothLocalGattService* service =
        event_router_->adapter()->GetGattService(params_->service_id);
    if (!service) {
-@@ -1357,6 +1358,9 @@ void BluetoothLowEnergyCreateCharacteristicFunction::DoWork() {
+@@ -1375,6 +1376,9 @@ void BluetoothLowEnergyCreateCharacteristicFunction::DoWork() {
  
    Respond(ArgumentList(apibtle::CreateCharacteristic::Results::Create(
        characteristic->GetIdentifier())));
@@ -132,15 +117,15 @@ index 515838f..59360ec 100644
  }
  
  // createDescriptor:
-@@ -1365,6 +1369,7 @@ template class BLEPeripheralExtensionFunction<
-     apibtle::CreateDescriptor::Params>;
+@@ -1391,6 +1395,7 @@ bool BluetoothLowEnergyCreateDescriptorFunction::ParseParams() {
+ }
  
  void BluetoothLowEnergyCreateDescriptorFunction::DoWork() {
 +#if !defined(OS_LINUX) || defined(USE_DBUS)
    device::BluetoothLocalGattCharacteristic* characteristic =
        event_router_->GetLocalCharacteristic(params_->characteristic_id);
    if (!characteristic) {
-@@ -1380,6 +1385,9 @@ void BluetoothLowEnergyCreateDescriptorFunction::DoWork() {
+@@ -1406,6 +1411,9 @@ void BluetoothLowEnergyCreateDescriptorFunction::DoWork() {
  
    Respond(ArgumentList(
        apibtle::CreateDescriptor::Results::Create(descriptor->GetIdentifier())));
@@ -150,23 +135,10 @@ index 515838f..59360ec 100644
  }
  
  // registerService:
-diff --git chromium-68.0.3440.84/extensions/browser/api/networking_private/BUILD.gn
-index 0f3eade..9041f4b 100644
---- chromium-68.0.3440.84/extensions/browser/api/networking_private/BUILD.gn.orig
-+++ chromium-68.0.3440.84/extensions/browser/api/networking_private/BUILD.gn
-@@ -61,7 +61,7 @@ source_set("networking_private") {
-               ]
-     deps += [ "//chromeos" ]
-   } else {
--    not_needed(default_sources)
-+    not_needed(["default_sources"])
-     sources = [
-       "networking_private_stubs.cc",
-     ]
-diff --git chromium-60.0.3112.78/services/device/battery/battery_status_manager_default.cc chromium-60.0.3112.78/services/device/battery/battery_status_manager_default.cc
-index 5d64b34..a224c74 100644
---- chromium-60.0.3112.78/services/device/battery/battery_status_manager_default.cc
-+++ chromium-60.0.3112.78/services/device/battery/battery_status_manager_default.cc
+diff --git chromium-69.0.3497.100/services/device/battery/battery_status_manager_default.cc
+index 0249c6f..ab2ff4e 100644
+--- chromium-69.0.3497.100/services/device/battery/battery_status_manager_default.cc
++++ chromium-69.0.3497.100/services/device/battery/battery_status_manager_default.cc
 @@ -22,11 +22,10 @@ class BatteryStatusManagerDefault : public BatteryStatusManager {
   private:
    // BatteryStatusManager:
@@ -180,3 +152,17 @@ index 5d64b34..a224c74 100644
  
    DISALLOW_COPY_AND_ASSIGN(BatteryStatusManagerDefault);
  };
+diff --git chromium-69.0.3497.100/services/device/wake_lock/power_save_blocker/BUILD.gn
+index dfce90f..75eaadb 100644
+--- chromium-69.0.3497.100/services/device/wake_lock/power_save_blocker/BUILD.gn
++++ chromium-69.0.3497.100/services/device/wake_lock/power_save_blocker/BUILD.gn
+@@ -62,6 +62,9 @@ source_set("power_save_blocker") {
+   if (is_chromeos || !use_x11 || !use_dbus) {
+     sources -= [ "power_save_blocker_x11.cc" ]
+   }
++  if (!is_chromeos && use_x11 && !use_dbus) {
++    sources += [ "power_save_blocker_ozone.cc" ]
++  }
+ 
+   if (is_android) {
+     deps += [ ":jni_headers" ]

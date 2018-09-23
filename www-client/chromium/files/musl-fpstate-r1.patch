@@ -1,7 +1,7 @@
-diff --git chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
+diff --git chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
 index 052ce37..95b0fb4 100644
---- chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc.orig
-+++ chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
+--- chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
++++ chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
 @@ -49,7 +49,7 @@ uintptr_t UContextReader::GetInstructionPointer(const ucontext_t* uc) {
  }
  
@@ -20,10 +20,10 @@ index 052ce37..95b0fb4 100644
    const greg_t* regs = uc->uc_mcontext.gregs;
  
    out->context_flags = MD_CONTEXT_AMD64_FULL;
-diff --git chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
-index 2de80b7..4cf1377 100644
---- chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h.orig
-+++ chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
+diff --git chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
+index f830618..f3dde1f 100644
+--- chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
++++ chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
 @@ -50,7 +50,7 @@ struct UContextReader {
    //   info: the collection of register structures.
  #if defined(__i386__) || defined(__x86_64)
@@ -33,10 +33,10 @@ index 2de80b7..4cf1377 100644
  #elif defined(__aarch64__)
    static void FillCPUContext(RawContextCPU *out, const ucontext_t *uc,
                               const struct fpsimd_context* fpregs);
-diff --git chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h
+diff --git chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h
 index d1dc331..d1cc562 100644
---- chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h.orig
-+++ chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h
+--- chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h
++++ chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h
 @@ -48,7 +48,7 @@ class ExceptionHandler;
  #if defined(__aarch64__)
  typedef struct fpsimd_context fpstate_t;

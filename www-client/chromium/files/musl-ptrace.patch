@@ -1,7 +1,7 @@
-diff --git chromium-67.0.3396.87/third_party/crashpad/crashpad/util/linux/ptracer.cc
-index 8444736..bbcd392 100644
---- chromium-67.0.3396.87/third_party/crashpad/crashpad/util/linux/ptracer.cc.orig
-+++ chromium-67.0.3396.87/third_party/crashpad/crashpad/util/linux/ptracer.cc
+diff --git chromium-69.0.3497.100/third_party/crashpad/crashpad/util/linux/ptracer.cc
+index c6c9229..6731148 100644
+--- chromium-69.0.3497.100/third_party/crashpad/crashpad/util/linux/ptracer.cc
++++ chromium-69.0.3497.100/third_party/crashpad/crashpad/util/linux/ptracer.cc
 @@ -66,6 +66,7 @@ bool GetThreadArea32(pid_t tid,
                       const ThreadContext& context,
                       LinuxVMAddress* address,

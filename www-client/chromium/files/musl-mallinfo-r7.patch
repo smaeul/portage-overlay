@@ -1,8 +1,8 @@
-diff --git chromium-61.0.3163.79/base/process/process_metrics_posix.cc
-index 0eb5c1f..7e0e5c0 100644
---- chromium-61.0.3163.79/base/process/process_metrics_posix.cc.orig
-+++ chromium-61.0.3163.79/base/process/process_metrics_posix.cc
-@@ -94,14 +94,14 @@ size_t ProcessMetrics::GetMallocUsage() {
+diff --git chromium-69.0.3497.100/base/process/process_metrics_posix.cc
+index a09bbf2..f0a439f 100644
+--- chromium-69.0.3497.100/base/process/process_metrics_posix.cc
++++ chromium-69.0.3497.100/base/process/process_metrics_posix.cc
+@@ -100,14 +100,14 @@ size_t ProcessMetrics::GetMallocUsage() {
    malloc_statistics_t stats = {0};
    malloc_zone_statistics(nullptr, &stats);
    return stats.size_in_use;
@@ -19,12 +19,12 @@ index 0eb5c1f..7e0e5c0 100644
    // TODO(fuchsia): Not currently exposed. https://crbug.com/735087.
    return 0;
  #endif
-diff --git chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc
-index 14ba0a2..2cedb37 100644
---- chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc
-+++ chromium-60.0.3112.78/base/trace_event/malloc_dump_provider.cc
-@@ -243,7 +243,7 @@ bool MallocDumpProvider::OnMemoryDump(const MemoryDumpArgs& args,
-   allocated_objects_count = main_heap_info.block_count;
+diff --git chromium-69.0.3497.100/base/trace_event/malloc_dump_provider.cc
+index 46fdb3e..d9b237f 100644
+--- chromium-69.0.3497.100/base/trace_event/malloc_dump_provider.cc
++++ chromium-69.0.3497.100/base/trace_event/malloc_dump_provider.cc
+@@ -132,7 +132,7 @@ bool MallocDumpProvider::OnMemoryDump(const MemoryDumpArgs& args,
+   }
  #elif defined(OS_FUCHSIA)
  // TODO(fuchsia): Port, see https://crbug.com/706592.
 -#else
@@ -32,10 +32,10 @@ index 14ba0a2..2cedb37 100644
    struct mallinfo info = mallinfo();
    DCHECK_GE(info.arena + info.hblkhd, info.uordblks);
  
-diff --git chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
-index dfeca51..e188d33 100644
---- chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
-+++ chromium-60.0.3112.78/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+diff --git chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+index e14edbd..154fefe 100644
+--- chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
 @@ -130,7 +130,7 @@
  /* #undef HAVE_MALLCTL */
  

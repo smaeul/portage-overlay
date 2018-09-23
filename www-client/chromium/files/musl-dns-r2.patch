@@ -1,17 +1,17 @@
-diff --git chromium-61.0.3163.79/net/dns/dns_config_service_posix.cc
-index 03d0255..2cb06d7 100644
---- chromium-61.0.3163.79/net/dns/dns_config_service_posix.cc.orig
-+++ chromium-61.0.3163.79/net/dns/dns_config_service_posix.cc
-@@ -122,7 +122,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* config) {
+diff --git chromium-69.0.3497.100/net/dns/dns_config_service_posix.cc
+index 06e9d79..2ad441d 100644
+--- chromium-69.0.3497.100/net/dns/dns_config_service_posix.cc
++++ chromium-69.0.3497.100/net/dns/dns_config_service_posix.cc
+@@ -147,7 +147,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* dns_config) {
+ #if !defined(OS_ANDROID)
    ConfigParsePosixResult result;
-   config->unhandled_options = false;
  // TODO(fuchsia): Use res_ninit() when it's implemented on Fuchsia.
 -#if defined(OS_OPENBSD) || defined(OS_FUCHSIA)
 +#if defined(OS_OPENBSD) || defined(OS_FUCHSIA) || (defined(OS_LINUX) && !defined(__GLIBC__))
    // Note: res_ninit in glibc always returns 0 and sets RES_INIT.
    // res_init behaves the same way.
    memset(&_res, 0, sizeof(_res));
-@@ -145,7 +145,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* config) {
+@@ -170,7 +170,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* dns_config) {
  #else
    res_nclose(&res);
  #endif  // defined(OS_MACOSX) || defined(OS_FREEBSD)
@@ -20,10 +20,10 @@ index 03d0255..2cb06d7 100644
  
  #if defined(OS_MACOSX) && !defined(OS_IOS)
    ConfigParsePosixResult error = DnsConfigWatcher::CheckDnsConfig();
-diff --git chromium-54.0.2840.59/net/dns/dns_reloader.cc.orig chromium-54.0.2840.59/net/dns/dns_reloader.cc
-index 74534e6..9ca2619 100644
---- chromium-54.0.2840.59/net/dns/dns_reloader.cc.orig
-+++ chromium-54.0.2840.59/net/dns/dns_reloader.cc
+diff --git chromium-69.0.3497.100/net/dns/dns_reloader.cc
+index ad96f68..c78a38a 100644
+--- chromium-69.0.3497.100/net/dns/dns_reloader.cc
++++ chromium-69.0.3497.100/net/dns/dns_reloader.cc
 @@ -4,8 +4,7 @@
  
  #include "net/dns/dns_reloader.h"
@@ -34,18 +34,18 @@ index 74534e6..9ca2619 100644
  
  #include <resolv.h>
  
-@@ -121,5 +120,4 @@ void DnsReloaderMaybeReload() {
+@@ -114,5 +113,4 @@ void DnsReloaderMaybeReload() {
  
  }  // namespace net
  
 -#endif  // defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) &&
 -        // !defined(OS_ANDROID)
 +#endif  // defined(__GLIBC__)
-diff --git chromium-54.0.2840.59/net/dns/host_resolver_impl.cc.orig chromium-54.0.2840.59/net/dns/host_resolver_impl.cc
-index 8be7731..8412824 100644
---- chromium-54.0.2840.59/net/dns/host_resolver_impl.cc.orig
-+++ chromium-54.0.2840.59/net/dns/host_resolver_impl.cc
-@@ -2015,8 +2015,7 @@ HostResolverImpl::HostResolverImpl(
+diff --git chromium-69.0.3497.100/net/dns/host_resolver_impl.cc
+index 2d2db7d..6416ebc 100644
+--- chromium-69.0.3497.100/net/dns/host_resolver_impl.cc
++++ chromium-69.0.3497.100/net/dns/host_resolver_impl.cc
+@@ -1985,8 +1985,7 @@ HostResolverImpl::HostResolverImpl(const Options& options, NetLog* net_log)
    NetworkChangeNotifier::AddIPAddressObserver(this);
    NetworkChangeNotifier::AddConnectionTypeObserver(this);
    NetworkChangeNotifier::AddDNSObserver(this);
@@ -55,13 +55,13 @@ index 8be7731..8412824 100644
    EnsureDnsReloaderInit();
  #endif
  
-diff --git chromium-54.0.2840.59/net/dns/host_resolver_proc.cc.orig chromium-54.0.2840.59/net/dns/host_resolver_proc.cc
-index 4bed222..90bead6 100644
---- chromium-54.0.2840.59/net/dns/host_resolver_proc.cc.orig
-+++ chromium-54.0.2840.59/net/dns/host_resolver_proc.cc
-@@ -193,8 +193,7 @@ int SystemHostResolverCall(const std::string& host,
-   // Restrict result set to only this socket type to avoid duplicates.
-   hints.ai_socktype = SOCK_STREAM;
+diff --git chromium-69.0.3497.100/net/dns/host_resolver_proc.cc
+index 4ced225..6098a4c 100644
+--- chromium-69.0.3497.100/net/dns/host_resolver_proc.cc
++++ chromium-69.0.3497.100/net/dns/host_resolver_proc.cc
+@@ -195,8 +195,7 @@ int SystemHostResolverCall(const std::string& host,
+   // current process during that time.
+   base::ScopedBlockingCall scoped_blocking_call(base::BlockingType::WILL_BLOCK);
  
 -#if defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) && \
 -    !defined(OS_ANDROID) && !defined(OS_FUCHSIA)

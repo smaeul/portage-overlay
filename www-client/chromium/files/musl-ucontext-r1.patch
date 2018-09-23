@@ -1,8 +1,8 @@
-diff --git chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc.orig chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
-index b63f973..bf99823 100644
---- chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc.orig
-+++ chromium-63.0.3239.84/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
-@@ -477,7 +477,9 @@ bool ExceptionHandler::SimulateSignalDelivery(int sig) {
+diff --git chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
+index b895f6d..4f13352 100644
+--- chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
++++ chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
+@@ -490,7 +490,9 @@ bool ExceptionHandler::SimulateSignalDelivery(int sig) {
    siginfo.si_code = SI_USER;
    siginfo.si_pid = getpid();
    ucontext_t context;
@@ -12,7 +12,7 @@ index b63f973..bf99823 100644
    return HandleSignal(sig, &siginfo, &context);
  }
  
-@@ -647,8 +649,10 @@ bool ExceptionHandler::WriteMinidump() {
+@@ -675,8 +677,10 @@ bool ExceptionHandler::WriteMinidump() {
    sys_prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
  
    CrashContext context;

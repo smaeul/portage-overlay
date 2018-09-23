@@ -97,6 +97,7 @@ DEPEND="${COMMON_DEPEND}
 		dev-lang/yasm
 	)
 	dev-lang/perl
+	dev-util/gn
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
 	>=net-libs/nodejs-6.9.4
@@ -134,19 +135,13 @@ GTK+ icon theme.
 "
 
 PATCHES=(
+	"${FILESDIR}/chromium-compiler-r4.patch"
 	"${FILESDIR}/chromium-widevine-r2.patch"
-	"${FILESDIR}/chromium-compiler-r2.patch"
 	"${FILESDIR}/chromium-webrtc-r0.patch"
-	"${FILESDIR}/chromium-ffmpeg-r1.patch"
-	"${FILESDIR}/chromium-libjpeg-r0.patch"
-	"${FILESDIR}/chromium-cors-string-r0.patch"
-	"${FILESDIR}/chromium-libwebp-shim-r0.patch"
 	"${FILESDIR}/chromium-ffmpeg-ebp-r1.patch"
-	"${FILESDIR}/chromium-gn-2-r0.patch"
 	"${FILESDIR}/chromium-gtk2-r3.patch"
 	"${FILESDIR}/chromium-optional-atk-r0.patch"
 	"${FILESDIR}/chromium-optional-dbus-r4.patch"
-	"${FILESDIR}/musl-bootstrap-r2.patch"
 	"${FILESDIR}/musl-cdefs-r2.patch"
 	"${FILESDIR}/musl-dlopen.patch"
 	"${FILESDIR}/musl-dns-r2.patch"
@@ -237,6 +232,7 @@ src_prepare() {
 		net/third_party/quic
 		net/third_party/spdy
 		third_party/WebKit
+		third_party/abseil-cpp
 		third_party/analytics
 		third_party/angle
 		third_party/angle/src/common/third_party/base
@@ -247,6 +243,9 @@ src_prepare() {
 		third_party/angle/third_party/glslang
 		third_party/angle/third_party/spirv-headers
 		third_party/angle/third_party/spirv-tools
+		third_party/angle/third_party/vulkan-headers
+		third_party/angle/third_party/vulkan-loader
+		third_party/angle/third_party/vulkan-tools
 		third_party/angle/third_party/vulkan-validation-layers
 		third_party/apple_apsl
 		third_party/blink
@@ -388,22 +387,6 @@ src_prepare() {
 
 	# Remove most bundled libraries. Some are still needed.
 	build/linux/unbundle/remove_bundled_libraries.py "${keeplibs[@]}" --do-remove || die
-}
-
-bootstrap_gn() {
-	if tc-is-cross-compiler; then
-		local -x AR=${BUILD_AR}
-		local -x CC=${BUILD_CC}
-		local -x CXX=${BUILD_CXX}
-		local -x NM=${BUILD_NM}
-		local -x CFLAGS=${BUILD_CFLAGS}
-		local -x CXXFLAGS=${BUILD_CXXFLAGS}
-		local -x LDFLAGS=${BUILD_LDFLAGS}
-	fi
-	einfo "Building GN..."
-	set -- tools/gn/bootstrap/bootstrap.py -s -v --no-clean
-	echo "$@"
-	"$@" || die
 }
 
 src_configure() {
@@ -602,10 +585,8 @@ src_configure() {
 		popd > /dev/null || die
 	fi
 
-	bootstrap_gn
-
 	einfo "Configuring Chromium..."
-	set -- out/Release/gn gen --args="${myconf_gn} ${EXTRA_GN}" out/Release
+	set -- gn gen --args="${myconf_gn} ${EXTRA_GN}" out/Release
 	echo "$@"
 	"$@" || die
 }

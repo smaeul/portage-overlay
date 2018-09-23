@@ -1,8 +1,8 @@
-diff --git chromium-61.0.3163.79/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-index 9067e84..1ed51bb 100644
---- chromium-61.0.3163.79/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc.orig
-+++ chromium-61.0.3163.79/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-@@ -39,7 +39,9 @@
+diff --git chromium-69.0.3497.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+index eb7f41d..b98beff 100644
+--- chromium-69.0.3497.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
++++ chromium-69.0.3497.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+@@ -43,7 +43,9 @@
  #endif  // defined(OS_ANDROID) && defined(__arm__)
  
  #if defined(OS_LINUX) && !defined(OS_CHROMEOS)
@@ -12,7 +12,7 @@ index 9067e84..1ed51bb 100644
  
  #include "base/linux_util.h"
  #include "base/strings/string_split.h"
-@@ -295,7 +297,7 @@ void RecordLinuxDistro() {
+@@ -350,7 +352,7 @@ void RecordLinuxDistro() {
  #endif  // defined(OS_LINUX) && !defined(OS_CHROMEOS)
  
  void RecordLinuxGlibcVersion() {
@@ -21,10 +21,10 @@ index 9067e84..1ed51bb 100644
    base::Version version(gnu_get_libc_version());
  
    UMALinuxGlibcVersion glibc_version_result = UMA_LINUX_GLIBC_NOT_PARSEABLE;
-diff --git chromium-54.0.2840.59/device/serial/serial_io_handler_posix.cc.orig chromium-54.0.2840.59/device/serial/serial_io_handler_posix.cc
-index 59582c5..65673c6 100644
---- chromium-54.0.2840.59/device/serial/serial_io_handler_posix.cc.orig
-+++ chromium-54.0.2840.59/device/serial/serial_io_handler_posix.cc
+diff --git chromium-69.0.3497.100/device/serial/serial_io_handler_posix.cc
+index d6ed5e1..3f5474c 100644
+--- chromium-69.0.3497.100/device/serial/serial_io_handler_posix.cc
++++ chromium-69.0.3497.100/device/serial/serial_io_handler_posix.cc
 @@ -4,6 +4,7 @@
  
  #include "device/serial/serial_io_handler_posix.h"

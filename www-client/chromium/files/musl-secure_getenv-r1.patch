@@ -1,8 +1,8 @@
-diff --git chromium-66.0.3359.117/third_party/angle/third_party/vulkan-validation-layers/BUILD.gn
-index e945079..ad3c43d 100644
---- chromium-66.0.3359.117/third_party/angle/third_party/vulkan-validation-layers/BUILD.gn.orig
-+++ chromium-66.0.3359.117/third_party/angle/third_party/vulkan-validation-layers/BUILD.gn
-@@ -263,10 +263,6 @@ config("vulkan_loader_config") {
+diff --git chromium-69.0.3497.100/third_party/angle/third_party/vulkan-loader/BUILD.gn
+index 0d662fd..de5a0b1 100644
+--- chromium-69.0.3497.100/third_party/angle/third_party/vulkan-loader/BUILD.gn
++++ chromium-69.0.3497.100/third_party/angle/third_party/vulkan-loader/BUILD.gn
+@@ -192,10 +192,6 @@ config("vulkan_loader_config") {
    if (is_win) {
      cflags = [ "/wd4201" ]
    }

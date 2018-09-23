@@ -1,9 +1,9 @@
-diff --git chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h.orig chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h
-index 9dbd239..0c5ed72 100644
---- chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h.orig
-+++ chromium-54.0.2840.59/third_party/lss/linux_syscall_support.h
-@@ -143,6 +143,13 @@ extern "C" {
- # undef lstat64
+diff --git chromium-69.0.3497.100/third_party/lss/linux_syscall_support.h
+index 5d9c2e8..2682349 100644
+--- chromium-69.0.3497.100/third_party/lss/linux_syscall_support.h
++++ chromium-69.0.3497.100/third_party/lss/linux_syscall_support.h
+@@ -166,6 +166,13 @@ extern "C" {
+ # undef __NR_waitpid
  #endif
  
 +#ifdef pread64

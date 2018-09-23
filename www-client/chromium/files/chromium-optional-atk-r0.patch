@@ -1,7 +1,7 @@
-diff --git chromium-64.0.3282.140/build/config/ui.gni
+diff --git chromium-69.0.3497.100/build/config/ui.gni
 index 547b42f..966b00c 100644
---- chromium-64.0.3282.140/build/config/ui.gni.orig
-+++ chromium-64.0.3282.140/build/config/ui.gni
+--- chromium-69.0.3497.100/build/config/ui.gni
++++ chromium-69.0.3497.100/build/config/ui.gni
 @@ -51,8 +51,10 @@ if (use_ozone) {
    use_glib = false
  }
