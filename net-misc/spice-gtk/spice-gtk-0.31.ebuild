@@ -30,7 +30,6 @@ RDEPEND="
 		media-libs/gst-plugins-base:1.0
 		media-libs/gst-plugins-good:1.0 )
 	>=x11-libs/pixman-0.17.7
-	>=media-libs/celt-0.5.1.1:0.5.1
 	media-libs/opus
 	x11-libs/gtk+:2[introspection?]
 	>=dev-libs/glib-2.28:2
@@ -92,6 +91,7 @@ src_configure() {
 	fi
 
 	econf \
+		--disable-celt051 \
 		--disable-gtk-doc \
 		--disable-maintainer-mode \
 		--disable-werror \
