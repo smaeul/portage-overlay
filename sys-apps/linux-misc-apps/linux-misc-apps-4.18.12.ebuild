@@ -41,6 +41,7 @@ IUSE="bash-completion"
 RDEPEND="sys-apps/hwids
 		!sys-power/pmtools"
 DEPEND="${RDEPEND}
+		dev-util/patchutils
 		virtual/pkgconfig"
 
 S="${WORKDIR}/linux-${LINUX_VER}"
