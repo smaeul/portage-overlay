@@ -1,0 +1,251 @@
+From d2060da25bfe168314997599e702b52bf07f92f2 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Mon, 17 Sep 2018 02:29:06 +0000
+Subject: [PATCH 24/25] Add gentoo target specs
+
+---
+ src/bootstrap/native.rs                       |  7 +++++-
+ .../spec/aarch64_gentoo_linux_musl.rs         | 21 +++++++++++++++++
+ .../spec/arm_gentoo_linux_musleabi.rs         | 21 +++++++++++++++++
+ .../spec/armv7a_gentoo_linux_musleabihf.rs    | 21 +++++++++++++++++
+ .../spec/i686_gentoo_linux_musl.rs            | 23 +++++++++++++++++++
+ src/librustc_target/spec/mod.rs               | 10 +++++++-
+ .../spec/powerpc_gentoo_linux_musl.rs         | 23 +++++++++++++++++++
+ .../spec/x86_64_gentoo_linux_musl.rs          | 21 +++++++++++++++++
+ 8 files changed, 145 insertions(+), 2 deletions(-)
+ create mode 100644 src/librustc_target/spec/aarch64_gentoo_linux_musl.rs
+ create mode 100644 src/librustc_target/spec/arm_gentoo_linux_musleabi.rs
+ create mode 100644 src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs
+ create mode 100644 src/librustc_target/spec/i686_gentoo_linux_musl.rs
+ create mode 100644 src/librustc_target/spec/powerpc_gentoo_linux_musl.rs
+ create mode 100644 src/librustc_target/spec/x86_64_gentoo_linux_musl.rs
+
+diff --git a/src/bootstrap/native.rs b/src/bootstrap/native.rs
+index a0329910be..dd96bb4607 100644
+--- a/src/bootstrap/native.rs
++++ b/src/bootstrap/native.rs
+@@ -685,6 +685,11 @@ impl Step for Openssl {
+             "x86_64-unknown-linux-gnux32" => "linux-x32",
+             "x86_64-unknown-linux-musl" => "linux-x86_64",
+             "x86_64-unknown-netbsd" => "BSD-x86_64",
++            "aarch64-gentoo-linux-musl" => "linux-aarch64",
++            "armv7a-unknown-linux-musleabihf" => "linux-armv4",
++            "i686-gentoo-linux-musl" => "linux-elf",
++            "powerpc-gentoo-linux-musl" => "linux-ppc",
++            "x86_64-gentoo-linux-musl" => "linux-x86_64",
+             _ => panic!("don't know how to configure OpenSSL for {}", target),
+         };
+         configure.arg(os);
+@@ -714,7 +719,7 @@ impl Step for Openssl {
+         // Make PIE binaries
+         // Non-PIE linker support was removed in Lollipop
+         // https://source.android.com/security/enhancements/enhancements50
+-        if target == "i686-linux-android" {
++        if target == "i686-linux-android" || target == "i686-gentoo-linux-musl" {
+             configure.arg("no-asm");
+         }
+         configure.current_dir(&obj);
+diff --git a/src/librustc_target/spec/aarch64_gentoo_linux_musl.rs b/src/librustc_target/spec/aarch64_gentoo_linux_musl.rs
+new file mode 100644
+index 0000000000..78e302f83c
+--- /dev/null
++++ b/src/librustc_target/spec/aarch64_gentoo_linux_musl.rs
+@@ -0,0 +1,21 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::TargetResult;
++
++pub fn target() -> TargetResult {
++    let mut base = super::aarch64_unknown_linux_musl::target()?;
++
++    base.llvm_target = "aarch64-gentoo-linux-musl".to_string();
++    base.target_vendor = "gentoo".to_string();
++    base.options.crt_static_default = false;
++
++    Ok(base)
++}
+diff --git a/src/librustc_target/spec/arm_gentoo_linux_musleabi.rs b/src/librustc_target/spec/arm_gentoo_linux_musleabi.rs
+new file mode 100644
+index 0000000000..485a84c16a
+--- /dev/null
++++ b/src/librustc_target/spec/arm_gentoo_linux_musleabi.rs
+@@ -0,0 +1,21 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::TargetResult;
++
++pub fn target() -> TargetResult {
++    let mut base = super::arm_unknown_linux_musleabi::target()?;
++
++    base.llvm_target = "arm-gentoo-linux-musleabi".to_string();
++    base.target_vendor = "gentoo".to_string();
++    base.options.crt_static_default = false;
++
++    Ok(base)
++}
+diff --git a/src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs b/src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs
+new file mode 100644
+index 0000000000..16aacf7af2
+--- /dev/null
++++ b/src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs
+@@ -0,0 +1,21 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::TargetResult;
++
++pub fn target() -> TargetResult {
++    let mut base = super::armv7_unknown_linux_musleabihf::target()?;
++
++    base.llvm_target = "armv7a-gentoo-linux-musleabihf".to_string();
++    base.target_vendor = "gentoo".to_string();
++    base.options.crt_static_default = false;
++
++    Ok(base)
++}
+diff --git a/src/librustc_target/spec/i686_gentoo_linux_musl.rs b/src/librustc_target/spec/i686_gentoo_linux_musl.rs
+new file mode 100644
+index 0000000000..08f484c186
+--- /dev/null
++++ b/src/librustc_target/spec/i686_gentoo_linux_musl.rs
+@@ -0,0 +1,23 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::{LinkerFlavor, TargetResult};
++
++pub fn target() -> TargetResult {
++    let mut base = super::i686_unknown_linux_musl::target()?;
++
++    base.llvm_target = "i686-gentoo-linux-musl".to_string();
++    base.target_vendor = "gentoo".to_string();
++    base.options.crt_static_default = false;
++    base.options.post_link_args.insert(LinkerFlavor::Gcc,
++        vec!["-Wl,--as-needed".to_string(), "-lssp_nonshared".to_string()]);
++
++    Ok(base)
++}
+diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
+index 9ee761fd51..0592c68dc2 100644
+--- a/src/librustc_target/spec/mod.rs
++++ b/src/librustc_target/spec/mod.rs
+@@ -286,6 +286,8 @@ macro_rules! supported_targets {
+     )
+ }
+ 
++mod arm_unknown_linux_musleabi;
++
+ supported_targets! {
+     ("x86_64-unknown-linux-gnu", x86_64_unknown_linux_gnu),
+     ("x86_64-unknown-linux-gnux32", x86_64_unknown_linux_gnux32),
+@@ -307,7 +309,7 @@ supported_targets! {
+     ("sparc64-unknown-linux-gnu", sparc64_unknown_linux_gnu),
+     ("arm-unknown-linux-gnueabi", arm_unknown_linux_gnueabi),
+     ("arm-unknown-linux-gnueabihf", arm_unknown_linux_gnueabihf),
+-    ("arm-unknown-linux-musleabi", arm_unknown_linux_musleabi),
++    ("arm-unknown-linux-musleabi", arm_gentoo_linux_musleabi),
+     ("arm-unknown-linux-musleabihf", arm_unknown_linux_musleabihf),
+     ("armv4t-unknown-linux-gnueabi", armv4t_unknown_linux_gnueabi),
+     ("armv5te-unknown-linux-gnueabi", armv5te_unknown_linux_gnueabi),
+@@ -414,6 +416,12 @@ supported_targets! {
+     ("riscv32imac-unknown-none-elf", riscv32imac_unknown_none_elf),
+ 
+     ("aarch64-unknown-none", aarch64_unknown_none),
++
++    ("aarch64-gentoo-linux-musl", aarch64_gentoo_linux_musl),
++    ("armv7a-unknown-linux-musleabihf", armv7a_gentoo_linux_musleabihf),
++    ("i686-gentoo-linux-musl", i686_gentoo_linux_musl),
++    ("powerpc-gentoo-linux-musl", powerpc_gentoo_linux_musl),
++    ("x86_64-gentoo-linux-musl", x86_64_gentoo_linux_musl),
+ }
+ 
+ /// Everything `rustc` knows about how to compile for a specific target.
+diff --git a/src/librustc_target/spec/powerpc_gentoo_linux_musl.rs b/src/librustc_target/spec/powerpc_gentoo_linux_musl.rs
+new file mode 100644
+index 0000000000..e5163505ff
+--- /dev/null
++++ b/src/librustc_target/spec/powerpc_gentoo_linux_musl.rs
+@@ -0,0 +1,23 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::{LinkerFlavor, TargetResult};
++
++pub fn target() -> TargetResult {
++    let mut base = super::powerpc_unknown_linux_musl::target()?;
++
++    base.llvm_target = "powerpc-gentoo-linux-musl".to_string();
++    base.target_vendor = "gentoo".to_string();
++    base.options.crt_static_default = false;
++    base.options.post_link_args.insert(LinkerFlavor::Gcc,
++        vec!["-Wl,--as-needed".to_string(), "-lssp_nonshared".to_string()]);
++
++    Ok(base)
++}
+diff --git a/src/librustc_target/spec/x86_64_gentoo_linux_musl.rs b/src/librustc_target/spec/x86_64_gentoo_linux_musl.rs
+new file mode 100644
+index 0000000000..e2cb31d662
+--- /dev/null
++++ b/src/librustc_target/spec/x86_64_gentoo_linux_musl.rs
+@@ -0,0 +1,21 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::TargetResult;
++
++pub fn target() -> TargetResult {
++    let mut base = super::x86_64_unknown_linux_musl::target()?;
++
++    base.llvm_target = "x86_64-gentoo-linux-musl".to_string();
++    base.target_vendor = "gentoo".to_string();
++    base.options.crt_static_default = false;
++
++    Ok(base)
++}
+-- 
+2.19.1
+

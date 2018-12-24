@@ -1,0 +1,75 @@
+From 65201305a4733fee2c5c811c6b4320d1c404c64f Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Mon, 12 Nov 2018 20:51:26 -0600
+Subject: [PATCH 25/25] Add powerpc64-linux-musl target spec
+
+---
+ src/bootstrap/native.rs                       |  3 ++-
+ src/librustc_target/spec/mod.rs               |  1 +
+ .../spec/powerpc64_linux_musl.rs              | 21 +++++++++++++++++++
+ 3 files changed, 24 insertions(+), 1 deletion(-)
+ create mode 100644 src/librustc_target/spec/powerpc64_linux_musl.rs
+
+diff --git a/src/bootstrap/native.rs b/src/bootstrap/native.rs
+index dd96bb4607..068175033a 100644
+--- a/src/bootstrap/native.rs
++++ b/src/bootstrap/native.rs
+@@ -689,6 +689,7 @@ impl Step for Openssl {
+             "armv7a-unknown-linux-musleabihf" => "linux-armv4",
+             "i686-gentoo-linux-musl" => "linux-elf",
+             "powerpc-gentoo-linux-musl" => "linux-ppc",
++            "powerpc64-linux-musl" => "linux-ppc64",
+             "x86_64-gentoo-linux-musl" => "linux-x86_64",
+             _ => panic!("don't know how to configure OpenSSL for {}", target),
+         };
+@@ -704,7 +705,7 @@ impl Step for Openssl {
+             configure.arg("-fomit-frame-pointer");
+         }
+         // OpenSSL ships incompatible ELFv1 ABI assembly code
+-        if target == "powerpc64-unknown-linux-musl" {
++        if target == "powerpc64-unknown-linux-musl" || target == "powerpc64-linux-musl" {
+             configure.arg("no-asm");
+         }
+         if target == "sparc64-unknown-netbsd" {
+diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
+index 0592c68dc2..6e9180a981 100644
+--- a/src/librustc_target/spec/mod.rs
++++ b/src/librustc_target/spec/mod.rs
+@@ -421,6 +421,7 @@ supported_targets! {
+     ("armv7a-unknown-linux-musleabihf", armv7a_gentoo_linux_musleabihf),
+     ("i686-gentoo-linux-musl", i686_gentoo_linux_musl),
+     ("powerpc-gentoo-linux-musl", powerpc_gentoo_linux_musl),
++    ("powerpc64-linux-musl", powerpc64_linux_musl),
+     ("x86_64-gentoo-linux-musl", x86_64_gentoo_linux_musl),
+ }
+ 
+diff --git a/src/librustc_target/spec/powerpc64_linux_musl.rs b/src/librustc_target/spec/powerpc64_linux_musl.rs
+new file mode 100644
+index 0000000000..14d1d4329a
+--- /dev/null
++++ b/src/librustc_target/spec/powerpc64_linux_musl.rs
+@@ -0,0 +1,21 @@
++// Copyright 2018 The Rust Project Developers. See the COPYRIGHT
++// file at the top-level directory of this distribution and at
++// http://rust-lang.org/COPYRIGHT.
++//
++// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
++// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
++// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
++// option. This file may not be copied, modified, or distributed
++// except according to those terms.
++
++use spec::TargetResult;
++
++pub fn target() -> TargetResult {
++    let mut base = super::powerpc64_unknown_linux_musl::target()?;
++
++    base.llvm_target = "powerpc64-linux-musl".to_string();
++    base.target_vendor = "unknown".to_string();
++    base.options.crt_static_default = false;
++
++    Ok(base)
++}
+-- 
+2.19.1
+

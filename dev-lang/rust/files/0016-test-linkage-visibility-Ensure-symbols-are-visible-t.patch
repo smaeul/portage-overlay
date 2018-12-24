@@ -1,0 +1,30 @@
+From 48b225e5e66e6bfd912d8e66cfed4d7f95591d07 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 16 Sep 2018 16:35:41 +0000
+Subject: [PATCH 16/25] test/linkage-visibility: Ensure symbols are visible to
+ dlsym
+
+DynamicLibrary uses libc's dlsym() function internally to find symbols.
+Some implementations of dlsym(), like musl's, only look at dynamically-
+exported symbols, as found in shared libraries. To also export symbols
+from the main executable, pass --export-dynamic to the linker.
+---
+ src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs b/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs
+index 7a15a4cb3a..853d97670d 100644
+--- a/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs
++++ b/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs
+@@ -8,6 +8,8 @@
+ // option. This file may not be copied, modified, or distributed
+ // except according to those terms.
+ 
++// compile-flags: -C link-arg=-Wl,--export-dynamic
++
+ #![feature(rustc_private)]
+ 
+ // We're testing linkage visibility; the compiler warns us, but we want to
+-- 
+2.19.1
+

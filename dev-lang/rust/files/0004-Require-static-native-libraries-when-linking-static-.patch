@@ -1,18 +1,24 @@
-From d951a12638c00623e94cde4f8fe28d65b96ce4b4 Mon Sep 17 00:00:00 2001
+From 8912b0e6b881fda271f3805622442e4d5ac1e286 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
-Subject: [PATCH 01/14] Require static native libraries when linking static
+Subject: [PATCH 04/25] Require static native libraries when linking static
  executables
 
+gcc/ld will create a dynamically-linked executable without warning, even
+when passed `-static`, when asked to link to a `.so`. Avoid this
+confusing and unintended behavior by always using the static version of
+libraries when trying to link static executables.
+
+Fixes #54243
 ---
  src/librustc_codegen_llvm/back/link.rs | 13 ++++++++++---
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/src/librustc_codegen_llvm/back/link.rs b/src/librustc_codegen_llvm/back/link.rs
-index 4e9910e58f..8441b1a3cf 100644
+index 8248385c12..9fc1991412 100644
 --- a/src/librustc_codegen_llvm/back/link.rs
 +++ b/src/librustc_codegen_llvm/back/link.rs
-@@ -1540,8 +1540,8 @@ fn add_upstream_rust_crates(cmd: &mut Linker,
+@@ -1592,8 +1592,8 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
      }
  }
  
@@ -23,22 +29,22 @@ index 4e9910e58f..8441b1a3cf 100644
  // dependencies. We've got two cases then:
  //
  // 1. The upstream crate is an rlib. In this case we *must* link in the
-@@ -1581,7 +1581,14 @@ fn add_upstream_native_libraries(cmd: &mut Linker,
+@@ -1637,7 +1637,14 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                  continue
              }
              match lib.kind {
--                NativeLibraryKind::NativeUnknown => cmd.link_dylib(&lib.name.as_str()),
+-                NativeLibraryKind::NativeUnknown => cmd.link_dylib(&name.as_str()),
 +                NativeLibraryKind::NativeUnknown => {
 +                    // When creating executables, match library linkage to that of the executable.
-+                    if crate_type == config::CrateTypeExecutable && sess.crt_static() {
-+                        cmd.link_staticlib(&lib.name.as_str())
++                    if crate_type == config::CrateType::Executable && sess.crt_static() {
++                        cmd.link_staticlib(&name.as_str())
 +                    } else {
-+                        cmd.link_dylib(&lib.name.as_str())
++                        cmd.link_dylib(&name.as_str())
 +                    }
 +                },
-                 NativeLibraryKind::NativeFramework => cmd.link_framework(&lib.name.as_str()),
+                 NativeLibraryKind::NativeFramework => cmd.link_framework(&name.as_str()),
                  NativeLibraryKind::NativeStaticNobundle => {
                      // Link "static-nobundle" native libs only if the crate they originate from
 -- 
-2.16.4
+2.19.1
 

@@ -1,0 +1,25 @@
+From 44e00e6842dd230f1da838de231446f1c1c3e48d Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 16 Sep 2018 16:37:09 +0000
+Subject: [PATCH 15/25] test/invalid_const_promotion: Accept SIGTRAP as a valid
+ death signal
+
+---
+ src/test/run-pass/invalid_const_promotion.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test/run-pass/invalid_const_promotion.rs b/src/test/run-pass/invalid_const_promotion.rs
+index a18d82fb7a..2b159db9fd 100644
+--- a/src/test/run-pass/invalid_const_promotion.rs
++++ b/src/test/run-pass/invalid_const_promotion.rs
+@@ -35,6 +35,7 @@ fn check_status(status: std::process::ExitStatus)
+     use std::os::unix::process::ExitStatusExt;
+ 
+     assert!(status.signal() == Some(libc::SIGILL)
++            || status.signal() == Some(libc::SIGTRAP)
+             || status.signal() == Some(libc::SIGABRT));
+ }
+ 
+-- 
+2.19.1
+

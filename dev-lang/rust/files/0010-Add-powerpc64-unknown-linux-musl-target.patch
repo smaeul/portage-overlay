@@ -1,41 +1,26 @@
-From 81e16a4066a36f74971a650e503c006fa30e9df2 Mon Sep 17 00:00:00 2001
+From ed45371c6dc89c3f9d4546ce1a544903eb90cb96 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Tue, 7 Aug 2018 21:59:15 -0500
-Subject: [PATCH 09/14] Support big-endian powerpc64 musl
+Subject: [PATCH 10/25] Add powerpc64-unknown-linux-musl target
 
-Signed-off-by: Samuel Holland <samuel@sholland.org>
 ---
- src/bootstrap/native.rs                            |  1 +
- src/librustc_target/spec/mod.rs                    |  1 +
- .../spec/powerpc64_unknown_linux_musl.rs           | 35 ++++++++++++++++++++++
- src/tools/build-manifest/src/main.rs               |  1 +
- 4 files changed, 38 insertions(+)
+ src/librustc_target/spec/mod.rs               |  1 +
+ .../spec/powerpc64_unknown_linux_musl.rs      | 35 +++++++++++++++++++
+ 2 files changed, 36 insertions(+)
  create mode 100644 src/librustc_target/spec/powerpc64_unknown_linux_musl.rs
 
-diff --git a/src/bootstrap/native.rs b/src/bootstrap/native.rs
-index 69c9e8cdb4..b8089a4879 100644
---- a/src/bootstrap/native.rs
-+++ b/src/bootstrap/native.rs
-@@ -621,6 +621,7 @@ impl Step for Openssl {
-             "powerpc-unknown-linux-gnuspe" => "linux-ppc",
-             "powerpc-unknown-netbsd" => "BSD-generic32",
-             "powerpc64-unknown-linux-gnu" => "linux-ppc64",
-+            "powerpc64-unknown-linux-musl" => "linux-ppc64",
-             "powerpc64le-unknown-linux-gnu" => "linux-ppc64le",
-             "s390x-unknown-linux-gnu" => "linux64-s390x",
-             "sparc-unknown-linux-gnu" => "linux-sparcv9",
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index e54cd77312..0bf9920d5f 100644
+index 2e396b99e0..9ee761fd51 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
-@@ -273,6 +273,7 @@ supported_targets! {
-     ("powerpc-unknown-linux-gnu", powerpc_unknown_linux_gnu),
+@@ -299,6 +299,7 @@ supported_targets! {
      ("powerpc-unknown-linux-gnuspe", powerpc_unknown_linux_gnuspe),
+     ("powerpc-unknown-linux-musl", powerpc_unknown_linux_musl),
      ("powerpc64-unknown-linux-gnu", powerpc64_unknown_linux_gnu),
 +    ("powerpc64-unknown-linux-musl", powerpc64_unknown_linux_musl),
      ("powerpc64le-unknown-linux-gnu", powerpc64le_unknown_linux_gnu),
+     ("powerpc64le-unknown-linux-musl", powerpc64le_unknown_linux_musl),
      ("s390x-unknown-linux-gnu", s390x_unknown_linux_gnu),
-     ("sparc-unknown-linux-gnu", sparc_unknown_linux_gnu),
 diff --git a/src/librustc_target/spec/powerpc64_unknown_linux_musl.rs b/src/librustc_target/spec/powerpc64_unknown_linux_musl.rs
 new file mode 100644
 index 0000000000..24ff9e0ecd
@@ -77,18 +62,6 @@ index 0000000000..24ff9e0ecd
 +        options: base,
 +    })
 +}
-diff --git a/src/tools/build-manifest/src/main.rs b/src/tools/build-manifest/src/main.rs
-index 91a44fdd42..c5c42d6057 100644
---- a/src/tools/build-manifest/src/main.rs
-+++ b/src/tools/build-manifest/src/main.rs
-@@ -87,6 +87,7 @@ static TARGETS: &'static [&'static str] = &[
-     "powerpc-unknown-linux-gnu",
-     "powerpc-unknown-linux-gnuspe",
-     "powerpc64-unknown-linux-gnu",
-+    "powerpc64-unknown-linux-musl",
-     "powerpc64le-unknown-linux-gnu",
-     "s390x-unknown-linux-gnu",
-     "sparc-unknown-linux-gnu",
 -- 
-2.16.4
+2.19.1
 
