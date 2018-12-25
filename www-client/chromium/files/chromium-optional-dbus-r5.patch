@@ -32,9 +32,9 @@ index 3a26947..50c9452 100644
  void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
 -#if !defined(OS_CHROMEOS)
 +#if !defined(OS_CHROMEOS) && defined(USE_DBUS)
-   bluez::DBusThreadManagerLinux::Initialize();
-   bluez::BluezDBusManager::Initialize(
-       bluez::DBusThreadManagerLinux::Get()->GetSystemBus(), false);
+   bluez::BluezDBusThreadManager::Initialize();
+   bluez::BluezDBusManager::Initialize();
+ #endif
 @@ -103,7 +103,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
  }
  
@@ -42,7 +42,7 @@ index 3a26947..50c9452 100644
 -#if !defined(OS_CHROMEOS)
 +#if !defined(OS_CHROMEOS) && defined(USE_DBUS)
    bluez::BluezDBusManager::Shutdown();
-   bluez::DBusThreadManagerLinux::Shutdown();
+   bluez::BluezDBusThreadManager::Shutdown();
  #endif
 diff --git chromium-69.0.3497.100/chrome/browser/password_manager/password_store_factory.cc
 index a234d58..465853e 100644

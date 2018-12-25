@@ -56,22 +56,22 @@ index f3f05da..fc2a96f 100644
    count = std::min(arraysize(trace_), count);
  
    // Though the backtrace API man page does not list any possible negative
-@@ -815,13 +815,13 @@ void StackTrace::Print() const {
-   // NOTE: This code MUST be async-signal safe (it's used by in-process
-   // stack dumping signal handler). NO malloc or stdio is allowed here.
+@@ -827,13 +827,13 @@ void StackTrace::PrintWithPrefix(const char* prefix_string) const {
+ // NOTE: This code MUST be async-signal safe (it's used by in-process
+ // stack dumping signal handler). NO malloc or stdio is allowed here.
  
 -#if !defined(__UCLIBC__) && !defined(_AIX)
 +#if defined(__GLIBC__) && !defined(__UCLIBC__) && !defined(_AIX)
    PrintBacktraceOutputHandler handler;
-   ProcessBacktrace(trace_, count_, &handler);
+   ProcessBacktrace(trace_, count_, prefix_string, &handler);
  #endif
  }
  
 -#if !defined(__UCLIBC__) && !defined(_AIX)
 +#if defined(__GLIBC__) && !defined(__UCLIBC__) && !defined(_AIX)
- void StackTrace::OutputToStream(std::ostream* os) const {
+ void StackTrace::OutputToStreamWithPrefix(std::ostream* os,
+                                           const char* prefix_string) const {
    StreamBacktraceOutputHandler handler(os);
-   ProcessBacktrace(trace_, count_, &handler);
 diff --git chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
 index c7ecc7f..1284614 100644
 --- chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
