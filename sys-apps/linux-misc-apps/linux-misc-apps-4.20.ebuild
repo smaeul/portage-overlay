@@ -55,7 +55,9 @@ TARGETS_SIMPLE=(
 TARGET_MAKE_SIMPLE=(
 	samples/mei:mei-amt-version
 	samples/watchdog:watchdog-simple
-	tools/accounting:getdelays
+	# getdelays.c:231:23: error: 'struct taskstats' has no member named 'thrashing_delay_total'
+	# getdelays.c:231:49: error: 'struct taskstats' has no member named 'thrashing_count'
+	#tools/accounting:getdelays
 	tools/bpf:bpf_asm
 	tools/bpf:bpf_dbg
 	# bpf_jit_disasm.c:75:29: error: incompatible type for argument 1 of 'disassembler'
@@ -84,8 +86,9 @@ TARGET_MAKE_SIMPLE=(
 	#tools/power/acpi:acpidbg
 	tools/power/acpi:acpidump
 	tools/power/acpi:ec
-	tools/power/x86/turbostat:turbostat
-	tools/power/x86/x86_energy_perf_policy:x86_energy_perf_policy
+	# x86-specific
+	#tools/power/x86/turbostat:turbostat
+	#tools/power/x86/x86_energy_perf_policy:x86_energy_perf_policy
 	tools/thermal/tmon:tmon
 	tools/vm:page_owner_sort
 	tools/vm:page-types
