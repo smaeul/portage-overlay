@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/smaeul/i3status.git"
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="pulseaudio"
+IUSE="pulseaudio test"
 
 RDEPEND="!x11-misc/i3status
 	dev-libs/confuse:=
@@ -24,6 +24,7 @@ RDEPEND="!x11-misc/i3status
 	pulseaudio? ( media-sound/pulseaudio )"
 DEPEND="${RDEPEND}
 	app-text/asciidoc
+	test? ( sys-apps/grep[pcre] )
 	virtual/pkgconfig"
 
 src_prepare() {
