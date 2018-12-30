@@ -1,7 +1,7 @@
-From d927c3bdf6e312f5c92ec33d5dfe4b77b3dfa8e0 Mon Sep 17 00:00:00 2001
+From 0613fed83ccf58ce3305a1df35e31eda25ba409e Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
-Subject: [PATCH 03/25] Allow rustdoc to work when cross-compiling on musl
+Subject: [PATCH 03/22] Allow rustdoc to work when cross-compiling on musl
 
 musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
 ---
@@ -32,5 +32,5 @@ index bb5a21e3e4..1b6b78b90a 100644
      // Force all crates compiled by this compiler to (a) be unstable and (b)
      // allow the `rustc_private` feature to link to other unstable crates
 -- 
-2.19.1
+2.19.2
 

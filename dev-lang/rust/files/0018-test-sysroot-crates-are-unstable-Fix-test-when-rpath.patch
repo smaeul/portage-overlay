@@ -1,7 +1,7 @@
-From 551fd6c9c61c77eb98bed53c67f412033f9328af Mon Sep 17 00:00:00 2001
+From bf4d6a932fb1538e70bb9eb4eb169414a5c91387 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 01:32:20 +0000
-Subject: [PATCH 20/25] test/sysroot-crates-are-unstable: Fix test when rpath
+Subject: [PATCH 18/22] test/sysroot-crates-are-unstable: Fix test when rpath
  is disabled
 
 Without this environment var, the test can't run rustc to find
@@ -21,5 +21,5 @@ index a35174b3c2..9e77070685 100644
 -	python2.7 test.py
 +	env '$(HOST_RPATH_ENV)' python2.7 test.py
 -- 
-2.19.1
+2.19.2
 

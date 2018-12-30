@@ -1,7 +1,7 @@
-From 2a347ba6131fa5b1eedb3236fe25a6ca25842e19 Mon Sep 17 00:00:00 2001
+From cdcbabdffce7f1b5379faf96db0dc12e4a5f1a36 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 18:27:56 +0000
-Subject: [PATCH 14/25] Fix double_check tests on big-endian targets
+Subject: [PATCH 13/22] Fix double_check tests on big-endian targets
 
 Since the enums get optimized down to 1 byte long, the bits
 set in the usize member don't align with the enums on big-endian
@@ -71,5 +71,5 @@ index 2102587734..78a112304e 100644
     | |___^ type validation failed: encountered invalid enum discriminant 5 at .1.<deref>
     |
 -- 
-2.19.1
+2.19.2
 

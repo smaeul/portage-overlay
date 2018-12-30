@@ -1,7 +1,7 @@
-From 48b225e5e66e6bfd912d8e66cfed4d7f95591d07 Mon Sep 17 00:00:00 2001
+From cc2e1f8ee1d28a772c0309b226e996359180124a Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:35:41 +0000
-Subject: [PATCH 16/25] test/linkage-visibility: Ensure symbols are visible to
+Subject: [PATCH 15/22] test/linkage-visibility: Ensure symbols are visible to
  dlsym
 
 DynamicLibrary uses libc's dlsym() function internally to find symbols.
@@ -13,7 +13,7 @@ from the main executable, pass --export-dynamic to the linker.
  1 file changed, 2 insertions(+)
 
 diff --git a/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs b/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs
-index 7a15a4cb3a..853d97670d 100644
+index 4ea3d0d0d0..b958e1a1fc 100644
 --- a/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs
 +++ b/src/test/run-pass-fulldeps/auxiliary/linkage-visibility.rs
 @@ -8,6 +8,8 @@
@@ -26,5 +26,5 @@ index 7a15a4cb3a..853d97670d 100644
  
  // We're testing linkage visibility; the compiler warns us, but we want to
 -- 
-2.19.1
+2.19.2
 

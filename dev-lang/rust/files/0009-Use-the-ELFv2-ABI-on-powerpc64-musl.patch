@@ -1,7 +1,7 @@
-From 4fc3ffc1ec745c25b2727a076380e237beb2515c Mon Sep 17 00:00:00 2001
+From 44c55a243178d34d5a21e08abc38d103e6ddb0c8 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 8 Aug 2018 22:06:18 -0500
-Subject: [PATCH 09/25] Use the ELFv2 ABI on powerpc64 musl
+Subject: [PATCH 09/22] Use the ELFv2 ABI on powerpc64 musl
 
 ---
  src/librustc_target/abi/call/powerpc64.rs | 15 ++++++++++-----
@@ -46,5 +46,5 @@ index 934d2b1138..18d14495e2 100644
  
      if !fty.ret.is_ignore() {
 -- 
-2.19.1
+2.19.2
 

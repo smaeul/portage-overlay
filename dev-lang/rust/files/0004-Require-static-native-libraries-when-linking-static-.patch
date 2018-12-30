@@ -1,7 +1,7 @@
-From 8912b0e6b881fda271f3805622442e4d5ac1e286 Mon Sep 17 00:00:00 2001
+From 4e6debd6806faf62ba737c01bb74080a637b127a Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
-Subject: [PATCH 04/25] Require static native libraries when linking static
+Subject: [PATCH 04/22] Require static native libraries when linking static
  executables
 
 gcc/ld will create a dynamically-linked executable without warning, even
@@ -15,10 +15,10 @@ Fixes #54243
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/src/librustc_codegen_llvm/back/link.rs b/src/librustc_codegen_llvm/back/link.rs
-index 8248385c12..9fc1991412 100644
+index 86c6a5e65b..0e3ff6da07 100644
 --- a/src/librustc_codegen_llvm/back/link.rs
 +++ b/src/librustc_codegen_llvm/back/link.rs
-@@ -1592,8 +1592,8 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
+@@ -1588,8 +1588,8 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
      }
  }
  
@@ -29,7 +29,7 @@ index 8248385c12..9fc1991412 100644
  // dependencies. We've got two cases then:
  //
  // 1. The upstream crate is an rlib. In this case we *must* link in the
-@@ -1637,7 +1637,14 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
+@@ -1633,7 +1633,14 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                  continue
              }
              match lib.kind {
@@ -46,5 +46,5 @@ index 8248385c12..9fc1991412 100644
                  NativeLibraryKind::NativeStaticNobundle => {
                      // Link "static-nobundle" native libs only if the crate they originate from
 -- 
-2.19.1
+2.19.2
 

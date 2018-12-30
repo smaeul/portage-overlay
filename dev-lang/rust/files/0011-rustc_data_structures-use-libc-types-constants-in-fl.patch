@@ -1,7 +1,7 @@
-From e587a3f45f91053d1f7b20089f984b227af741f7 Mon Sep 17 00:00:00 2001
+From c99b99efd9f9632ac4917e1c410bf34e3c2be78b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Tue, 9 Oct 2018 04:15:48 +0000
-Subject: [PATCH 12/25] rustc_data_structures: use libc types/constants in
+Subject: [PATCH 11/22] rustc_data_structures: use libc types/constants in
  flock
 
 ---
@@ -205,5 +205,5 @@ index 38ce331051..d5c38b9a39 100644
                  }
              }
 -- 
-2.19.1
+2.19.2
 

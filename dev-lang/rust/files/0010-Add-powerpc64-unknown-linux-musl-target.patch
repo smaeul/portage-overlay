@@ -1,7 +1,7 @@
-From ed45371c6dc89c3f9d4546ce1a544903eb90cb96 Mon Sep 17 00:00:00 2001
+From c0d3804aa53dee33c03ebc8b64bd6f7a7b54044c Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Tue, 7 Aug 2018 21:59:15 -0500
-Subject: [PATCH 10/25] Add powerpc64-unknown-linux-musl target
+Subject: [PATCH 10/22] Add powerpc64-unknown-linux-musl target
 
 ---
  src/librustc_target/spec/mod.rs               |  1 +
@@ -10,7 +10,7 @@ Subject: [PATCH 10/25] Add powerpc64-unknown-linux-musl target
  create mode 100644 src/librustc_target/spec/powerpc64_unknown_linux_musl.rs
 
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index 2e396b99e0..9ee761fd51 100644
+index 4b03f6141f..f75c4940c6 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
 @@ -299,6 +299,7 @@ supported_targets! {
@@ -63,5 +63,5 @@ index 0000000000..24ff9e0ecd
 +    })
 +}
 -- 
-2.19.1
+2.19.2
 

@@ -1,8 +1,9 @@
-From d25ab4c89e6ce3afdb84db0c9028c7f5facbbf3c Mon Sep 17 00:00:00 2001
+From e8d020665645cab48f5039acf60f708bcd452595 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
-Subject: [PATCH 21/25] Ignore broken and non-applicable tests
+Subject: [PATCH 19/22] Ignore broken and non-applicable tests
 
+env-funky-keys: broken by sandbox LD_PRELOAD
 long-linker-command-lines: takes >10 minutes to run (but still passes)
 sparc-struct-abi: no sparc target
 sysroot-crates-are-unstable: can't run rustc without rpath
@@ -10,7 +11,8 @@ sysroot-crates-are-unstable: can't run rustc without rpath
  src/test/codegen/sparc-struct-abi.rs                            | 1 +
  src/test/run-make-fulldeps/long-linker-command-lines/Makefile   | 1 -
  src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile | 2 +-
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ src/test/run-pass/env-funky-keys.rs                             | 1 +
+ 4 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/test/codegen/sparc-struct-abi.rs b/src/test/codegen/sparc-struct-abi.rs
 index 56c4364d59..9aebf8f002 100644
@@ -43,6 +45,18 @@ index 9e77070685..7784230b46 100644
  all:
 -	env '$(HOST_RPATH_ENV)' python2.7 test.py
 +	true
+diff --git a/src/test/run-pass/env-funky-keys.rs b/src/test/run-pass/env-funky-keys.rs
+index 12e1cbe97d..b63bd3837c 100644
+--- a/src/test/run-pass/env-funky-keys.rs
++++ b/src/test/run-pass/env-funky-keys.rs
+@@ -10,6 +10,7 @@
+ 
+ // Ignore this test on Android, because it segfaults there.
+ 
++// ignore-test
+ // ignore-android
+ // ignore-windows
+ // ignore-cloudabi no execve
 -- 
-2.19.1
+2.19.2
 
