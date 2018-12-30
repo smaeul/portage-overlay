@@ -15,7 +15,6 @@ SRC="${MY_P}-src.tar.xz"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86"
 
 RUST_STAGE0_VERSION="1.$(($(get_version_component_range 2) - 1)).1"
-CARGO_DEPEND_VERSION="0.$(($(get_version_component_range 2) + 1)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
