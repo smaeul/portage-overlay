@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="5"
@@ -16,7 +16,7 @@ fi
 inherit flag-o-matic linux-info linux-mod toolchain-funcs autotools-utils
 
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
-HOMEPAGE="http://zfsonlinux.org/"
+HOMEPAGE="https://zfsonlinux.org/"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
 SLOT="0"
@@ -45,6 +45,7 @@ pkg_setup() {
 		IOSCHED_NOOP
 		MODULES
 		!PAX_KERNEXEC_PLUGIN_METHOD_OR
+		!TRIM_UNUSED_KSYMS
 		ZLIB_DEFLATE
 		ZLIB_INFLATE
 	"
@@ -66,7 +67,7 @@ pkg_setup() {
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
-		{ kernel_is le 4 18 || die "Linux 4.18 is the latest supported version."; }
+		{ kernel_is le 4 20 || die "Linux 4.20 is the latest supported version."; }
 }
 
 src_prepare() {
@@ -76,6 +77,8 @@ src_prepare() {
 	# Set module revision number
 	[ ${PV} != "9999" ] && \
 		{ sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" "${S}/META" || die "Could not set Gentoo release"; }
+
+	epatch "${FILESDIR}/4f981f6ab614a908f912f7dc147b248f96b498a2.patch"
 
 	autotools-utils_src_prepare
 }
