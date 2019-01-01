@@ -16,10 +16,11 @@ KEYWORDS=""
 IUSE=""
 
 RDEPEND="
-	sys-devel/clang:6=
+	sys-devel/clang:7=
+	sys-devel/llvm:7=
+	sys-devel/lld:7=
 "
 DEPEND="${RDEPEND}
-	sys-devel/lld
 "
 
 CMAKE_MIN_VERSION="2.8.5"
