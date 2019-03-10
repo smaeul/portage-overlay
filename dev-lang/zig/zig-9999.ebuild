@@ -15,10 +15,14 @@ SLOT="0"
 KEYWORDS=""
 IUSE=""
 
+ALL_LLVM_TARGETS=( AArch64 AMDGPU ARM BPF Hexagon Lanai Mips MSP430
+	NVPTX PowerPC Sparc SystemZ X86 XCore )
+ALL_LLVM_TARGETS=${ALL_LLVM_TARGETS[*]/#/llvm_targets_}
+
 RDEPEND="
 	sys-devel/clang:7=
-	sys-devel/llvm:7=
-	sys-devel/lld:7=
+	sys-devel/llvm:7=[${ALL_LLVM_TARGETS// /,}]
+	sys-devel/lld:=
 "
 DEPEND="${RDEPEND}
 "
