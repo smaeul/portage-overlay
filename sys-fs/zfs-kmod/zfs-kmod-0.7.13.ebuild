@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="5"
@@ -42,7 +42,6 @@ pkg_setup() {
 	CONFIG_CHECK="
 		!DEBUG_LOCK_ALLOC
 		EFI_PARTITION
-		IOSCHED_NOOP
 		MODULES
 		!PAX_KERNEXEC_PLUGIN_METHOD_OR
 		!TRIM_UNUSED_KSYMS
@@ -64,10 +63,12 @@ pkg_setup() {
 
 	linux-mod_pkg_setup
 
+	kernel_is lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
+
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	[ ${PV} != "9999" ] && \
-		{ kernel_is le 4 20 || die "Linux 4.20 is the latest supported version."; }
+		{ kernel_is le 5 0 || die "Linux 5.0 is the latest supported version."; }
 }
 
 src_prepare() {
@@ -77,8 +78,6 @@ src_prepare() {
 	# Set module revision number
 	[ ${PV} != "9999" ] && \
 		{ sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" "${S}/META" || die "Could not set Gentoo release"; }
-
-	epatch "${FILESDIR}/4f981f6ab614a908f912f7dc147b248f96b498a2.patch"
 
 	autotools-utils_src_prepare
 }
