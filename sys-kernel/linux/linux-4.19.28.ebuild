@@ -1,10 +1,11 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=5
 
-DESCRIPTION="Vanilla Linux kernel (binary package)"
+inherit linux-info
+
+DESCRIPTION="Linux kernel (binary package)"
 HOMEPAGE="https://www.kernel.org"
 
 LICENSE="GPL-2"
@@ -12,18 +13,20 @@ SLOT="${PV}"
 KEYWORDS="amd64 x86"
 
 DEPEND="
-	=sys-kernel/vanilla-sources-${PVR}
 	sys-apps/debianutils
 	sys-apps/kmod
+	virtual/linux-sources
 "
 
 KVER="${PV}-${PR}"
 KVER="${KVER%-r0}"
 
-S="${EPREFIX}/usr/src/linux-${KVER}"
+S="${EPREFIX}/usr/src/linux"
 
 src_compile() {
-	:
+	set_arch_to_kernel
+	test "$(make M="$T" kernelversion)" = "$PV" || \
+		die "Package version does not match source version"
 }
 
 src_install() {
