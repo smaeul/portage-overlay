@@ -15,7 +15,10 @@ SLOT="0"
 KEYWORDS=""
 IUSE="static"
 
-RDEPEND="sys-libs/zlib:="
+RDEPEND="
+	>=dev-libs/openssl-1.1.0:=
+	sys-libs/zlib:=
+"
 # ADB only works with BoringSSL (not LibreSSL or OpenSSL).
 # BoringSSL uses perl in its build system.
 # Android core libraries use stdatomic.h from C++, which breaks g++.
