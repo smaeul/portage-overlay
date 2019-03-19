@@ -1,24 +1,24 @@
-From d70cd5b6d304cc1b6d8f245460b27b8b0e0e6869 Mon Sep 17 00:00:00 2001
+From 9574147ed66363e8b812102e03d8c460414ad163 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:04:29 -0500
-Subject: [PATCH 02/22] Fix LLVM build
+Subject: [PATCH 02/15] Fix LLVM build
 
 ---
  src/bootstrap/lib.rs | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index ab3d0b5137..30e84bc13f 100644
+index 2832f5bebd..585c22d5fe 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -785,7 +785,8 @@ impl Build {
+@@ -779,7 +779,8 @@ impl Build {
          // cc-rs because the build scripts will determine that for themselves.
          let mut base = self.cc[&target].args().iter()
                             .map(|s| s.to_string_lossy().into_owned())
 -                           .filter(|s| !s.starts_with("-O") && !s.starts_with("/O"))
 +                           .filter(|s| !s.starts_with("-O") && !s.starts_with("/O")
 +                                   && !s.starts_with("-static"))
-                            .collect::<Vec<_>>();
+                            .collect::<Vec<String>>();
  
          // If we're compiling on macOS then we add a few unconditional flags
 -- 

@@ -1,7 +1,7 @@
-From c99b99efd9f9632ac4917e1c410bf34e3c2be78b Mon Sep 17 00:00:00 2001
+From cae0e1967f8bd9217ece1dec9f7bdfbc7f584121 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Tue, 9 Oct 2018 04:15:48 +0000
-Subject: [PATCH 11/22] rustc_data_structures: use libc types/constants in
+Subject: [PATCH 07/15] rustc_data_structures: use libc types/constants in
  flock
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 11/22] rustc_data_structures: use libc types/constants in
  1 file changed, 10 insertions(+), 145 deletions(-)
 
 diff --git a/src/librustc_data_structures/flock.rs b/src/librustc_data_structures/flock.rs
-index 38ce331051..d5c38b9a39 100644
+index 86e48e2162..809e2fc7f4 100644
 --- a/src/librustc_data_structures/flock.rs
 +++ b/src/librustc_data_structures/flock.rs
 @@ -26,143 +26,6 @@ cfg_if! {

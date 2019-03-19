@@ -1,17 +1,17 @@
-From 2a82e95d73d7e86bd420c15f712b09eb104a82c1 Mon Sep 17 00:00:00 2001
+From 0ca19bbd8af86150c05f2bb0db249002d7cc818b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 10 Jan 2018 13:36:41 -0600
-Subject: [PATCH 01/22] Don't pass CFLAGS to the C++ compiler
+Subject: [PATCH 01/15] Don't pass CFLAGS to the C++ compiler
 
 ---
  src/bootstrap/builder.rs | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/src/bootstrap/builder.rs b/src/bootstrap/builder.rs
-index 02e9ca9250..7be38b1e8b 100644
+index 98005f9396..e3f2fa7404 100644
 --- a/src/bootstrap/builder.rs
 +++ b/src/bootstrap/builder.rs
-@@ -1041,7 +1041,7 @@ impl<'a> Builder<'a> {
+@@ -1040,7 +1040,7 @@ impl<'a> Builder<'a> {
              let cflags = self.cflags(target, GitRepo::Rustc).join(" ");
              cargo
                  .env(format!("CFLAGS_{}", target), cflags.clone())
@@ -20,7 +20,7 @@ index 02e9ca9250..7be38b1e8b 100644
  
              if let Some(ar) = self.ar(target) {
                  let ranlib = format!("{} s", ar.display());
-@@ -1056,9 +1056,7 @@ impl<'a> Builder<'a> {
+@@ -1055,9 +1055,7 @@ impl<'a> Builder<'a> {
                  let cxx = ccacheify(&cxx);
                  cargo
                      .env(format!("CXX_{}", target), &cxx)

@@ -1,7 +1,7 @@
-From bf4d6a932fb1538e70bb9eb4eb169414a5c91387 Mon Sep 17 00:00:00 2001
+From 995db4a3dd114052462da4ad8879af25df5c86e8 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 01:32:20 +0000
-Subject: [PATCH 18/22] test/sysroot-crates-are-unstable: Fix test when rpath
+Subject: [PATCH 11/15] test/sysroot-crates-are-unstable: Fix test when rpath
  is disabled
 
 Without this environment var, the test can't run rustc to find

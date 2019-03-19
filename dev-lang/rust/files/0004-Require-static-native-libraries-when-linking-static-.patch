@@ -1,7 +1,7 @@
-From 4e6debd6806faf62ba737c01bb74080a637b127a Mon Sep 17 00:00:00 2001
+From f952c616f97111332172a24a18cfa95b23bda3b8 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
-Subject: [PATCH 04/22] Require static native libraries when linking static
+Subject: [PATCH 04/15] Require static native libraries when linking static
  executables
 
 gcc/ld will create a dynamically-linked executable without warning, even
@@ -15,10 +15,10 @@ Fixes #54243
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/src/librustc_codegen_llvm/back/link.rs b/src/librustc_codegen_llvm/back/link.rs
-index 86c6a5e65b..0e3ff6da07 100644
+index 68da14570e..d94317be7b 100644
 --- a/src/librustc_codegen_llvm/back/link.rs
 +++ b/src/librustc_codegen_llvm/back/link.rs
-@@ -1588,8 +1588,8 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
+@@ -1414,8 +1414,8 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
      }
  }
  
@@ -29,7 +29,7 @@ index 86c6a5e65b..0e3ff6da07 100644
  // dependencies. We've got two cases then:
  //
  // 1. The upstream crate is an rlib. In this case we *must* link in the
-@@ -1633,7 +1633,14 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
+@@ -1459,7 +1459,14 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                  continue
              }
              match lib.kind {

@@ -1,7 +1,7 @@
-From f043e089c9f5fadefabb423a9de1d067d39c440a Mon Sep 17 00:00:00 2001
+From 15174b56a58b3257dda10ca1b5ead8f784d431b8 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:39:46 +0000
-Subject: [PATCH 16/22] test/target-feature-gate: Only run on relevant targets
+Subject: [PATCH 09/15] test/target-feature-gate: Only run on relevant targets
 
 ---
  src/test/ui/target-feature-gate.rs     | 2 ++

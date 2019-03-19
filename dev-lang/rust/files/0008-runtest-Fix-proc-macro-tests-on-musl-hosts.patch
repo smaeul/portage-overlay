@@ -1,14 +1,14 @@
-From 050dfd0e91b92cb350ca52599266cefc6c765106 Mon Sep 17 00:00:00 2001
+From 062f655acf5a38d7b769c31360a7fb90049ad35d Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:40:04 +0000
-Subject: [PATCH 12/22] runtest: Fix proc-macro tests on musl hosts
+Subject: [PATCH 08/15] runtest: Fix proc-macro tests on musl hosts
 
 ---
  src/tools/compiletest/src/runtest.rs | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/tools/compiletest/src/runtest.rs b/src/tools/compiletest/src/runtest.rs
-index a80bbd401a..bbe0a6fb7a 100644
+index c654230e20..bf4b6247f4 100644
 --- a/src/tools/compiletest/src/runtest.rs
 +++ b/src/tools/compiletest/src/runtest.rs
 @@ -1582,7 +1582,6 @@ impl<'test> TestCx<'test> {

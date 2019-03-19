@@ -1,7 +1,7 @@
-From 0613fed83ccf58ce3305a1df35e31eda25ba409e Mon Sep 17 00:00:00 2001
+From cf8140967b2d7a473993966be9360fd71c7849df Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
-Subject: [PATCH 03/22] Allow rustdoc to work when cross-compiling on musl
+Subject: [PATCH 03/15] Allow rustdoc to work when cross-compiling on musl
 
 musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
 ---

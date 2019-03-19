@@ -1,14 +1,14 @@
-From 7e57e73a5106632bf3de42669f5b6f41fd860151 Mon Sep 17 00:00:00 2001
+From d90074f49e6d30a609a77b9adfad6990b58cf5ad Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 24 Sep 2018 23:42:23 +0000
-Subject: [PATCH 20/22] Link stage 2 tools dynamically to libstd
+Subject: [PATCH 13/15] Link stage 2 tools dynamically to libstd
 
 ---
  src/bootstrap/tool.rs | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/tool.rs b/src/bootstrap/tool.rs
-index 6868a063ce..3a91b4fa07 100644
+index 58c5296beb..4b4b3e5c20 100644
 --- a/src/bootstrap/tool.rs
 +++ b/src/bootstrap/tool.rs
 @@ -217,7 +217,9 @@ pub fn prepare_tool_cargo(

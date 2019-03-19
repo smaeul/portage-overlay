@@ -1,7 +1,7 @@
-From 3b3824f89654f5c02d9c4eb31be86263e53b6a85 Mon Sep 17 00:00:00 2001
+From 60c658cced1b4f6ba8ccdad00123be10ca1b001c Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
-Subject: [PATCH 21/22] Move debugger scripts to /usr/share/rust
+Subject: [PATCH 14/15] Move debugger scripts to /usr/share/rust
 
 ---
  src/bootstrap/dist.rs | 2 +-
@@ -10,7 +10,7 @@ Subject: [PATCH 21/22] Move debugger scripts to /usr/share/rust
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/bootstrap/dist.rs b/src/bootstrap/dist.rs
-index fea6302d0a..e6ba249d28 100644
+index cd8d5642b2..4316aba881 100644
 --- a/src/bootstrap/dist.rs
 +++ b/src/bootstrap/dist.rs
 @@ -591,7 +591,7 @@ impl Step for DebuggerScripts {
