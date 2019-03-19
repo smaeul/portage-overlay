@@ -1,7 +1,7 @@
-From 4b1c6e334f2da460e57d7d29dd55b07bcb9c9e47 Mon Sep 17 00:00:00 2001
+From 11bc7416130ccaf001483c85fc68b816266d17ac Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
-Subject: [PATCH 12/15] Ignore broken and non-applicable tests
+Subject: [PATCH 10/13] Ignore broken and non-applicable tests
 
 long-linker-command-lines: takes >10 minutes to run (but still passes)
 sparc-struct-abi: no sparc target
@@ -13,10 +13,10 @@ sysroot-crates-are-unstable: can't run rustc without rpath
  3 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/test/codegen/sparc-struct-abi.rs b/src/test/codegen/sparc-struct-abi.rs
-index 56c4364d59..9aebf8f002 100644
+index 78e5b14a21..6f93e93286 100644
 --- a/src/test/codegen/sparc-struct-abi.rs
 +++ b/src/test/codegen/sparc-struct-abi.rs
-@@ -13,6 +13,7 @@
+@@ -4,6 +4,7 @@
  
  // only-sparc64
  // compile-flags: -O --target=sparc64-unknown-linux-gnu --crate-type=rlib

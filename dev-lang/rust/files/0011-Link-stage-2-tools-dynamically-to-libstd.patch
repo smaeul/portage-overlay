@@ -1,17 +1,17 @@
-From d90074f49e6d30a609a77b9adfad6990b58cf5ad Mon Sep 17 00:00:00 2001
+From 017389404c7696621987818a5664bae65fddcacc Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 24 Sep 2018 23:42:23 +0000
-Subject: [PATCH 13/15] Link stage 2 tools dynamically to libstd
+Subject: [PATCH 11/13] Link stage 2 tools dynamically to libstd
 
 ---
  src/bootstrap/tool.rs | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/tool.rs b/src/bootstrap/tool.rs
-index 58c5296beb..4b4b3e5c20 100644
+index 9f6db73e6f..69cc2219c1 100644
 --- a/src/bootstrap/tool.rs
 +++ b/src/bootstrap/tool.rs
-@@ -217,7 +217,9 @@ pub fn prepare_tool_cargo(
+@@ -208,7 +208,9 @@ pub fn prepare_tool_cargo(
  
      // We don't want to build tools dynamically as they'll be running across
      // stages and such and it's just easier if they're not dynamically linked.

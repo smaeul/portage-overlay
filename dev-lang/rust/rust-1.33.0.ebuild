@@ -14,7 +14,7 @@ MY_P="rustc-${PV}"
 SRC="${MY_P}-src.tar.xz"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
-RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).1"
+RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
@@ -63,24 +63,20 @@ REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
 	x86? ( cpu_flags_x86_sse2 )"
 
 PATCHES=(
-	"${FILESDIR}/1.32.0-system-llvm-7-SIGSEGV.patch"
 	"${FILESDIR}/0001-Don-t-pass-CFLAGS-to-the-C-compiler.patch"
 	"${FILESDIR}/0002-Fix-LLVM-build.patch"
 	"${FILESDIR}/0003-Allow-rustdoc-to-work-when-cross-compiling-on-musl.patch"
 	"${FILESDIR}/0004-Require-static-native-libraries-when-linking-static-.patch"
 	"${FILESDIR}/0005-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
 	"${FILESDIR}/0006-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
-	"${FILESDIR}/0007-rustc_data_structures-use-libc-types-constants-in-fl.patch"
-	"${FILESDIR}/0008-runtest-Fix-proc-macro-tests-on-musl-hosts.patch"
-	"${FILESDIR}/0009-test-target-feature-gate-Only-run-on-relevant-target.patch"
-	"${FILESDIR}/0010-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
-	"${FILESDIR}/0011-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
-	"${FILESDIR}/0012-Ignore-broken-and-non-applicable-tests.patch"
-	"${FILESDIR}/0013-Link-stage-2-tools-dynamically-to-libstd.patch"
-	"${FILESDIR}/0014-Move-debugger-scripts-to-usr-share-rust.patch"
-	"${FILESDIR}/0015-Add-gentoo-target-specs.patch"
+	"${FILESDIR}/0007-runtest-Fix-proc-macro-tests-on-musl-hosts.patch"
+	"${FILESDIR}/0008-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
+	"${FILESDIR}/0009-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
+	"${FILESDIR}/0010-Ignore-broken-and-non-applicable-tests.patch"
+	"${FILESDIR}/0011-Link-stage-2-tools-dynamically-to-libstd.patch"
+	"${FILESDIR}/0012-Move-debugger-scripts-to-usr-share-rust.patch"
+	"${FILESDIR}/0013-Add-gentoo-target-specs.patch"
 	"${FILESDIR}/0030-liblibc-linkage.patch"
-	"${FILESDIR}/0031-liblibc-1b130d4c349d.patch"
 	"${FILESDIR}/0040-rls-atomics.patch"
 	"${FILESDIR}/0050-llvm.patch"
 	"${FILESDIR}/0051-llvm-D45520.patch"
@@ -189,7 +185,6 @@ src_test() {
 		src/test/codegen \
 		src/test/codegen-units \
 		src/test/compile-fail \
-		src/test/compile-fail-fulldeps \
 		src/test/incremental \
 		src/test/mir-opt \
 		src/test/pretty \
