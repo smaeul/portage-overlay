@@ -110,7 +110,7 @@ BDEPEND="
 	sys-apps/hwids[usb(+)]
 	>=sys-devel/bison-2.4.3
 	sys-devel/flex
-	elibc_musl? ( sys-libs/queue )
+	elibc_musl? ( sys-libs/queue-standalone )
 	closure-compile? ( virtual/jre )
 	virtual/pkgconfig
 "
