@@ -75,6 +75,14 @@ diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets
 index 9f1cdef..a330d9a 100644
 --- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
 +++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+@@ -370,6 +370,7 @@ bool SyscallSets::IsAllowedProcessStartOrDeath(int sysno) {
+   switch (sysno) {
+     case __NR_exit:
+     case __NR_exit_group:
++    case __NR_membarrier:
+     case __NR_wait4:
+     case __NR_waitid:
+ #if defined(__i386__)
 @@ -496,6 +496,7 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
      case __NR_mlock:
      case __NR_munlock:
@@ -91,3 +99,17 @@ index 9f1cdef..a330d9a 100644
      case __NR_msync:
      case __NR_munlockall:
      case __NR_readahead:
+diff --git chromium-72.0.3626.121/sandbox/linux/system_headers/x86_64_linux_syscalls.h
+index 349504a..ea3c7c9 100644
+--- chromium-72.0.3626.121/sandbox/linux/system_headers/x86_64_linux_syscalls.h.orig
++++ chromium-72.0.3626.121/sandbox/linux/system_headers/x86_64_linux_syscalls.h
+@@ -1290,5 +1290,9 @@
+ #define __NR_memfd_create 319
+ #endif
+ 
++#if !defined(__NR_membarrier)
++#define __NR_membarrier 324
++#endif
++
+ #endif  // SANDBOX_LINUX_SYSTEM_HEADERS_X86_64_LINUX_SYSCALLS_H_
+ 
