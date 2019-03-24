@@ -1,7 +1,7 @@
 From 46e6ead56b2899d9041fe73c1530b7f02df2ca40 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
-Subject: [PATCH 04/13] Require static native libraries when linking static
+Subject: [PATCH 04/15] Require static native libraries when linking static
  executables
 
 gcc/ld will create a dynamically-linked executable without warning, even

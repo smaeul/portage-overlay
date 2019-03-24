@@ -1,7 +1,7 @@
 From e60db771c8ffe7b82a97ca516737cbf40b372e54 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:40:04 +0000
-Subject: [PATCH 07/13] runtest: Fix proc-macro tests on musl hosts
+Subject: [PATCH 07/15] runtest: Fix proc-macro tests on musl hosts
 
 ---
  src/tools/compiletest/src/runtest.rs | 7 ++-----

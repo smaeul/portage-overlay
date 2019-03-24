@@ -1,7 +1,7 @@
-From 017389404c7696621987818a5664bae65fddcacc Mon Sep 17 00:00:00 2001
+From ece4b39b205ba98452faa4016c9050a1b92563a6 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 24 Sep 2018 23:42:23 +0000
-Subject: [PATCH 11/13] Link stage 2 tools dynamically to libstd
+Subject: [PATCH 13/15] Link stage 2 tools dynamically to libstd
 
 ---
  src/bootstrap/tool.rs | 4 +++-

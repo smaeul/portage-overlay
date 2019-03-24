@@ -1,7 +1,7 @@
-From 50f613d7d83bcb1736cfa4fdb4e1b9119519472c Mon Sep 17 00:00:00 2001
+From 826bc0a6ad767ede16641b93bc9d4a8ec81abeb6 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:29:06 +0000
-Subject: [PATCH 13/13] Add gentoo target specs
+Subject: [PATCH 15/15] Add gentoo target specs
 
 ---
  .../spec/aarch64_gentoo_linux_musl.rs         | 21 +++++++++++++++++

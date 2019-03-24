@@ -1,7 +1,7 @@
 From 5d98731bae319172c5fbfd8235f62bb00acb3a7d Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 22:11:14 -0500
-Subject: [PATCH 05/13] Remove -nostdlib and musl_root from musl targets
+Subject: [PATCH 05/15] Remove -nostdlib and musl_root from musl targets
 
 ---
  config.toml.example                           |  6 ----
