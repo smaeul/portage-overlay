@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<longdescription lang="en">
+		A fast static site generator in a single binary with everything built-in.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">getzola/zola</remote-id>
+	</upstream>
+</pkgmetadata>
