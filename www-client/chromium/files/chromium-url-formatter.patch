@@ -1,8 +1,8 @@
-diff --git chromium-72.0.3626.121/components/url_formatter/url_formatter.cc
-index b060780..01a249f 100644
---- chromium-72.0.3626.121/components/url_formatter/url_formatter.cc.orig
-+++ chromium-72.0.3626.121/components/url_formatter/url_formatter.cc
-@@ -410,13 +410,13 @@ IDNConversionStatus IDNToUnicodeOneComponent(const base::char16* comp,
+diff --git chromium-73.0.3683.103/components/url_formatter/url_formatter.cc chromium-73.0.3683.103/components/url_formatter/url_formatter.cc
+index 97bc67e4b..caead697b 100644
+--- chromium-73.0.3683.103/components/url_formatter/url_formatter.cc
++++ chromium-73.0.3683.103/components/url_formatter/url_formatter.cc
+@@ -410,14 +410,14 @@ IDNConversionStatus IDNToUnicodeOneComponent(const base::char16* comp,
  }  // namespace
  
  const FormatUrlType kFormatUrlOmitNothing = 0;
@@ -13,6 +13,7 @@ index b060780..01a249f 100644
 -const FormatUrlType kFormatUrlOmitTrivialSubdomains = 1 << 5;
 -const FormatUrlType kFormatUrlTrimAfterHost = 1 << 6;
 -const FormatUrlType kFormatUrlOmitFileScheme = 1 << 7;
+-const FormatUrlType kFormatUrlOmitMailToScheme = 1 << 8;
 +const FormatUrlType kFormatUrlOmitUsernamePassword = 0;
 +const FormatUrlType kFormatUrlOmitHTTP = 0;
 +const FormatUrlType kFormatUrlOmitTrailingSlashOnBareHostname = 0;
@@ -20,6 +21,7 @@ index b060780..01a249f 100644
 +const FormatUrlType kFormatUrlOmitTrivialSubdomains = 0;
 +const FormatUrlType kFormatUrlTrimAfterHost = 0;
 +const FormatUrlType kFormatUrlOmitFileScheme = 0;
++const FormatUrlType kFormatUrlOmitMailToScheme = 0;
  
  const FormatUrlType kFormatUrlOmitDefaults =
      kFormatUrlOmitUsernamePassword | kFormatUrlOmitHTTP |

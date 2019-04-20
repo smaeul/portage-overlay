@@ -12,8 +12,7 @@ inherit check-reqs chromium-2 desktop flag-o-matic multilib ninja-utils pax-util
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="http://chromium.org/"
-SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz
-	https://dev.gentoo.org/~floppym/dist/chromium-webrtc-includes-r1.patch.xz"
+SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz"
 
 LICENSE="BSD"
 SLOT="0"
@@ -21,7 +20,8 @@ KEYWORDS="amd64 ~x86"
 IUSE="+atk +closure-compile component-build cups +dbus gnome-keyring +hangouts jumbo-build kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
-REQUIRED_USE="atk? ( dbus )"
+REQUIRED_USE="atk? ( dbus )
+	component-build? ( !suid )"
 
 COMMON_DEPEND="
 	atk? ( >=app-accessibility/at-spi2-atk-2.26:2 )
@@ -40,7 +40,7 @@ COMMON_DEPEND="
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
-	>=media-libs/harfbuzz-2.0.0:0=[icu(-)]
+	>=media-libs/harfbuzz-2.2.0:0=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
 	system-libvpx? ( media-libs/libvpx:=[postproc,svc] )
@@ -147,6 +147,15 @@ GTK+ icon theme.
 PATCHES=(
 	"${FILESDIR}/chromium-compiler-r7.patch"
 	"${FILESDIR}/chromium-widevine-r4.patch"
+	"${FILESDIR}/chromium-fix-char_traits.patch"
+	"${FILESDIR}/chromium-73-gcc-0.patch"
+	"${FILESDIR}/chromium-73-gcc-1.patch"
+	"${FILESDIR}/chromium-73-gcc-2.patch"
+	"${FILESDIR}/chromium-73-gcc-3.patch"
+	"${FILESDIR}/chromium-73-gcc-4.patch"
+	"${FILESDIR}/chromium-73-gcc-5.patch"
+	"${FILESDIR}/chromium-73-gcc-6.patch"
+	"${FILESDIR}/chromium-73-xdg-current-desktop.patch"
 	"${FILESDIR}/chromium-optional-atk-r1.patch"
 	"${FILESDIR}/chromium-optional-dbus-r5.patch"
 	"${FILESDIR}/chromium-url-formatter.patch"
@@ -168,21 +177,18 @@ PATCHES=(
 	"${FILESDIR}/musl-stacktrace-r2.patch"
 	"${FILESDIR}/musl-syscall.patch"
 	"${FILESDIR}/musl-ucontext-r1.patch"
+	"${FILESDIR}/musl-v8-fix-deadlock.patch"
+	"${FILESDIR}/musl-v8-monotonic-pthread-cont_timedwait.patch"
 	"${FILESDIR}/musl-wordsize-r1.patch"
 )
 
 pre_build_checks() {
-	#if [[ ${MERGE_TYPE} != binary ]]; then
-	#	local -x CPP="$(tc-getCXX) -E"
-	#	if tc-is-clang && ! version_is_at_least "3.9.1" "$(clang-fullversion)"; then
-	#		# bugs: #601654
-	#		die "At least clang 3.9.1 is required"
-	#	fi
-	#	if tc-is-gcc && ! version_is_at_least 5.0 "$(gcc-version)"; then
-	#		# bugs: #535730, #525374, #518668, #600288, #627356
-	#		die "At least gcc 5.0 is required"
-	#	fi
-	#fi
+	if [[ ${MERGE_TYPE} != binary ]]; then
+		local -x CPP="$(tc-getCXX) -E"
+		if tc-is-gcc && ! ver_test "$(gcc-version)" -ge 8.0; then
+			die "At least gcc 8.0 is required"
+		fi
+	fi
 
 	# Check build requirements, bug #541816 and bug #471810 .
 	CHECKREQS_MEMORY="3G"
@@ -212,10 +218,6 @@ src_prepare() {
 
 	default
 
-	pushd third_party/webrtc >/dev/null || die
-	eapply "${WORKDIR}"/chromium-webrtc-includes-r1.patch
-	popd >/dev/null || die
-
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
 	ln -s "${EPREFIX}"/usr/bin/node third_party/node/linux/node-linux-x64/bin/node || die
 
@@ -236,11 +238,9 @@ src_prepare() {
 		buildtools/third_party/libc++abi
 		chrome/third_party/mozilla_security_manager
 		courgette/third_party
-		net/third_party/http2
 		net/third_party/mozilla_security_manager
 		net/third_party/nss
 		net/third_party/quic
-		net/third_party/spdy
 		net/third_party/uri_template
 		third_party/abseil-cpp
 		third_party/angle
@@ -351,6 +351,7 @@ src_prepare() {
 		third_party/sfntly
 		third_party/simplejson
 		third_party/skia
+		third_party/skia/include/third_party/vulkan
 		third_party/skia/third_party/gif
 		third_party/skia/third_party/skcms
 		third_party/skia/third_party/vulkan
@@ -359,6 +360,7 @@ src_prepare() {
 		third_party/SPIRV-Tools
 		third_party/sqlite
 		third_party/swiftshader
+		third_party/swiftshader/third_party/llvm-7.0
 		third_party/swiftshader/third_party/llvm-subzero
 		third_party/swiftshader/third_party/subzero
 		third_party/unrar
@@ -378,6 +380,7 @@ src_prepare() {
 		third_party/woff2
 		third_party/zlib/google
 		url/third_party/mozilla
+		v8/src/third_party/siphash
 		v8/src/third_party/valgrind
 		v8/src/third_party/utf8-decoder
 		v8/third_party/inspector_protocol

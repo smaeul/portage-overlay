@@ -1,8 +1,8 @@
-diff --git chromium-69.0.3497.100/base/debug/stack_trace.cc
-index 7715121..bcdc1a0 100644
---- chromium-69.0.3497.100/base/debug/stack_trace.cc
-+++ chromium-69.0.3497.100/base/debug/stack_trace.cc
-@@ -221,7 +221,9 @@ void StackTrace::Print() const {
+diff --git chromium-73.0.3683.103/base/debug/stack_trace.cc chromium-73.0.3683.103/base/debug/stack_trace.cc
+index ed531f6..36ef6e6 100644
+--- chromium-73.0.3683.103/base/debug/stack_trace.cc
++++ chromium-73.0.3683.103/base/debug/stack_trace.cc
+@@ -225,7 +225,9 @@ void StackTrace::Print() const {
  }
  
  void StackTrace::OutputToStream(std::ostream* os) const {
@@ -12,7 +12,7 @@ index 7715121..bcdc1a0 100644
  }
  
  std::string StackTrace::ToString() const {
-@@ -229,7 +229,7 @@ const void *const *StackTrace::Addresses(size_t* count) const {
+@@ -233,7 +235,7 @@ std::string StackTrace::ToString() const {
  }
  std::string StackTrace::ToStringWithPrefix(const char* prefix_string) const {
    std::stringstream stream;
@@ -21,11 +21,11 @@ index 7715121..bcdc1a0 100644
    OutputToStreamWithPrefix(&stream, prefix_string);
  #endif
    return stream.str();
-diff --git chromium-69.0.3497.100/base/logging.cc
-index 7752cce..b531337 100644
---- chromium-69.0.3497.100/base/logging.cc
-+++ chromium-69.0.3497.100/base/logging.cc
-@@ -583,8 +583,8 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
+diff --git chromium-73.0.3683.103/base/logging.cc chromium-73.0.3683.103/base/logging.cc
+index d473555..1f343df 100644
+--- chromium-73.0.3683.103/base/logging.cc
++++ chromium-73.0.3683.103/base/logging.cc
+@@ -584,8 +584,8 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
  
  LogMessage::~LogMessage() {
    size_t stack_start = stream_.tellp();

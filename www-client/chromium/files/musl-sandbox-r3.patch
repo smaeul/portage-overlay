@@ -1,8 +1,8 @@
-diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
-index 46a54ed..d8b8094 100644
---- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
-+++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
-@@ -202,6 +202,9 @@ ResultExpr EvaluateSyscallImpl(int fs_denied_errno,
+diff --git chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+index f33aa90..9d86119 100644
+--- chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
++++ chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc
+@@ -207,6 +207,9 @@ ResultExpr EvaluateSyscallImpl(int fs_denied_errno,
    if (sysno == __NR_prctl)
      return RestrictPrctl();
  
@@ -12,11 +12,11 @@ index 46a54ed..d8b8094 100644
  #if defined(__x86_64__) || defined(__arm__) || defined(__mips__) || \
      defined(__aarch64__)
    if (sysno == __NR_socketpair) {
-diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
-index 2577f02..37fa09b 100644
---- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
-+++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
-@@ -129,23 +129,13 @@ namespace sandbox {
+diff --git chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+index 68ce32a..bae41ac 100644
+--- chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
++++ chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+@@ -137,23 +137,13 @@ namespace sandbox {
  // CLONE_VM, nor CLONE_THREAD, which includes all fork() implementations.
  ResultExpr RestrictCloneToThreadsAndEPERMFork() {
    const Arg<unsigned long> flags(0);
@@ -46,9 +46,9 @@ index 2577f02..37fa09b 100644
        .ElseIf((flags & (CLONE_VM | CLONE_THREAD)) == 0, Error(EPERM))
        .Else(CrashSIGSYSClone());
  }
-@@ -383,4 +373,10 @@ ResultExpr RestrictPrlimit(pid_t target_pid) {
-   return If(AnyOf(pid == 0, pid == target_pid), Allow()).Else(Error(EPERM));
+@@ -412,4 +402,10 @@ ResultExpr RestrictPtrace() {
  }
+ #endif  // defined(OS_NACL_NONSFI)
  
 +ResultExpr RestrictSetTIDAddress() {
 +  const Arg<uintptr_t> address(0);
@@ -57,13 +57,13 @@ index 2577f02..37fa09b 100644
 +}
 +
  }  // namespace sandbox.
-diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
-index 71c5609..5d5ebfc 100644
---- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
-+++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
-@@ -103,6 +103,9 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictGetRandom();
- // gracefully; see crbug.com/160157.
- SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictPrlimit(pid_t target_pid);
+diff --git chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+index cb563df..8aef632 100644
+--- chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
++++ chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.h
+@@ -107,6 +107,9 @@ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictPrlimit(pid_t target_pid);
+ // reporting. See https://crbug.com/933418 for details.
+ SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictPtrace();
  
 +// Restrict the address to NULL.
 +SANDBOX_EXPORT bpf_dsl::ResultExpr RestrictSetTIDAddress();
@@ -71,11 +71,11 @@ index 71c5609..5d5ebfc 100644
  }  // namespace sandbox.
  
  #endif  // SANDBOX_LINUX_SECCOMP_BPF_HELPERS_SYSCALL_PARAMETERS_RESTRICTIONS_H_
-diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
-index 9f1cdef..a330d9a 100644
---- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
-+++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
-@@ -370,6 +370,7 @@ bool SyscallSets::IsAllowedProcessStartOrDeath(int sysno) {
+diff --git chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+index 7dbcc87..41f3fd5 100644
+--- chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
++++ chromium-73.0.3683.103/sandbox/linux/seccomp-bpf-helpers/syscall_sets.cc
+@@ -386,6 +386,7 @@ bool SyscallSets::IsAllowedProcessStartOrDeath(int sysno) {
    switch (sysno) {
      case __NR_exit:
      case __NR_exit_group:
@@ -83,7 +83,7 @@ index 9f1cdef..a330d9a 100644
      case __NR_wait4:
      case __NR_waitid:
  #if defined(__i386__)
-@@ -496,6 +496,7 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
+@@ -513,6 +514,7 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
      case __NR_mlock:
      case __NR_munlock:
      case __NR_munmap:
@@ -91,7 +91,7 @@ index 9f1cdef..a330d9a 100644
        return true;
      case __NR_madvise:
      case __NR_mincore:
-@@ -511,7 +512,6 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
+@@ -530,7 +532,6 @@ bool SyscallSets::IsAllowedAddressSpaceAccess(int sysno) {
      case __NR_modify_ldt:
  #endif
      case __NR_mprotect:
@@ -99,10 +99,10 @@ index 9f1cdef..a330d9a 100644
      case __NR_msync:
      case __NR_munlockall:
      case __NR_readahead:
-diff --git chromium-72.0.3626.121/sandbox/linux/system_headers/x86_64_linux_syscalls.h
+diff --git chromium-73.0.3683.103/sandbox/linux/system_headers/x86_64_linux_syscalls.h chromium-73.0.3683.103/sandbox/linux/system_headers/x86_64_linux_syscalls.h
 index 349504a..ea3c7c9 100644
---- chromium-72.0.3626.121/sandbox/linux/system_headers/x86_64_linux_syscalls.h.orig
-+++ chromium-72.0.3626.121/sandbox/linux/system_headers/x86_64_linux_syscalls.h
+--- chromium-73.0.3683.103/sandbox/linux/system_headers/x86_64_linux_syscalls.h
++++ chromium-73.0.3683.103/sandbox/linux/system_headers/x86_64_linux_syscalls.h
 @@ -1290,5 +1290,9 @@
  #define __NR_memfd_create 319
  #endif

@@ -1,8 +1,8 @@
-diff --git chromium-69.0.3497.100/base/threading/platform_thread_linux.cc
-index 190aced..9456146 100644
---- chromium-69.0.3497.100/base/threading/platform_thread_linux.cc
-+++ chromium-69.0.3497.100/base/threading/platform_thread_linux.cc
-@@ -172,12 +172,14 @@ void InitThreading() {}
+diff --git chromium-73.0.3683.103/base/threading/platform_thread_linux.cc chromium-73.0.3683.103/base/threading/platform_thread_linux.cc
+index 277a7e9..8eff808 100644
+--- chromium-73.0.3683.103/base/threading/platform_thread_linux.cc
++++ chromium-73.0.3683.103/base/threading/platform_thread_linux.cc
+@@ -185,12 +185,14 @@ void InitThreading() {}
  void TerminateOnThread() {}
  
  size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
@@ -20,11 +20,11 @@ index 190aced..9456146 100644
  #endif
  }
  
-diff --git chromium-69.0.3497.100/chrome/app/shutdown_signal_handlers_posix.cc
-index 5c7ffd9..c2ffff9 100644
---- chromium-69.0.3497.100/chrome/app/shutdown_signal_handlers_posix.cc
-+++ chromium-69.0.3497.100/chrome/app/shutdown_signal_handlers_posix.cc
-@@ -183,6 +183,7 @@ void InstallShutdownSignalHandlers(
+diff --git chromium-73.0.3683.103/chrome/app/shutdown_signal_handlers_posix.cc chromium-73.0.3683.103/chrome/app/shutdown_signal_handlers_posix.cc
+index 4b487d7..3cd4706 100644
+--- chromium-73.0.3683.103/chrome/app/shutdown_signal_handlers_posix.cc
++++ chromium-73.0.3683.103/chrome/app/shutdown_signal_handlers_posix.cc
+@@ -183,12 +183,19 @@ void InstallShutdownSignalHandlers(
    g_pipe_pid = getpid();
    g_shutdown_pipe_read_fd = pipefd[0];
    g_shutdown_pipe_write_fd = pipefd[1];
@@ -32,7 +32,6 @@ index 5c7ffd9..c2ffff9 100644
  #if !defined(ADDRESS_SANITIZER)
    const size_t kShutdownDetectorThreadStackSize = PTHREAD_STACK_MIN * 2;
  #else
-@@ -189,6 +190,12 @@ void InstallShutdownSignalHandlers(
    // ASan instrumentation bloats the stack frames, so we need to increase the
    // stack size to avoid hitting the guard page.
    const size_t kShutdownDetectorThreadStackSize = PTHREAD_STACK_MIN * 4;

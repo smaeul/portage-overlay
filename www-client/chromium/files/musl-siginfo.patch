@@ -1,7 +1,7 @@
-diff --git chromium-69.0.3497.100/sandbox/linux/seccomp-bpf/trap.cc
+diff --git chromium-73.0.3683.103/sandbox/linux/seccomp-bpf/trap.cc chromium-73.0.3683.103/sandbox/linux/seccomp-bpf/trap.cc
 index 003708d..0fef314 100644
---- chromium-69.0.3497.100/sandbox/linux/seccomp-bpf/trap.cc
-+++ chromium-69.0.3497.100/sandbox/linux/seccomp-bpf/trap.cc
+--- chromium-73.0.3683.103/sandbox/linux/seccomp-bpf/trap.cc
++++ chromium-73.0.3683.103/sandbox/linux/seccomp-bpf/trap.cc
 @@ -168,7 +168,7 @@ void Trap::SigSys(int nr, LinuxSigInfo* info, ucontext_t* ctx) {
    // most versions of glibc don't include this information in siginfo_t. So,
    // we need to explicitly copy it into a arch_sigsys structure.

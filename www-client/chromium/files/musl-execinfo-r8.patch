@@ -1,7 +1,7 @@
-diff --git chromium-69.0.3497.100/base/debug/stack_trace_posix.cc
-index f3f05da..fc2a96f 100644
---- chromium-69.0.3497.100/base/debug/stack_trace_posix.cc
-+++ chromium-69.0.3497.100/base/debug/stack_trace_posix.cc
+diff --git chromium-73.0.3683.103/base/debug/stack_trace_posix.cc chromium-73.0.3683.103/base/debug/stack_trace_posix.cc
+index 1f015ee..fd6c39a 100644
+--- chromium-73.0.3683.103/base/debug/stack_trace_posix.cc
++++ chromium-73.0.3683.103/base/debug/stack_trace_posix.cc
 @@ -27,7 +27,7 @@
  #if !defined(USE_SYMBOLIZE)
  #include <cxxabi.h>
@@ -11,7 +11,7 @@ index f3f05da..fc2a96f 100644
  #include <execinfo.h>
  #endif
  
-@@ -85,7 +85,7 @@ void DemangleSymbols(std::string* text) {
+@@ -86,7 +86,7 @@ void DemangleSymbols(std::string* text) {
    // Note: code in this function is NOT async-signal safe (std::string uses
    // malloc internally).
  
@@ -20,7 +20,7 @@ index f3f05da..fc2a96f 100644
    std::string::size_type search_from = 0;
    while (search_from < text->size()) {
      // Look for the start of a mangled symbol, from search_from.
-@@ -120,7 +120,7 @@ void DemangleSymbols(std::string* text) {
+@@ -121,7 +121,7 @@ void DemangleSymbols(std::string* text) {
        search_from = mangled_start + 2;
      }
    }
@@ -29,7 +29,7 @@ index f3f05da..fc2a96f 100644
  }
  #endif  // !defined(USE_SYMBOLIZE)
  
-@@ -132,7 +132,7 @@ class BacktraceOutputHandler {
+@@ -133,7 +133,7 @@ class BacktraceOutputHandler {
    virtual ~BacktraceOutputHandler() = default;
  };
  
@@ -38,7 +38,7 @@ index f3f05da..fc2a96f 100644
  void OutputPointer(void* pointer, BacktraceOutputHandler* handler) {
    // This should be more than enough to store a 64-bit number in hex:
    // 16 hex digits + 1 for null-terminator.
-@@ -209,7 +209,7 @@ void ProcessBacktrace(void *const *trace,
+@@ -216,7 +216,7 @@ void ProcessBacktrace(void* const* trace,
    }
  #endif  // defined(USE_SYMBOLIZE)
  }
@@ -47,16 +47,16 @@ index f3f05da..fc2a96f 100644
  
  void PrintToStderr(const char* output) {
    // NOTE: This code MUST be async-signal safe (it's used by in-process
-@@ -800,7 +800,7 @@ StackTrace::StackTrace(size_t count) {
- // NOTE: This code MUST be async-signal safe (it's used by in-process
- // stack dumping signal handler). NO malloc or stdio is allowed here.
+@@ -812,7 +812,7 @@ size_t CollectStackTrace(void** trace, size_t count) {
+   // NOTE: This code MUST be async-signal safe (it's used by in-process
+   // stack dumping signal handler). NO malloc or stdio is allowed here.
  
 -#if !defined(__UCLIBC__) && !defined(_AIX)
 +#if defined(__GLIBC__) && !defined(__UCLIBC__) && !defined(_AIX)
-   count = std::min(arraysize(trace_), count);
- 
    // Though the backtrace API man page does not list any possible negative
-@@ -827,13 +827,13 @@ void StackTrace::PrintWithPrefix(const char* prefix_string) const {
+   // return values, we take no chance.
+   return base::saturated_cast<size_t>(backtrace(trace, count));
+@@ -825,13 +825,13 @@ void StackTrace::PrintWithPrefix(const char* prefix_string) const {
  // NOTE: This code MUST be async-signal safe (it's used by in-process
  // stack dumping signal handler). NO malloc or stdio is allowed here.
  
@@ -72,10 +72,10 @@ index f3f05da..fc2a96f 100644
  void StackTrace::OutputToStreamWithPrefix(std::ostream* os,
                                            const char* prefix_string) const {
    StreamBacktraceOutputHandler handler(os);
-diff --git chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
+diff --git chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc
 index c7ecc7f..1284614 100644
---- chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
-+++ chromium-69.0.3497.100/third_party/blink/renderer/platform/wtf/assertions.cc
+--- chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc
++++ chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc
 @@ -48,7 +48,7 @@
  #include <windows.h>
  #endif

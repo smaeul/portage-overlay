@@ -1,7 +1,7 @@
-diff --git chromium-69.0.3497.100/base/allocator/allocator_shim_internals.h
+diff --git chromium-73.0.3683.103/base/allocator/allocator_shim_internals.h chromium-73.0.3683.103/base/allocator/allocator_shim_internals.h
 index 0196f89..bb42b5d 100644
---- chromium-69.0.3497.100/base/allocator/allocator_shim_internals.h
-+++ chromium-69.0.3497.100/base/allocator/allocator_shim_internals.h
+--- chromium-73.0.3683.103/base/allocator/allocator_shim_internals.h
++++ chromium-73.0.3683.103/base/allocator/allocator_shim_internals.h
 @@ -7,7 +7,9 @@
  
  #if defined(__GNUC__)
@@ -12,11 +12,11 @@ index 0196f89..bb42b5d 100644
  
  #ifndef __THROW  // Not a glibc system
  #ifdef _NOEXCEPT  // LLVM libc++ uses noexcept instead
-diff --git chromium-69.0.3497.100/sandbox/linux/suid/sandbox.c
-index 66f68ef..1997ee9 100644
---- chromium-69.0.3497.100/sandbox/linux/suid/sandbox.c
-+++ chromium-69.0.3497.100/sandbox/linux/suid/sandbox.c
-@@ -42,7 +42,16 @@
+diff --git chromium-73.0.3683.103/sandbox/linux/suid/sandbox.c chromium-73.0.3683.103/sandbox/linux/suid/sandbox.c
+index 854819b..39937e4 100644
+--- chromium-73.0.3683.103/sandbox/linux/suid/sandbox.c
++++ chromium-73.0.3683.103/sandbox/linux/suid/sandbox.c
+@@ -44,7 +44,16 @@
  
  static bool DropRoot();
  
@@ -33,10 +33,10 @@ index 66f68ef..1997ee9 100644
  
  static void FatalError(const char* msg, ...)
      __attribute__((noreturn, format(printf, 1, 2)));
-diff --git chromium-69.0.3497.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
-index fa89438..29738cb 100644
---- chromium-69.0.3497.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
-+++ chromium-69.0.3497.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
+diff --git chromium-73.0.3683.103/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h chromium-73.0.3683.103/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
+index f8be372..c07e4c8 100644
+--- chromium-73.0.3683.103/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
++++ chromium-73.0.3683.103/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
 @@ -17,8 +17,6 @@
  
  #include_next <sys/ptrace.h>
