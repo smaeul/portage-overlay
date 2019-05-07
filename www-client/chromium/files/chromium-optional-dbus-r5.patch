@@ -187,3 +187,19 @@ index 788bb497b..b40c0394f 100644
  
    if (is_android) {
      deps += [ ":jni_headers" ]
+diff --git chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
+index dcade65..835c405 100644
+--- chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc.orig
++++ chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
+@@ -69,8 +69,10 @@ void ReportBluetoothAvailability() {
+     return;
+ #endif  // defined(OS_LINUX)
+ 
+-  if (!device::BluetoothAdapterFactory::Get().IsBluetoothSupported())
++  if (!device::BluetoothAdapterFactory::Get().IsBluetoothSupported()) {
+     ReportAvailability(BLUETOOTH_NOT_SUPPORTED);
++    return;
++  }
+ 
+   device::BluetoothAdapterFactory::Get().GetAdapter(
+       base::BindOnce(&OnGetAdapter));
