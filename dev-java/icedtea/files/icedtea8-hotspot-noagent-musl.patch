@@ -36,8 +36,8 @@ diff -Naurw openjdk.orig/hotspot/make/linux/makefiles/defs.make openjdk/hotspot/
                          $(EXPORT_LIB_DIR)/sa-jdi.jar
  ADD_SA_BINARIES/sparc = $(EXPORT_JRE_LIB_ARCH_DIR)/libsaproc.$(LIBRARY_SUFFIX) \
 @@ -326,6 +329,11 @@
+     endif
    endif
- endif
  endif
 +else
 +ADD_SA_BINARIES/x86     =

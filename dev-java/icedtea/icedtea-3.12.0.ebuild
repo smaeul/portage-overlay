@@ -1,28 +1,32 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Build written by Andrew John Hughes (gnu_andrew@member.fsf.org)
 
+# *********************************************************
+# * IF YOU CHANGE THIS EBUILD, CHANGE ICEDTEA-6.* AS WELL *
+# *********************************************************
+
 EAPI="6"
 SLOT="8"
 
-inherit check-reqs gnome2-utils java-pkg-2 java-vm-2 multiprocessing pax-utils prefix versionator
+inherit check-reqs flag-o-matic java-pkg-2 java-vm-2 multiprocessing pax-utils prefix versionator xdg-utils
 
 ICEDTEA_VER=$(get_version_component_range 1-3)
 ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="75fd375dd38a.tar.xz"
-JAXP_TARBALL="2b279bb3475b.tar.xz"
-JAXWS_TARBALL="c54a27559acb.tar.xz"
-JDK_TARBALL="9c9ff65b03b6.tar.xz"
-LANGTOOLS_TARBALL="21524ad5b914.tar.xz"
-OPENJDK_TARBALL="499b993b345a.tar.xz"
-NASHORN_TARBALL="bb3e3345d3ec.tar.xz"
-HOTSPOT_TARBALL="cb5711bf53d9.tar.xz"
-SHENANDOAH_TARBALL="c44a9eef4985.tar.xz"
-AARCH32_TARBALL="bd08b7f27e11.tar.xz"
+CORBA_TARBALL="fa1553d2f23e.tar.xz"
+JAXP_TARBALL="7a977b82f34c.tar.xz"
+JAXWS_TARBALL="752d9e54c69a.tar.xz"
+JDK_TARBALL="bfaa5c6df4a8.tar.xz"
+LANGTOOLS_TARBALL="fb494039358f.tar.xz"
+OPENJDK_TARBALL="f0482b9b7f7b.tar.xz"
+NASHORN_TARBALL="93462e8b4f4f.tar.xz"
+HOTSPOT_TARBALL="3f9a60eb8ef0.tar.xz"
+SHENANDOAH_TARBALL="adb62c0031b8.tar.xz"
+AARCH32_TARBALL="57f4048a925b.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -41,14 +45,14 @@ AARCH32_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-aarch32-${AARCH32_TARBALL}"
 CACAO_GENTOO_TARBALL="icedtea-${CACAO_TARBALL}"
 JAMVM_GENTOO_TARBALL="icedtea-${JAMVM_TARBALL}"
 
-DROP_URL="http://icedtea.classpath.org/download/drops"
+DROP_URL="https://icedtea.classpath.org/download/drops"
 ICEDTEA_URL="${DROP_URL}/icedtea${SLOT}/${ICEDTEA_VER}"
 
 DESCRIPTION="A harness to build OpenJDK using Free Software build tools and dependencies"
-HOMEPAGE="http://icedtea.classpath.org"
+HOMEPAGE="https://icedtea.classpath.org"
 SRC_PKG="${ICEDTEA_PKG}.tar.xz"
 SRC_URI="
-	http://icedtea.classpath.org/download/source/${SRC_PKG}
+	https://icedtea.classpath.org/download/source/${SRC_PKG}
 	${ICEDTEA_URL}/openjdk.tar.xz -> ${OPENJDK_GENTOO_TARBALL}
 	${ICEDTEA_URL}/corba.tar.xz -> ${CORBA_GENTOO_TARBALL}
 	${ICEDTEA_URL}/jaxp.tar.xz -> ${JAXP_GENTOO_TARBALL}
@@ -67,7 +71,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
 IUSE="+alsa cacao +cups doc examples +gtk headless-awt
 	jamvm +jbootstrap kerberos libressl nsplugin pax_kernel +pch
-	pulseaudio sctp selinux shenandoah smartcard +source +sunec +system-lcms test +webstart zero"
+	pulseaudio sctp selinux shenandoah smartcard +source +system-lcms test +webstart zero"
 
 REQUIRED_USE="gtk? ( !headless-awt )"
 
@@ -101,7 +105,6 @@ COMMON_DEP="
 	kerberos? ( virtual/krb5 )
 	sctp? ( net-misc/lksctp-tools )
 	smartcard? ( sys-apps/pcsc-lite )
-	sunec? ( >=dev-libs/nss-3.16.1-r1 )
 	system-lcms? ( >=media-libs/lcms-2.9:2= )"
 
 # Gtk+ will move to COMMON_DEP in time; PR1982
@@ -135,6 +138,8 @@ DEPEND="${COMMON_DEP} ${ALSA_COMMON_DEP} ${CUPS_COMMON_DEP} ${X_COMMON_DEP} ${X_
 		dev-java/icedtea-bin:7
 		dev-java/icedtea:8
 		dev-java/icedtea:7
+		dev-java/openjdk:8
+		dev-java/openjdk-bin:8
 	)
 	app-arch/cpio
 	app-arch/unzip
@@ -176,7 +181,8 @@ pkg_setup() {
 
 	JAVA_PKG_WANT_BUILD_VM="
 		icedtea-8 icedtea-bin-8
-		icedtea-7 icedtea-bin-7"
+		icedtea-7 icedtea-bin-7
+		openjdk-8 openjdk-bin-8"
 	JAVA_PKG_WANT_SOURCE="1.5"
 	JAVA_PKG_WANT_TARGET="1.5"
 
@@ -190,15 +196,16 @@ src_unpack() {
 
 src_configure() {
 	# Link MUSL patches into icedtea build tree
+	ln -s "${FILESDIR}/${PN}8-autoconf-config.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-hotspot-musl-ppc.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-hotspot-musl.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-hotspot-noagent-musl.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-hotspot-uclibc-fixes.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-execinfo.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-jdk-fix-ipv6-init.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-fix-libjvm-load.patch" patches || die
-	ln -s "${FILESDIR}/${PN}-jdk-fix-ipv6-init.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-jdk-getmntent-buffer.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-musl.patch" patches || die
-	ln -s "${FILESDIR}/${PN}8-autoconf-config.patch" patches || die
-	ln -s "${FILESDIR}/${PN}8-gcc-triple.patch" patches || die
 	ln -s "${FILESDIR}/${PN}-3.5.0-hotspot.patch" patches || die
 	ln -s "${FILESDIR}/${PN}-3.4.0-jdk.patch" patches || die
 	ln -s "${FILESDIR}/${PN}-3.4.0-jdk-globals.patch" patches || die
@@ -215,15 +222,16 @@ src_configure() {
 	# Export MUSL patches for configure
 	DISTRIBUTION_PATCHES=""
 
+	DISTRIBUTION_PATCHES+="patches/${PN}8-autoconf-config.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-musl-ppc.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-musl.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-noagent-musl.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-uclibc-fixes.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-execinfo.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-ipv6-init.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-libjvm-load.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}-jdk-fix-ipv6-init.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-getmntent-buffer.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-musl.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}8-autoconf-config.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}8-gcc-triple.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.5.0-hotspot.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk-globals.patch "
@@ -257,6 +265,8 @@ src_configure() {
 	# In-tree JIT ports are available for amd64, arm, arm64, ppc64 (be&le), SPARC and x86.
 	if { use amd64 || use arm || use arm64 || use ppc64 || use sparc || use x86; }; then
 		hotspot_port="yes"
+		# Work around stack alignment issue, bug #647954.
+		use x86 && append-flags -mincoming-stack-boundary=2
 	fi
 
 	# Always use HotSpot as the primary VM if available. #389521 #368669 #357633 ...
@@ -270,7 +280,7 @@ src_configure() {
 			hs_config="--with-hotspot-build=shenandoah"
 			hs_config+=" --with-hotspot-src-zip="${DISTDIR}/${SHENANDOAH_GENTOO_TARBALL}""
 		else
-			eerror "Shenandoah can only be built on arm64 and x86_64. Please re-build with USE="-shenandoah""
+			eerror "Shenandoah is only supported on arm64 and x86_64. Please re-build with USE="-shenandoah""
 		fi
 	else
 		if use arm ; then
@@ -308,14 +318,6 @@ src_configure() {
 		zero_config="--enable-zero"
 	fi
 
-	# Warn about potential problems with ccache enabled
-	if has ccache ${FEATURES}; then
-		ewarn 'ccache has been known to break IcedTea. Disable it before filing bugs.'
-		config+=" --enable-ccache"
-	else
-		config+=" --disable-ccache"
-	fi
-
 	# PaX breaks pch, bug #601016
 	if use pch && ! host-is-pax; then
 		config+=" --enable-precompiled-headers"
@@ -343,6 +345,7 @@ src_configure() {
 		--docdir="${EPREFIX}/usr/share/doc/${PF}" \
 		--htmldir="${EPREFIX}/usr/share/doc/${PF}/html" \
 		--with-pkgversion="Gentoo ${PF}" \
+		--disable-ccache \
 		--disable-downloading --disable-Werror --disable-tests \
 		--disable-systemtap-tests --enable-improved-font-rendering \
 		--enable-system-jpeg --enable-system-zlib \
@@ -355,7 +358,6 @@ src_configure() {
 		$(use_with pax_kernel pax "${EPREFIX}/usr/sbin/paxmark.sh") \
 		$(use_enable sctp system-sctp) \
 		$(use_enable smartcard system-pcsc) \
-		$(use_enable sunec) \
 		${zero_config} ${cacao_config} ${jamvm_config} ${hs_config}
 }
 
@@ -405,27 +407,12 @@ src_install() {
 	java-vm_sandbox-predict /proc/self/coredump_filter
 }
 
-pkg_preinst() {
-	# From 3.4.0 onwards, the arm directory is a symlink to the aarch32
-	# directory. We need to clear the old directory for a clean upgrade.
-	if use arm; then
-		local dir
-		for dir in "${EROOT}usr/$(get_libdir)/icedtea${SLOT}"/{lib,jre/lib}/arm; do
-			if [[ -d ${dir} && ! -L ${dir} ]]; then
-				rm -r "${dir}" || die
-			fi
-		done
-	fi
-
-	gnome2_icon_savelist
-}
-
 pkg_postinst() {
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 	java-vm-2_pkg_postinst
 }
 
 pkg_postrm() {
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 	java-vm-2_pkg_postrm
 }
