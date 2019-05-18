@@ -20,7 +20,7 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
-DOCS="CHANGELOG.rst README.md"
+DOCS="CHANGELOG.rst README.rst"
 
 src_compile() {
 	emake \
