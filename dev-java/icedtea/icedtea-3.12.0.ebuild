@@ -197,6 +197,7 @@ src_unpack() {
 src_configure() {
 	# Link MUSL patches into icedtea build tree
 	ln -s "${FILESDIR}/${PN}8-autoconf-config.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-gcc-triple.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-hotspot-musl-ppc.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-hotspot-musl.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-hotspot-noagent-musl.patch" patches || die
@@ -204,10 +205,11 @@ src_configure() {
 	ln -s "${FILESDIR}/${PN}8-jdk-execinfo.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-fix-ipv6-init.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-fix-libjvm-load.patch" patches || die
+	ln -s "${FILESDIR}/${PN}8-jdk-fix-null.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-getmntent-buffer.patch" patches || die
 	ln -s "${FILESDIR}/${PN}8-jdk-musl.patch" patches || die
 	ln -s "${FILESDIR}/${PN}-3.5.0-hotspot.patch" patches || die
-	ln -s "${FILESDIR}/${PN}-3.4.0-jdk.patch" patches || die
+	ln -s "${FILESDIR}/${PN}-3.12.0-jdk.patch" patches || die
 	ln -s "${FILESDIR}/${PN}-3.4.0-jdk-globals.patch" patches || die
 
 	# For bootstrap builds as the sandbox control file might not yet exist.
@@ -223,6 +225,7 @@ src_configure() {
 	DISTRIBUTION_PATCHES=""
 
 	DISTRIBUTION_PATCHES+="patches/${PN}8-autoconf-config.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-gcc-triple.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-musl-ppc.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-musl.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-hotspot-noagent-musl.patch "
@@ -230,10 +233,11 @@ src_configure() {
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-execinfo.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-ipv6-init.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-libjvm-load.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-fix-null.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-getmntent-buffer.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}8-jdk-musl.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.5.0-hotspot.patch "
-	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk.patch "
+	DISTRIBUTION_PATCHES+="patches/${PN}-3.12.0-jdk.patch "
 	DISTRIBUTION_PATCHES+="patches/${PN}-3.4.0-jdk-globals.patch "
 
 	export DISTRIBUTION_PATCHES
