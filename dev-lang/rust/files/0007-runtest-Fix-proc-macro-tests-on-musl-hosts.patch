@@ -1,17 +1,17 @@
-From e60db771c8ffe7b82a97ca516737cbf40b372e54 Mon Sep 17 00:00:00 2001
+From a7c6bcd4834952f3f5b0483dd71b47407d9fb186 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:40:04 +0000
-Subject: [PATCH 07/15] runtest: Fix proc-macro tests on musl hosts
+Subject: [PATCH 07/14] runtest: Fix proc-macro tests on musl hosts
 
 ---
  src/tools/compiletest/src/runtest.rs | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/tools/compiletest/src/runtest.rs b/src/tools/compiletest/src/runtest.rs
-index 400c205d44..be5c50b070 100644
+index 7781ce74f4..5d73545b1f 100644
 --- a/src/tools/compiletest/src/runtest.rs
 +++ b/src/tools/compiletest/src/runtest.rs
-@@ -1566,7 +1566,6 @@ impl<'test> TestCx<'test> {
+@@ -1604,7 +1604,6 @@ impl<'test> TestCx<'test> {
                  None
              } else if self.config.target.contains("cloudabi")
                  || self.config.target.contains("emscripten")
@@ -19,7 +19,7 @@ index 400c205d44..be5c50b070 100644
                  || self.config.target.contains("wasm32")
              {
                  // We primarily compile all auxiliary libraries as dynamic libraries
-@@ -1574,10 +1573,8 @@ impl<'test> TestCx<'test> {
+@@ -1612,10 +1611,8 @@ impl<'test> TestCx<'test> {
                  // for the test suite (otherwise including libstd statically in all
                  // executables takes up quite a bit of space).
                  //
@@ -33,5 +33,5 @@ index 400c205d44..be5c50b070 100644
              } else {
                  Some("dylib")
 -- 
-2.19.2
+2.21.0
 

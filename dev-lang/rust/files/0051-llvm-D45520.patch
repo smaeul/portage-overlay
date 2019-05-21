@@ -1,7 +1,7 @@
-Index: rustc-src/src/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
+Index: rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
 ===================================================================
---- rustc-src/src/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
-+++ rustc-src/src/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
+--- rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
++++ rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
 @@ -442,13 +442,22 @@
    // On PPC64, VariantKind is VK_None, but on PPC32, it's VK_PLT, and it must
    // come at the _end_ of the expression.
@@ -29,10 +29,10 @@ Index: rustc-src/src/llvm/lib/Target/PowerPC/InstPrinter/PPCInstPrinter.cpp
  }
  
  /// showRegistersWithPercentPrefix - Check if this register name should be
-Index: rustc-src/src/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
+Index: rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
 ===================================================================
---- rustc-src/src/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
-+++ rustc-src/src/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
+--- rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
++++ rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
 @@ -487,8 +487,14 @@
    if (!Subtarget->isPPC64() && !Subtarget->isDarwin() &&
        isPositionIndependent())
@@ -49,10 +49,10 @@ Index: rustc-src/src/llvm/lib/Target/PowerPC/PPCAsmPrinter.cpp
    const MachineOperand &MO = MI->getOperand(2);
    const GlobalValue *GValue = MO.getGlobal();
    MCSymbol *MOSymbol = getSymbol(GValue);
-Index: rustc-src/src/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
+Index: rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
 ===================================================================
---- rustc-src/src/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
-+++ rustc-src/src/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
+--- rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
++++ rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
 @@ -4054,7 +4054,20 @@
      if (trySETCC(N))
        return;
@@ -75,10 +75,10 @@ Index: rustc-src/src/llvm/lib/Target/PowerPC/PPCISelDAGToDAG.cpp
    case PPCISD::CALL: {
      const Module *M = MF->getFunction().getParent();
  
-Index: rustc-src/src/llvm/test/CodeGen/PowerPC/ppc32-secure-plt-tls.ll
+Index: rustc-src/src/llvm-project/llvm/test/CodeGen/PowerPC/ppc32-secure-plt-tls.ll
 ===================================================================
---- rustc-src/src/llvm/test/CodeGen/PowerPC/ppc32-secure-plt-tls.ll
-+++ rustc-src/src/llvm/test/CodeGen/PowerPC/ppc32-secure-plt-tls.ll
+--- rustc-src/src/llvm-project/llvm/test/CodeGen/PowerPC/ppc32-secure-plt-tls.ll
++++ rustc-src/src/llvm-project/llvm/test/CodeGen/PowerPC/ppc32-secure-plt-tls.ll
 @@ -0,0 +1,18 @@
 +; RUN: llc < %s -mtriple=powerpc-unknown-linux-gnu -mattr=+secure-plt -relocation-model=pic | FileCheck -check-prefix=SECURE-PLT-TLS %s
 +

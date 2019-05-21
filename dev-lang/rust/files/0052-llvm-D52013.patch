@@ -1,7 +1,7 @@
-Index: rustc-src/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
+Index: rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
 ===================================================================
---- rustc-src/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
-+++ rustc-src/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
+--- rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
++++ rustc-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
 @@ -199,6 +199,10 @@
    case Triple::ppc64le:
      return PPCTargetMachine::PPC_ABI_ELFv2;

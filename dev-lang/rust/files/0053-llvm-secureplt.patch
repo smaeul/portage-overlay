@@ -1,6 +1,6 @@
-diff --git a/src/llvm/lib/Target/PowerPC/PPCSubtarget.cpp b/src/llvm/lib/Target/PowerPC/PPCSubtarget.cpp
---- a/src/llvm/lib/Target/PowerPC/PPCSubtarget.cpp
-+++ b/src/llvm/lib/Target/PowerPC/PPCSubtarget.cpp
+diff --git a/src/llvm-project/llvm/lib/Target/PowerPC/PPCSubtarget.cpp b/src/llvm-project/llvm/lib/Target/PowerPC/PPCSubtarget.cpp
+--- a/src/llvm-project/llvm/lib/Target/PowerPC/PPCSubtarget.cpp
++++ b/src/llvm-project/llvm/lib/Target/PowerPC/PPCSubtarget.cpp
 @@ -138,6 +138,10 @@
    if (isDarwin())
      HasLazyResolverStubs = true;
@@ -12,17 +12,17 @@ diff --git a/src/llvm/lib/Target/PowerPC/PPCSubtarget.cpp b/src/llvm/lib/Target/
    if (HasSPE && IsPPC64)
      report_fatal_error( "SPE is only supported for 32-bit targets.\n", false);
    if (HasSPE && (HasAltivec || HasQPX || HasVSX || HasFPU))
-diff --git a/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp b/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
---- a/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
-+++ b/src/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
+diff --git a/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp b/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
+--- a/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
++++ b/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
 @@ -222,6 +222,10 @@ static Reloc::Model getEffectiveRelocModel(const Triple &TT,
-   if (TT.getArch() == Triple::ppc64 || TT.getArch() == Triple::ppc64le)
+   if (TT.getArch() == Triple::ppc64)
      return Reloc::PIC_;
  
 +  // musl needs SecurePlt, which depends on PIC.
 +  if (TT.getEnvironment() == Triple::Musl)
 +    return Reloc::PIC_;
 +
-   // 32-bit is static by default.
+   // Rest are static by default.
    return Reloc::Static;
  }

@@ -1,7 +1,5 @@
-diff --git a/src/tools/rls/src/cmd.rs b/src/tools/rls/src/cmd.rs
-index 64035aa..d9129d8 100644
---- a/src/tools/rls/src/cmd.rs
-+++ b/src/tools/rls/src/cmd.rs
+--- a/src/tools/rls/rls/src/cmd.rs
++++ b/src/tools/rls/rls/src/cmd.rs
 @@ -17,7 +17,7 @@ use crate::config::Config;
  use crate::server::{self, LsService, Notification, Request, RequestId};
  use rls_analysis::{AnalysisHost, Target};
@@ -9,9 +7,9 @@ index 64035aa..d9129d8 100644
 -use std::sync::atomic::{AtomicU64, Ordering};
 +use std::sync::atomic::{AtomicU32, Ordering};
  
- use languageserver_types::{
+ use lsp_types::{
      ClientCapabilities, CodeActionContext, CodeActionParams, CompletionItem,
-@@ -424,8 +424,8 @@ fn url(file_name: &str) -> Url {
+@@ -323,8 +323,8 @@ fn url(file_name: &str) -> Url {
  }
  
  fn next_id() -> RequestId {
@@ -22,10 +20,8 @@ index 64035aa..d9129d8 100644
  }
  
  // Custom reader and output for the RLS server.
-diff --git a/src/tools/rls/src/server/io.rs b/src/tools/rls/src/server/io.rs
-index 7b93d4a..f3c5361 100644
---- a/src/tools/rls/src/server/io.rs
-+++ b/src/tools/rls/src/server/io.rs
+--- a/src/tools/rls/rls/src/server/io.rs
++++ b/src/tools/rls/rls/src/server/io.rs
 @@ -17,7 +17,7 @@ use crate::lsp_data::{LSPNotification, LSPRequest};
  
  use std::fmt;
@@ -35,7 +31,7 @@ index 7b93d4a..f3c5361 100644
  use std::sync::Arc;
  
  use jsonrpc_core::{self as jsonrpc, response, version, Id};
-@@ -190,14 +190,14 @@ pub trait Output: Sync + Send + Clone + 'static {
+@@ -182,13 +182,13 @@ pub trait Output: Sync + Send + Clone + 'static {
  /// An output that sends notifications and responses on `stdout`.
  #[derive(Clone)]
  pub(super) struct StdioOutput {
@@ -45,14 +41,13 @@ index 7b93d4a..f3c5361 100644
  
  impl StdioOutput {
      /// Construct a new `stdout` output.
-     crate fn new() -> StdioOutput {
-         StdioOutput {
--            next_id: Arc::new(AtomicU64::new(1)),
-+            next_id: Arc::new(AtomicU32::new(1).into()),
-         }
+     pub(crate) fn new() -> StdioOutput {
+-        StdioOutput { next_id: Arc::new(AtomicU64::new(1)) }
++        StdioOutput { next_id: Arc::new(AtomicU32::new(1).into()) }
      }
  }
-@@ -215,7 +215,7 @@ impl Output for StdioOutput {
+ 
+@@ -205,7 +205,7 @@ impl Output for StdioOutput {
      }
  
      fn provide_id(&self) -> RequestId {
