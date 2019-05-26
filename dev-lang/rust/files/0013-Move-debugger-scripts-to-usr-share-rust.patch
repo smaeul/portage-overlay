@@ -1,4 +1,4 @@
-From 14fd596e0b883d2f5d3eae28a9a528f78360963c Mon Sep 17 00:00:00 2001
+From b3b713b954619af8768ad21bd73700291e9d7b58 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
 Subject: [PATCH 13/14] Move debugger scripts to /usr/share/rust

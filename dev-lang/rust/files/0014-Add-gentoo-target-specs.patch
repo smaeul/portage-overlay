@@ -1,4 +1,4 @@
-From faaad6e9e6068d0b76ab7fbb41ac1bb281a003af Mon Sep 17 00:00:00 2001
+From d4b28cd40d12ef2a801658176b31c6663c25d66f Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:29:06 +0000
 Subject: [PATCH 14/14] Add gentoo target specs

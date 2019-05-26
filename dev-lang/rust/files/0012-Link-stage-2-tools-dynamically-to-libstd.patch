@@ -1,4 +1,4 @@
-From ec036027a91ecce550302233496db116826aa94d Mon Sep 17 00:00:00 2001
+From d7e94a443cd0876d384ccbc36a6eb21cfc3636d4 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 24 Sep 2018 23:42:23 +0000
 Subject: [PATCH 12/14] Link stage 2 tools dynamically to libstd
