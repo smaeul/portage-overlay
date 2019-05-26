@@ -12,10 +12,9 @@ if [[ ${PV} == "9999" ]]; then
 	inherit autotools git-r3
 	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
 else
-	MY_PV="${PV/_rc/-rc}"
-	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${MY_PV}/zfs-${MY_PV}.tar.gz"
+	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
 	KEYWORDS="~amd64"
-	S="${WORKDIR}/zfs-${PV%_rc*}"
+	S="${WORKDIR}/zfs-${PV}"
 	ZFS_KERNEL_COMPAT="5.1"
 fi
 
@@ -115,17 +114,21 @@ src_configure() {
 src_compile() {
 	set_arch_to_kernel
 
-	default
+	myemakeargs=( V=1 )
+
+	emake "${myemakeargs[@]}"
 }
 
 src_install() {
 	set_arch_to_kernel
 
-	emake \
-		DEPMOD="/bin/true" \
-		DESTDIR="${D}" \
-		INSTALL_MOD_PATH="${INSTALL_MOD_PATH:-$EROOT}" \
-		install
+	myemakeargs+=(
+		DEPMOD="/bin/true"
+		DESTDIR="${D}"
+		INSTALL_MOD_PATH="${INSTALL_MOD_PATH:-$EROOT}"
+	)
+
+	emake "${myemakeargs[@]}" install
 
 	einstalldocs
 }
