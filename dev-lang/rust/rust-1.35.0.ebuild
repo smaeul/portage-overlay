@@ -1,11 +1,11 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 
-inherit check-reqs eapi7-ver flag-o-matic llvm multiprocessing python-any-r1 toolchain-funcs
+inherit check-reqs estack flag-o-matic llvm multiprocessing python-any-r1 toolchain-funcs
 
 ABI_VER="$(ver_cut 1-2)"
 SLOT="stable/${ABI_VER}"
@@ -13,7 +13,7 @@ MY_P="rustc-${PV}"
 SRC="${MY_P}-src.tar.xz"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86"
 
-RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).0"
+RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).2"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
@@ -63,6 +63,7 @@ COMMON_DEPEND="
 		${LLVM_DEPEND}
 	)
 "
+
 DEPEND="${COMMON_DEPEND}
 	${PYTHON_DEPS}
 	|| (
@@ -74,10 +75,13 @@ DEPEND="${COMMON_DEPEND}
 		dev-util/ninja
 	)
 "
+
 RDEPEND="${COMMON_DEPEND}
 	>=app-eselect/eselect-rust-20190311
 	!dev-util/cargo
-	rustfmt? ( !dev-util/rustfmt )"
+	rustfmt? ( !dev-util/rustfmt )
+"
+
 REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
 	x86? ( cpu_flags_x86_sse2 )
 "
@@ -90,14 +94,13 @@ PATCHES=(
 	"${FILESDIR}/0005-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
 	"${FILESDIR}/0006-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
 	"${FILESDIR}/0007-runtest-Fix-proc-macro-tests-on-musl-hosts.patch"
-	"${FILESDIR}/0008-Correct-minimum-system-LLVM-version-in-tests.patch"
-	"${FILESDIR}/0009-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
-	"${FILESDIR}/0010-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
-	"${FILESDIR}/0011-Ignore-broken-and-non-applicable-tests.patch"
-	"${FILESDIR}/0012-Link-stage-2-tools-dynamically-to-libstd.patch"
-	"${FILESDIR}/0013-Move-debugger-scripts-to-usr-share-rust.patch"
-	"${FILESDIR}/0014-Add-gentoo-target-specs.patch"
-	"${FILESDIR}/0030-liblibc-linkage.patch"
+	"${FILESDIR}/0008-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
+	"${FILESDIR}/0009-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
+	"${FILESDIR}/0010-Ignore-broken-and-non-applicable-tests.patch"
+	"${FILESDIR}/0011-Link-stage-2-tools-dynamically-to-libstd.patch"
+	"${FILESDIR}/0012-Move-debugger-scripts-to-usr-share-rust.patch"
+	"${FILESDIR}/0013-Add-gentoo-target-specs.patch"
+	"${FILESDIR}/0030-libc-linkage.patch"
 	"${FILESDIR}/0040-rls-atomics.patch"
 	"${FILESDIR}/0050-llvm.patch"
 	"${FILESDIR}/0051-llvm-D45520.patch"

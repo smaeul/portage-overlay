@@ -1,7 +1,7 @@
-From af88a145ea4fbcda9f1d16a53a341282d2129b07 Mon Sep 17 00:00:00 2001
+From e74e7ab193b0d59302eac1edbab423f2e83e986d Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 9 Sep 2017 00:14:16 -0500
-Subject: [PATCH 06/14] Prefer libgcc_eh over libunwind for musl
+Subject: [PATCH 06/13] Prefer libgcc_eh over libunwind for musl
 
 ---
  src/libunwind/lib.rs | 2 +-

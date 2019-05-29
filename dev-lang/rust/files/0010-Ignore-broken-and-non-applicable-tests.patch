@@ -1,7 +1,7 @@
-From 0495caf6d9c4745ba3cedbdbb4dd690571e1cec0 Mon Sep 17 00:00:00 2001
+From 44e9b61563be6a169575358107774109f910cb9d Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
-Subject: [PATCH 11/14] Ignore broken and non-applicable tests
+Subject: [PATCH 10/13] Ignore broken and non-applicable tests
 
 c-link-to-rust-va-list-fn: unstable feature, broken on aarch64, #56475
 env-funky-keys: can't handle LD_PRELOAD (e.g. sandbox)

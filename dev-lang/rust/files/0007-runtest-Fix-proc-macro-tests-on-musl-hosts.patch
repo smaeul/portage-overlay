@@ -1,25 +1,25 @@
-From a7c6bcd4834952f3f5b0483dd71b47407d9fb186 Mon Sep 17 00:00:00 2001
+From cd7484e89d44ad980a526eb993c5cbc2b7f0878a Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:40:04 +0000
-Subject: [PATCH 07/14] runtest: Fix proc-macro tests on musl hosts
+Subject: [PATCH 07/13] runtest: Fix proc-macro tests on musl hosts
 
 ---
  src/tools/compiletest/src/runtest.rs | 7 ++-----
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/tools/compiletest/src/runtest.rs b/src/tools/compiletest/src/runtest.rs
-index 7781ce74f4..5d73545b1f 100644
+index 2021dd513a..765353620b 100644
 --- a/src/tools/compiletest/src/runtest.rs
 +++ b/src/tools/compiletest/src/runtest.rs
-@@ -1604,7 +1604,6 @@ impl<'test> TestCx<'test> {
+@@ -1605,7 +1605,6 @@ impl<'test> TestCx<'test> {
                  None
              } else if self.config.target.contains("cloudabi")
                  || self.config.target.contains("emscripten")
 -                || (self.config.target.contains("musl") && !aux_props.force_host)
                  || self.config.target.contains("wasm32")
+                 || self.config.target.contains("nvptx")
              {
-                 // We primarily compile all auxiliary libraries as dynamic libraries
-@@ -1612,10 +1611,8 @@ impl<'test> TestCx<'test> {
+@@ -1614,10 +1613,8 @@ impl<'test> TestCx<'test> {
                  // for the test suite (otherwise including libstd statically in all
                  // executables takes up quite a bit of space).
                  //
