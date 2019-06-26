@@ -1,8 +1,6 @@
-diff --git chromium-73.0.3683.103/chrome/browser/BUILD.gn chromium-73.0.3683.103/chrome/browser/BUILD.gn
-index 5f188cf2d..336e86dcf 100644
---- chromium-73.0.3683.103/chrome/browser/BUILD.gn
-+++ chromium-73.0.3683.103/chrome/browser/BUILD.gn
-@@ -3486,12 +3486,16 @@ jumbo_split_static_library("browser") {
+--- chromium-75.0.3770.100/chrome/browser/BUILD.gn
++++ chromium-75.0.3770.100/chrome/browser/BUILD.gn
+@@ -3681,14 +3681,16 @@ jumbo_split_static_library("browser") {
        "first_run/upgrade_util_linux.cc",
        "first_run/upgrade_util_linux.h",
        "icon_loader_auralinux.cc",
@@ -12,29 +10,27 @@ index 5f188cf2d..336e86dcf 100644
        "shell_integration_linux.cc",
        "shell_integration_linux.h",
      ]
-+    if (use_dbus) {
+ 
+     if (use_dbus) {
 +      sources += [
 +        "password_manager/native_backend_kwallet_x.cc",
 +        "password_manager/native_backend_kwallet_x.h",
 +      ]
-+    }
+       deps += [ "//components/dbus:dbus_thread_linux" ]
+     }
  
-     if (enable_native_notifications) {
-       sources += [
-diff --git chromium-73.0.3683.103/chrome/browser/chrome_browser_main_linux.cc chromium-73.0.3683.103/chrome/browser/chrome_browser_main_linux.cc
-index 10b5d1134..80b279237 100644
---- chromium-73.0.3683.103/chrome/browser/chrome_browser_main_linux.cc
-+++ chromium-73.0.3683.103/chrome/browser/chrome_browser_main_linux.cc
+--- chromium-75.0.3770.100/chrome/browser/chrome_browser_main_linux.cc
++++ chromium-75.0.3770.100/chrome/browser/chrome_browser_main_linux.cc
 @@ -95,7 +95,7 @@ void ChromeBrowserMainPartsLinux::PostProfileInit() {
  }
  
  void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
 -#if !defined(OS_CHROMEOS)
 +#if !defined(OS_CHROMEOS) && defined(USE_DBUS)
-   bluez::BluezDBusThreadManager::Initialize();
-   bluez::BluezDBusManager::Initialize();
+   bluez::BluezDBusManager::Initialize(nullptr /* system_bus */);
  #endif
-@@ -104,7 +104,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
+ 
+@@ -103,7 +103,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
  }
  
  void ChromeBrowserMainPartsLinux::PostDestroyThreads() {
@@ -43,10 +39,10 @@ index 10b5d1134..80b279237 100644
    bluez::BluezDBusManager::Shutdown();
    bluez::BluezDBusThreadManager::Shutdown();
  #endif
-diff --git chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
+diff --git chromium-75.0.3770.100/chrome/browser/metrics/bluetooth_available_utility.cc chromium-75.0.3770.100/chrome/browser/metrics/bluetooth_available_utility.cc
 index 1f6c223..dcade65 100644
---- chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
-+++ chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
+--- chromium-75.0.3770.100/chrome/browser/metrics/bluetooth_available_utility.cc
++++ chromium-75.0.3770.100/chrome/browser/metrics/bluetooth_available_utility.cc
 @@ -14,7 +14,7 @@
  #include "device/bluetooth/bluetooth_adapter.h"
  #include "device/bluetooth/bluetooth_adapter_factory.h"
@@ -65,10 +61,10 @@ index 1f6c223..dcade65 100644
    // This is for tests that have not initialized bluez or dbus thread manager.
    // Outside of tests these are initialized earlier during browser startup.
    if (!bluez::BluezDBusManager::IsInitialized())
-diff --git chromium-73.0.3683.103/chrome/browser/password_manager/password_store_factory.cc chromium-73.0.3683.103/chrome/browser/password_manager/password_store_factory.cc
+diff --git chromium-75.0.3770.100/chrome/browser/password_manager/password_store_factory.cc chromium-75.0.3770.100/chrome/browser/password_manager/password_store_factory.cc
 index 03d205d0e..cb8e9e820 100644
---- chromium-73.0.3683.103/chrome/browser/password_manager/password_store_factory.cc
-+++ chromium-73.0.3683.103/chrome/browser/password_manager/password_store_factory.cc
+--- chromium-75.0.3770.100/chrome/browser/password_manager/password_store_factory.cc
++++ chromium-75.0.3770.100/chrome/browser/password_manager/password_store_factory.cc
 @@ -211,6 +211,7 @@ PasswordStoreFactory::BuildServiceInstanceFor(
    std::unique_ptr<PasswordStoreX::NativeBackend> backend;
    if (selected_backend == os_crypt::SelectedLinuxBackend::KWALLET ||
@@ -85,10 +81,10 @@ index 03d205d0e..cb8e9e820 100644
    } else if (selected_backend == os_crypt::SelectedLinuxBackend::GNOME_ANY ||
               selected_backend ==
                   os_crypt::SelectedLinuxBackend::GNOME_KEYRING ||
-diff --git chromium-73.0.3683.103/device/bluetooth/bluetooth_adapter_factory.cc chromium-73.0.3683.103/device/bluetooth/bluetooth_adapter_factory.cc
+diff --git chromium-75.0.3770.100/device/bluetooth/bluetooth_adapter_factory.cc chromium-75.0.3770.100/device/bluetooth/bluetooth_adapter_factory.cc
 index 6413a162c..4a7fa801a 100644
---- chromium-73.0.3683.103/device/bluetooth/bluetooth_adapter_factory.cc
-+++ chromium-73.0.3683.103/device/bluetooth/bluetooth_adapter_factory.cc
+--- chromium-75.0.3770.100/device/bluetooth/bluetooth_adapter_factory.cc
++++ chromium-75.0.3770.100/device/bluetooth/bluetooth_adapter_factory.cc
 @@ -96,7 +96,7 @@ bool BluetoothAdapterFactory::IsBluetoothSupported() {
    // instance even on platforms that would otherwise not support it.
    if (default_adapter.Get())
@@ -107,10 +103,10 @@ index 6413a162c..4a7fa801a 100644
    return true;
  #else
    return false;
-diff --git chromium-73.0.3683.103/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc chromium-73.0.3683.103/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+diff --git chromium-75.0.3770.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc chromium-75.0.3770.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
 index adbe0ca74..91781e839 100644
---- chromium-73.0.3683.103/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
-+++ chromium-73.0.3683.103/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+--- chromium-75.0.3770.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
++++ chromium-75.0.3770.100/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
 @@ -1328,7 +1328,7 @@ void BluetoothLowEnergyCreateServiceFunction::DoWork() {
  // TODO: Ideally this should be handled by our feature system, so that this
  // code doesn't even compile on OSes it isn't being used on, but currently this
@@ -156,10 +152,10 @@ index adbe0ca74..91781e839 100644
  }
  
  // registerService:
-diff --git chromium-73.0.3683.103/services/device/battery/battery_status_manager_default.cc chromium-73.0.3683.103/services/device/battery/battery_status_manager_default.cc
+diff --git chromium-75.0.3770.100/services/device/battery/battery_status_manager_default.cc chromium-75.0.3770.100/services/device/battery/battery_status_manager_default.cc
 index 0249c6faa..ab2ff4e17 100644
---- chromium-73.0.3683.103/services/device/battery/battery_status_manager_default.cc
-+++ chromium-73.0.3683.103/services/device/battery/battery_status_manager_default.cc
+--- chromium-75.0.3770.100/services/device/battery/battery_status_manager_default.cc
++++ chromium-75.0.3770.100/services/device/battery/battery_status_manager_default.cc
 @@ -22,11 +22,10 @@ class BatteryStatusManagerDefault : public BatteryStatusManager {
   private:
    // BatteryStatusManager:
@@ -173,10 +169,10 @@ index 0249c6faa..ab2ff4e17 100644
  
    DISALLOW_COPY_AND_ASSIGN(BatteryStatusManagerDefault);
  };
-diff --git chromium-73.0.3683.103/services/device/wake_lock/power_save_blocker/BUILD.gn chromium-73.0.3683.103/services/device/wake_lock/power_save_blocker/BUILD.gn
+diff --git chromium-75.0.3770.100/services/device/wake_lock/power_save_blocker/BUILD.gn chromium-75.0.3770.100/services/device/wake_lock/power_save_blocker/BUILD.gn
 index 788bb497b..b40c0394f 100644
---- chromium-73.0.3683.103/services/device/wake_lock/power_save_blocker/BUILD.gn
-+++ chromium-73.0.3683.103/services/device/wake_lock/power_save_blocker/BUILD.gn
+--- chromium-75.0.3770.100/services/device/wake_lock/power_save_blocker/BUILD.gn
++++ chromium-75.0.3770.100/services/device/wake_lock/power_save_blocker/BUILD.gn
 @@ -62,6 +62,9 @@ source_set("power_save_blocker") {
    if (is_chromeos || !use_x11 || !use_dbus) {
      sources -= [ "power_save_blocker_x11.cc" ]
@@ -187,19 +183,3 @@ index 788bb497b..b40c0394f 100644
  
    if (is_android) {
      deps += [ ":jni_headers" ]
-diff --git chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
-index dcade65..835c405 100644
---- chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc.orig
-+++ chromium-73.0.3683.103/chrome/browser/metrics/bluetooth_available_utility.cc
-@@ -69,8 +69,10 @@ void ReportBluetoothAvailability() {
-     return;
- #endif  // defined(OS_LINUX)
- 
--  if (!device::BluetoothAdapterFactory::Get().IsBluetoothSupported())
-+  if (!device::BluetoothAdapterFactory::Get().IsBluetoothSupported()) {
-     ReportAvailability(BLUETOOTH_NOT_SUPPORTED);
-+    return;
-+  }
- 
-   device::BluetoothAdapterFactory::Get().GetAdapter(
-       base::BindOnce(&OnGetAdapter));

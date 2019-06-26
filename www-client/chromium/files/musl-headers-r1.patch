@@ -1,7 +1,7 @@
-diff --git chromium-73.0.3683.103/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc chromium-73.0.3683.103/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-index 70deab8..b146c78 100644
---- chromium-73.0.3683.103/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-+++ chromium-73.0.3683.103/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+diff --git chromium-75.0.3770.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc chromium-75.0.3770.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+index 3ae4f3c..08ed693 100644
+--- chromium-75.0.3770.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
++++ chromium-75.0.3770.100/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
 @@ -43,7 +43,9 @@
  #endif  // defined(OS_ANDROID) && defined(__arm__)
  
@@ -12,7 +12,7 @@ index 70deab8..b146c78 100644
  
  #include "base/linux_util.h"
  #include "base/strings/string_split.h"
-@@ -347,7 +349,7 @@ void RecordLinuxDistro() {
+@@ -326,7 +328,7 @@ void RecordLinuxDistro() {
  #endif  // defined(OS_LINUX) && !defined(OS_CHROMEOS)
  
  void RecordLinuxGlibcVersion() {
@@ -21,10 +21,10 @@ index 70deab8..b146c78 100644
    base::Version version(gnu_get_libc_version());
  
    UMALinuxGlibcVersion glibc_version_result = UMA_LINUX_GLIBC_NOT_PARSEABLE;
-diff --git chromium-73.0.3683.103/services/device/serial/serial_io_handler_posix.cc chromium-73.0.3683.103/services/device/serial/serial_io_handler_posix.cc
-index 507a359..ec3b2b8 100644
---- chromium-73.0.3683.103/services/device/serial/serial_io_handler_posix.cc
-+++ chromium-73.0.3683.103/services/device/serial/serial_io_handler_posix.cc
+diff --git chromium-75.0.3770.100/services/device/serial/serial_io_handler_posix.cc chromium-75.0.3770.100/services/device/serial/serial_io_handler_posix.cc
+index daed079..5470a35 100644
+--- chromium-75.0.3770.100/services/device/serial/serial_io_handler_posix.cc
++++ chromium-75.0.3770.100/services/device/serial/serial_io_handler_posix.cc
 @@ -4,6 +4,7 @@
  
  #include "services/device/serial/serial_io_handler_posix.h"

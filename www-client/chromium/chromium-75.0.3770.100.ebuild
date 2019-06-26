@@ -30,7 +30,7 @@ COMMON_DEPEND="
 	atk? ( >=dev-libs/atk-2.26 )
 	dev-libs/expat:=
 	dev-libs/glib:2
-	system-icu? ( >=dev-libs/icu-59:= )
+	system-icu? ( >=dev-libs/icu-64:= )
 	>=dev-libs/libxml2-2.9.4-r3:=[icu]
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
@@ -102,7 +102,7 @@ BDEPEND="
 		dev-lang/yasm
 	)
 	dev-lang/perl
-	dev-util/gn
+	<dev-util/gn-0.1583
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -118,7 +118,7 @@ BDEPEND="
 : ${CHROMIUM_FORCE_CLANG=no}
 
 if [[ ${CHROMIUM_FORCE_CLANG} == yes ]]; then
-	BDEPEND+=" >=sys-devel/clang-5"
+	BDEPEND+=" >=sys-devel/clang-7"
 fi
 
 if ! has chromium_pkg_die ${EBUILD_DEATH_HOOKS}; then
@@ -142,20 +142,21 @@ are not displayed properly:
 To fix broken icons on the Downloads page, you should install an icon
 theme that covers the appropriate MIME types, and configure this as your
 GTK+ icon theme.
+
+For native file dialogs in KDE, install kde-apps/kdialog.
 "
 
 PATCHES=(
-	"${FILESDIR}/chromium-compiler-r7.patch"
+	"${FILESDIR}/chromium-compiler-r9.patch"
 	"${FILESDIR}/chromium-widevine-r4.patch"
 	"${FILESDIR}/chromium-fix-char_traits.patch"
-	"${FILESDIR}/chromium-73-gcc-0.patch"
-	"${FILESDIR}/chromium-73-gcc-1.patch"
-	"${FILESDIR}/chromium-73-gcc-2.patch"
-	"${FILESDIR}/chromium-73-gcc-3.patch"
-	"${FILESDIR}/chromium-73-gcc-4.patch"
-	"${FILESDIR}/chromium-73-gcc-5.patch"
-	"${FILESDIR}/chromium-73-gcc-6.patch"
-	"${FILESDIR}/chromium-73-xdg-current-desktop.patch"
+	"${FILESDIR}/chromium-75-fix-gn-gen.patch"
+	"${FILESDIR}/chromium-75-gcc-angle-fix.patch"
+	"${FILESDIR}/chromium-75-unique_ptr.patch"
+	"${FILESDIR}/chromium-75-lss.patch"
+	"${FILESDIR}/chromium-75-noexcept.patch"
+	"${FILESDIR}/chromium-75-llvm8.patch"
+	"${FILESDIR}/chromium-75-pure-virtual.patch"
 	"${FILESDIR}/chromium-optional-atk-r1.patch"
 	"${FILESDIR}/chromium-optional-dbus-r5.patch"
 	"${FILESDIR}/chromium-url-formatter.patch"
@@ -169,6 +170,7 @@ PATCHES=(
 	"${FILESDIR}/musl-mallinfo-r7.patch"
 	"${FILESDIR}/musl-pthread-r5.patch"
 	"${FILESDIR}/musl-ptrace.patch"
+	"${FILESDIR}/musl-realpath.patch"
 	"${FILESDIR}/musl-sandbox-r3.patch"
 	"${FILESDIR}/musl-secure_getenv-r1.patch"
 	"${FILESDIR}/musl-siginfo.patch"
@@ -177,7 +179,6 @@ PATCHES=(
 	"${FILESDIR}/musl-stacktrace-r2.patch"
 	"${FILESDIR}/musl-syscall.patch"
 	"${FILESDIR}/musl-ucontext-r1.patch"
-	"${FILESDIR}/musl-v8-fix-deadlock.patch"
 	"${FILESDIR}/musl-v8-monotonic-pthread-cont_timedwait.patch"
 	"${FILESDIR}/musl-wordsize-r1.patch"
 )
@@ -258,6 +259,7 @@ src_prepare() {
 		third_party/angle/third_party/vulkan-tools
 		third_party/angle/third_party/vulkan-validation-layers
 		third_party/apple_apsl
+		third_party/axe-core
 		third_party/blink
 		third_party/boringssl
 		third_party/boringssl/src/third_party/fiat
@@ -285,12 +287,15 @@ src_prepare() {
 		third_party/crashpad/crashpad/third_party/zlib
 		third_party/crc32c
 		third_party/cros_system_api
+		third_party/dav1d
+		third_party/dawn
 		third_party/devscripts
 		third_party/dom_distiller_js
-		third_party/fips181
+		third_party/emoji-segmenter
 		third_party/flatbuffers
 		third_party/flot
 		third_party/freetype
+		third_party/glslang
 		third_party/google_input_tools
 		third_party/google_input_tools/third_party/closure_library
 		third_party/google_input_tools/third_party/closure_library/third_party/closure
@@ -340,6 +345,7 @@ src_prepare() {
 		third_party/pdfium/third_party/libtiff
 		third_party/pdfium/third_party/skia_shared
 		third_party/perfetto
+		third_party/pffft
 		third_party/ply
 		third_party/polymer
 		third_party/protobuf
@@ -590,9 +596,6 @@ src_configure() {
         myconf_gn+=" use_allocator_shim=false"
 	fi
 
-	# https://bugs.gentoo.org/588596
-	#append-cxxflags $(test-flags-CXX -fno-delete-null-pointer-checks)
-
 	# Bug 491582.
 	export TMPDIR="${WORKDIR}/temp"
 	mkdir -p -m 755 "${TMPDIR}" || die
@@ -631,9 +634,6 @@ src_compile() {
 	python_setup
 
 	#"${EPYTHON}" tools/clang/scripts/update.py --force-local-build --gcc-toolchain /usr --skip-checkout --use-system-cmake --without-android || die
-
-	# Work around broken deps
-	eninja -C out/Release gen/ui/accessibility/ax_enums.mojom{,-shared}.h
 
 	# Build mksnapshot and pax-mark it.
 	local x
@@ -735,20 +735,12 @@ src_install() {
 }
 
 pkg_postrm() {
-	if type gtk-update-icon-cache &>/dev/null; then
-		ebegin "Updating GTK icon cache"
-		gtk-update-icon-cache "${EROOT}/usr/share/icons/hicolor"
-		eend $?
-	fi
+	xdg_icon_cache_update
 	xdg_desktop_database_update
 }
 
 pkg_postinst() {
-	if type gtk-update-icon-cache &>/dev/null; then
-		ebegin "Updating GTK icon cache"
-		gtk-update-icon-cache "${EROOT}/usr/share/icons/hicolor"
-		eend $?
-	fi
+	xdg_icon_cache_update
 	xdg_desktop_database_update
 	readme.gentoo_print_elog
 }

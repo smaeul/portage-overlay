@@ -1,7 +1,7 @@
-diff --git chromium-73.0.3683.103/base/debug/stack_trace.cc chromium-73.0.3683.103/base/debug/stack_trace.cc
-index ed531f6..36ef6e6 100644
---- chromium-73.0.3683.103/base/debug/stack_trace.cc
-+++ chromium-73.0.3683.103/base/debug/stack_trace.cc
+diff --git chromium-75.0.3770.100/base/debug/stack_trace.cc chromium-75.0.3770.100/base/debug/stack_trace.cc
+index d8ca822..d78f128 100644
+--- chromium-75.0.3770.100/base/debug/stack_trace.cc
++++ chromium-75.0.3770.100/base/debug/stack_trace.cc
 @@ -225,7 +225,9 @@ void StackTrace::Print() const {
  }
  
@@ -21,11 +21,11 @@ index ed531f6..36ef6e6 100644
    OutputToStreamWithPrefix(&stream, prefix_string);
  #endif
    return stream.str();
-diff --git chromium-73.0.3683.103/base/logging.cc chromium-73.0.3683.103/base/logging.cc
-index d473555..1f343df 100644
---- chromium-73.0.3683.103/base/logging.cc
-+++ chromium-73.0.3683.103/base/logging.cc
-@@ -584,8 +584,8 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
+diff --git chromium-75.0.3770.100/base/logging.cc chromium-75.0.3770.100/base/logging.cc
+index 52720c4..8b759c7 100644
+--- chromium-75.0.3770.100/base/logging.cc
++++ chromium-75.0.3770.100/base/logging.cc
+@@ -582,8 +582,8 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
  
  LogMessage::~LogMessage() {
    size_t stack_start = stream_.tellp();
@@ -35,4 +35,4 @@ index d473555..1f343df 100644
 +    !defined(__UCLIBC__) && !defined(OS_AIX)
    if (severity_ == LOG_FATAL && !base::debug::BeingDebugged()) {
      // Include a stack trace on a fatal, unless a debugger is attached.
-     base::debug::StackTrace trace;
+     base::debug::StackTrace stack_trace;

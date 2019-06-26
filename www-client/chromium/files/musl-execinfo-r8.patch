@@ -1,7 +1,7 @@
-diff --git chromium-73.0.3683.103/base/debug/stack_trace_posix.cc chromium-73.0.3683.103/base/debug/stack_trace_posix.cc
-index 1f015ee..fd6c39a 100644
---- chromium-73.0.3683.103/base/debug/stack_trace_posix.cc
-+++ chromium-73.0.3683.103/base/debug/stack_trace_posix.cc
+diff --git chromium-75.0.3770.100/base/debug/stack_trace_posix.cc chromium-75.0.3770.100/base/debug/stack_trace_posix.cc
+index d4b8b3a..bd26968 100644
+--- chromium-75.0.3770.100/base/debug/stack_trace_posix.cc
++++ chromium-75.0.3770.100/base/debug/stack_trace_posix.cc
 @@ -27,7 +27,7 @@
  #if !defined(USE_SYMBOLIZE)
  #include <cxxabi.h>
@@ -72,19 +72,6 @@ index 1f015ee..fd6c39a 100644
  void StackTrace::OutputToStreamWithPrefix(std::ostream* os,
                                            const char* prefix_string) const {
    StreamBacktraceOutputHandler handler(os);
-diff --git chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc
-index c7ecc7f..1284614 100644
---- chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc
-+++ chromium-73.0.3683.103/third_party/blink/renderer/platform/wtf/assertions.cc
-@@ -48,7 +48,7 @@
- #include <windows.h>
- #endif
- 
--#if defined(OS_MACOSX) || (defined(OS_LINUX) && !defined(__UCLIBC__))
-+#if defined(OS_MACOSX) || (defined(OS_LINUX) && defined(__GLIBC__) && !defined(__UCLIBC__))
- #include <cxxabi.h>
- #include <dlfcn.h>
- #include <execinfo.h>
 diff --git chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
 index e14edbd..dfeca51 100644
 --- chromium-69.0.3497.100/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
