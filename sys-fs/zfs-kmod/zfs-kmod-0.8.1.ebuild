@@ -61,7 +61,7 @@ pkg_setup() {
 			DEVTMPFS
 	"
 
-	linux-mod_pkg_setup
+	use arm64 && CONFIG_CHECK="${CONFIG_CHECK} !PREEMPT"
 
 	kernel_is -lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
 
@@ -76,6 +76,8 @@ pkg_setup() {
 		kernel_is -le "${kv_major_max}" "${kv_minor_max}" || die \
 			"Linux ${kv_major_max}.${kv_minor_max} is the latest supported version"
 	fi
+
+	linux-mod_pkg_setup
 }
 
 src_prepare() {
