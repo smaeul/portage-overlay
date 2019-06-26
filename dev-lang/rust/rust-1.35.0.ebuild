@@ -275,6 +275,21 @@ src_install() {
 		rmdir "${ED}/usr/share/doc/rust" || die
 	fi
 
+	# temp fix for https://bugs.gentoo.org/672816
+	# FIXME: this should handle libdir=lib, not exact arches
+	if { use x86 || use arm; }; then
+		local rust_target wrongdir rightdir
+		rust_target=$(rust_abi $(get_abi_CHOST ${v##*.}))
+		wrongdir="${ED}/usr/$(get_libdir)/${P}/${P}/rustlib/${rust_target}/codegen-backends"
+		rightdir="${ED}/usr/$(get_libdir)/${P}/rustlib/${rust_target}/codegen-backends"
+		if [[ -e ${wrongdir}/librustc_codegen_llvm-llvm.so ]]; then
+			einfo "fixing bug #672816"
+			mv "${wrongdir}" "${rightdir}" || die
+			rm -r "${ED}/usr/$(get_libdir)/${P}/${P}" || die
+		fi
+	fi 
+	# end temp fix
+
 	dodoc COPYRIGHT
 	rm "${ED}/usr/share/doc/${P}"/*.old || die
 	rm "${ED}/usr/share/doc/${P}/LICENSE-APACHE" || die
