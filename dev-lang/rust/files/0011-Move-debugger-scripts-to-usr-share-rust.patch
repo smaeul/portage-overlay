@@ -1,7 +1,7 @@
-From 6ebe128c3440ee224fed5e0a2b8897df21ed55f2 Mon Sep 17 00:00:00 2001
+From 06a3f0608f996cc2791041a3f9a72f224223de43 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
-Subject: [PATCH 12/13] Move debugger scripts to /usr/share/rust
+Subject: [PATCH 11/12] Move debugger scripts to /usr/share/rust
 
 ---
  src/bootstrap/dist.rs | 2 +-
@@ -10,7 +10,7 @@ Subject: [PATCH 12/13] Move debugger scripts to /usr/share/rust
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/bootstrap/dist.rs b/src/bootstrap/dist.rs
-index 61a7705bd6..920e0ad1f1 100644
+index b0616ff6691..7a1225a9346 100644
 --- a/src/bootstrap/dist.rs
 +++ b/src/bootstrap/dist.rs
 @@ -597,7 +597,7 @@ impl Step for DebuggerScripts {
@@ -23,7 +23,7 @@ index 61a7705bd6..920e0ad1f1 100644
          let cp_debugger_script = |file: &str| {
              builder.install(&builder.src.join("src/etc/").join(file), &dst, 0o644);
 diff --git a/src/etc/rust-gdb b/src/etc/rust-gdb
-index 23ba93da8e..dc51b16c57 100755
+index 23ba93da8e5..dc51b16c572 100755
 --- a/src/etc/rust-gdb
 +++ b/src/etc/rust-gdb
 @@ -4,7 +4,7 @@ set -e
@@ -36,7 +36,7 @@ index 23ba93da8e..dc51b16c57 100755
  # Run GDB with the additional arguments that load the pretty printers
  # Set the environment variable `RUST_GDB` to overwrite the call to a
 diff --git a/src/etc/rust-lldb b/src/etc/rust-lldb
-index 424302d495..460e119210 100755
+index 424302d495f..460e1192100 100755
 --- a/src/etc/rust-lldb
 +++ b/src/etc/rust-lldb
 @@ -26,7 +26,7 @@ display the contents of local variables!"

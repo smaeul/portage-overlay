@@ -1,7 +1,7 @@
-From 121e89f649b1cfe3c18dc622279dc5a79873fcdb Mon Sep 17 00:00:00 2001
+From dc5862fa6adcd35e46b0a3ab160f5577535b4b76 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 22:11:14 -0500
-Subject: [PATCH 05/13] Remove -nostdlib and musl_root from musl targets
+Subject: [PATCH 05/12] Remove -nostdlib and musl_root from musl targets
 
 ---
  config.toml.example                           |  6 ----
@@ -20,7 +20,7 @@ Subject: [PATCH 05/13] Remove -nostdlib and musl_root from musl targets
  13 files changed, 4 insertions(+), 152 deletions(-)
 
 diff --git a/config.toml.example b/config.toml.example
-index 8b2153cd2e..b8145ce8d5 100644
+index 556625b531d..3c6f1872822 100644
 --- a/config.toml.example
 +++ b/config.toml.example
 @@ -474,12 +474,6 @@
@@ -33,11 +33,11 @@ index 8b2153cd2e..b8145ce8d5 100644
 -# linked binaries
 -#musl-root = "..."
 -
- # The root location of the `wasm32-unknown-wasi` sysroot.
+ # The root location of the `wasm32-wasi` sysroot.
  #wasi-root = "..."
  
 diff --git a/src/bootstrap/bin/rustc.rs b/src/bootstrap/bin/rustc.rs
-index a76584093f..8a534ab8e2 100644
+index 821c37dc235..906af787f4a 100644
 --- a/src/bootstrap/bin/rustc.rs
 +++ b/src/bootstrap/bin/rustc.rs
 @@ -122,16 +122,6 @@ fn main() {
@@ -58,7 +58,7 @@ index a76584093f..8a534ab8e2 100644
              let mut root = OsString::from("native=");
              root.push(&s);
 diff --git a/src/bootstrap/cc_detect.rs b/src/bootstrap/cc_detect.rs
-index dfc243b705..848d1d4b2b 100644
+index dfc243b7054..848d1d4b2b3 100644
 --- a/src/bootstrap/cc_detect.rs
 +++ b/src/bootstrap/cc_detect.rs
 @@ -84,7 +84,7 @@ pub fn find(build: &mut Build) {
@@ -117,10 +117,10 @@ index dfc243b705..848d1d4b2b 100644
      }
  }
 diff --git a/src/bootstrap/compile.rs b/src/bootstrap/compile.rs
-index 66443d472d..bbaa32a91c 100644
+index e1cdd226fd6..05442c6c612 100644
 --- a/src/bootstrap/compile.rs
 +++ b/src/bootstrap/compile.rs
-@@ -114,20 +114,7 @@ impl Step for Std {
+@@ -115,20 +115,7 @@ impl Step for Std {
  fn copy_third_party_objects(builder: &Builder<'_>, compiler: &Compiler, target: Interned<String>) {
      let libdir = builder.sysroot_libdir(*compiler, target);
  
@@ -142,7 +142,7 @@ index 66443d472d..bbaa32a91c 100644
          for &obj in &["crt1.o"] {
              builder.copy(
                  &builder.wasi_root(target).unwrap().join("lib/wasm32-wasi").join(obj),
-@@ -190,12 +177,6 @@ pub fn std_cargo(builder: &Builder<'_>,
+@@ -191,12 +178,6 @@ pub fn std_cargo(builder: &Builder<'_>,
              .arg("--manifest-path")
              .arg(builder.src.join("src/libstd/Cargo.toml"));
  
@@ -156,10 +156,10 @@ index 66443d472d..bbaa32a91c 100644
              if let Some(p) = builder.wasi_root(target) {
                  cargo.env("WASI_ROOT", p);
 diff --git a/src/bootstrap/config.rs b/src/bootstrap/config.rs
-index 0c31c41ced..b8c690fc41 100644
+index b1d009a6740..cc567839f47 100644
 --- a/src/bootstrap/config.rs
 +++ b/src/bootstrap/config.rs
-@@ -133,8 +133,6 @@ pub struct Config {
+@@ -135,8 +135,6 @@ pub struct Config {
      pub print_step_timings: bool,
      pub missing_tools: bool,
  
@@ -168,7 +168,7 @@ index 0c31c41ced..b8c690fc41 100644
      pub prefix: Option<PathBuf>,
      pub sysconfdir: Option<PathBuf>,
      pub datadir: Option<PathBuf>,
-@@ -169,7 +167,6 @@ pub struct Target {
+@@ -171,7 +169,6 @@ pub struct Target {
      pub linker: Option<PathBuf>,
      pub ndk: Option<PathBuf>,
      pub crt_static: Option<bool>,
@@ -176,7 +176,7 @@ index 0c31c41ced..b8c690fc41 100644
      pub wasi_root: Option<PathBuf>,
      pub qemu_rootfs: Option<PathBuf>,
      pub no_std: bool,
-@@ -306,7 +303,6 @@ struct Rust {
+@@ -308,7 +305,6 @@ struct Rust {
      backtrace: Option<bool>,
      default_linker: Option<String>,
      channel: Option<String>,
@@ -184,7 +184,7 @@ index 0c31c41ced..b8c690fc41 100644
      rpath: Option<bool>,
      optimize_tests: Option<bool>,
      debuginfo_tests: Option<bool>,
-@@ -346,7 +342,6 @@ struct TomlTarget {
+@@ -348,7 +344,6 @@ struct TomlTarget {
      linker: Option<String>,
      android_ndk: Option<String>,
      crt_static: Option<bool>,
@@ -192,7 +192,7 @@ index 0c31c41ced..b8c690fc41 100644
      wasi_root: Option<String>,
      qemu_rootfs: Option<String>,
  }
-@@ -566,7 +561,6 @@ impl Config {
+@@ -568,7 +563,6 @@ impl Config {
              set(&mut config.llvm_tools_enabled, rust.llvm_tools);
              config.rustc_parallel = rust.parallel_compiler.unwrap_or(false);
              config.rustc_default_linker = rust.default_linker.clone();
@@ -200,7 +200,7 @@ index 0c31c41ced..b8c690fc41 100644
              config.save_toolstates = rust.save_toolstates.clone().map(PathBuf::from);
              set(&mut config.deny_warnings, rust.deny_warnings.or(flags.warnings));
              set(&mut config.backtrace_on_ice, rust.backtrace_on_ice);
-@@ -609,7 +603,6 @@ impl Config {
+@@ -611,7 +605,6 @@ impl Config {
                  target.ranlib = cfg.ranlib.clone().map(PathBuf::from);
                  target.linker = cfg.linker.clone().map(PathBuf::from);
                  target.crt_static = cfg.crt_static.clone();
@@ -209,7 +209,7 @@ index 0c31c41ced..b8c690fc41 100644
                  target.qemu_rootfs = cfg.qemu_rootfs.clone().map(PathBuf::from);
  
 diff --git a/src/bootstrap/configure.py b/src/bootstrap/configure.py
-index ade8afee7c..f9ccf7aed5 100755
+index ade8afee7c1..f9ccf7aed5c 100755
 --- a/src/bootstrap/configure.py
 +++ b/src/bootstrap/configure.py
 @@ -111,28 +111,6 @@ v("aarch64-linux-android-ndk", "target.aarch64-linux-android.android-ndk",
@@ -242,10 +242,10 @@ index ade8afee7c..f9ccf7aed5 100755
    "rootfs in qemu testing, you probably don't want to use this")
  v("qemu-aarch64-rootfs", "target.aarch64-unknown-linux-gnu.qemu-rootfs",
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index 71ca61d97e..3b53029a79 100644
+index 7618a6e6df5..49cdb526e44 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -861,14 +861,6 @@ impl Build {
+@@ -852,14 +852,6 @@ impl Build {
          }
      }
  
@@ -261,10 +261,10 @@ index 71ca61d97e..3b53029a79 100644
      fn wasi_root(&self, target: Interned<String>) -> Option<&Path> {
          self.config.target_config.get(&target)
 diff --git a/src/bootstrap/sanity.rs b/src/bootstrap/sanity.rs
-index b9f456e910..792c975333 100644
+index dc65fb9b797..060ba6d9e42 100644
 --- a/src/bootstrap/sanity.rs
 +++ b/src/bootstrap/sanity.rs
-@@ -171,34 +171,6 @@ pub fn check(build: &mut Build) {
+@@ -176,34 +176,6 @@ pub fn check(build: &mut Build) {
              }
          }
  
@@ -300,7 +300,7 @@ index b9f456e910..792c975333 100644
              // There are three builds of cmake on windows: MSVC, MinGW, and
              // Cygwin. The Cygwin build does not have generators for Visual
 diff --git a/src/ci/docker/dist-i586-gnu-i586-i686-musl/Dockerfile b/src/ci/docker/dist-i586-gnu-i586-i686-musl/Dockerfile
-index ba2d32a929..412c37fdd1 100644
+index ba2d32a9296..412c37fdd12 100644
 --- a/src/ci/docker/dist-i586-gnu-i586-i686-musl/Dockerfile
 +++ b/src/ci/docker/dist-i586-gnu-i586-i686-musl/Dockerfile
 @@ -30,8 +30,6 @@ COPY scripts/sccache.sh /scripts/
@@ -313,7 +313,7 @@ index ba2d32a929..412c37fdd1 100644
        --disable-docs
  
 diff --git a/src/ci/docker/dist-various-1/Dockerfile b/src/ci/docker/dist-various-1/Dockerfile
-index a722a41839..44e6728de7 100644
+index a722a418391..44e6728de79 100644
 --- a/src/ci/docker/dist-various-1/Dockerfile
 +++ b/src/ci/docker/dist-various-1/Dockerfile
 @@ -132,13 +132,6 @@ ENV CC_mipsel_unknown_linux_musl=mipsel-openwrt-linux-gcc \
@@ -331,19 +331,19 @@ index a722a41839..44e6728de7 100644
        --disable-docs
  
 diff --git a/src/ci/docker/dist-x86_64-musl/Dockerfile b/src/ci/docker/dist-x86_64-musl/Dockerfile
-index 21a9023a45..db7c9729d0 100644
+index 385eefde846..81d4f7737e8 100644
 --- a/src/ci/docker/dist-x86_64-musl/Dockerfile
 +++ b/src/ci/docker/dist-x86_64-musl/Dockerfile
-@@ -29,7 +29,6 @@ COPY scripts/sccache.sh /scripts/
- RUN sh /scripts/sccache.sh
+@@ -31,7 +31,6 @@ RUN sh /scripts/sccache.sh
+ ENV HOSTS=x86_64-unknown-linux-musl
  
  ENV RUST_CONFIGURE_ARGS \
 -      --musl-root-x86_64=/usr/local/x86_64-linux-musl \
        --enable-extended \
-       --disable-docs
- 
+       --disable-docs \
+       --set target.x86_64-unknown-linux-musl.crt-static=false \
 diff --git a/src/ci/docker/test-various/Dockerfile b/src/ci/docker/test-various/Dockerfile
-index 611a24a69b..99c2b866b1 100644
+index 611a24a69bd..99c2b866b1d 100644
 --- a/src/ci/docker/test-various/Dockerfile
 +++ b/src/ci/docker/test-various/Dockerfile
 @@ -31,7 +31,6 @@ COPY scripts/sccache.sh /scripts/
@@ -355,7 +355,7 @@ index 611a24a69b..99c2b866b1 100644
    --set rust.lld
  
 diff --git a/src/librustc_target/spec/linux_musl_base.rs b/src/librustc_target/spec/linux_musl_base.rs
-index e294e63982..58ae91a96a 100644
+index e294e63982d..58ae91a96aa 100644
 --- a/src/librustc_target/spec/linux_musl_base.rs
 +++ b/src/librustc_target/spec/linux_musl_base.rs
 @@ -3,28 +3,12 @@ use crate::spec::{LinkerFlavor, TargetOptions};

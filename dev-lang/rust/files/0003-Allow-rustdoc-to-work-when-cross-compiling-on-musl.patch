@@ -1,7 +1,7 @@
-From d4b81fe2c052ddd6776da36b035dbe2c2564689b Mon Sep 17 00:00:00 2001
+From 09d94e416d0dbc2e5f0e873fd7e72acdf2c7e178 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
-Subject: [PATCH 03/13] Allow rustdoc to work when cross-compiling on musl
+Subject: [PATCH 03/12] Allow rustdoc to work when cross-compiling on musl
 
 musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
 ---
@@ -9,7 +9,7 @@ musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index 1c9f6e1ab2..7e90be8d8c 100644
+index 1c9f6e1ab28..7e90be8d8cc 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
 @@ -23,9 +23,6 @@ fn main() {

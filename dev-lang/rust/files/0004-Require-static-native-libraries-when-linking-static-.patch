@@ -1,7 +1,7 @@
-From 7f7ea1cba86a15510de2410529c8460fc5b7018b Mon Sep 17 00:00:00 2001
+From 41de62cd1f5e6326987cd9ec625b8ed06efa3041 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
-Subject: [PATCH 04/13] Require static native libraries when linking static
+Subject: [PATCH 04/12] Require static native libraries when linking static
  executables
 
 On ELF targets like Linux, gcc/ld will create a dynamically-linked
@@ -12,14 +12,14 @@ executables.
 
 Fixes #54243
 ---
- src/librustc_codegen_llvm/back/link.rs | 18 ++++++++++++++----
+ src/librustc_codegen_ssa/back/link.rs | 18 ++++++++++++++----
  1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/src/librustc_codegen_llvm/back/link.rs b/src/librustc_codegen_llvm/back/link.rs
-index 19419a72b9..9d26dd0b35 100644
---- a/src/librustc_codegen_llvm/back/link.rs
-+++ b/src/librustc_codegen_llvm/back/link.rs
-@@ -1408,9 +1408,7 @@ fn add_upstream_rust_crates(cmd: &mut dyn Linker,
+diff --git a/src/librustc_codegen_ssa/back/link.rs b/src/librustc_codegen_ssa/back/link.rs
+index d5a56f6a09e..bb06d80d814 100644
+--- a/src/librustc_codegen_ssa/back/link.rs
++++ b/src/librustc_codegen_ssa/back/link.rs
+@@ -1548,9 +1548,7 @@ fn add_upstream_rust_crates<'a, B: ArchiveBuilder<'a>>(cmd: &mut dyn Linker,
      }
  }
  
@@ -30,7 +30,7 @@ index 19419a72b9..9d26dd0b35 100644
  //
  // 1. The upstream crate is an rlib. In this case we *must* link in the
  // native dependency because the rlib is just an archive.
-@@ -1453,7 +1451,19 @@ fn add_upstream_native_libraries(cmd: &mut dyn Linker,
+@@ -1593,7 +1591,19 @@ pub fn add_upstream_native_libraries(cmd: &mut dyn Linker,
                  continue
              }
              match lib.kind {

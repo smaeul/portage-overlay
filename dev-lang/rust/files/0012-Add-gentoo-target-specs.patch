@@ -1,7 +1,7 @@
-From a7acc0aba5c3cde9d95de5d1af1828ec763b31fa Mon Sep 17 00:00:00 2001
+From f585a0e771e38a63c60dbe9aec6c7ee4a7268f67 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:29:06 +0000
-Subject: [PATCH 13/13] Add gentoo target specs
+Subject: [PATCH 12/12] Add gentoo target specs
 
 ---
  .../spec/aarch64_gentoo_linux_musl.rs               | 11 +++++++++++
@@ -23,7 +23,7 @@ Subject: [PATCH 13/13] Add gentoo target specs
 
 diff --git a/src/librustc_target/spec/aarch64_gentoo_linux_musl.rs b/src/librustc_target/spec/aarch64_gentoo_linux_musl.rs
 new file mode 100644
-index 0000000000..420fe7cde7
+index 00000000000..420fe7cde70
 --- /dev/null
 +++ b/src/librustc_target/spec/aarch64_gentoo_linux_musl.rs
 @@ -0,0 +1,11 @@
@@ -40,7 +40,7 @@ index 0000000000..420fe7cde7
 +}
 diff --git a/src/librustc_target/spec/arm_gentoo_linux_musleabi.rs b/src/librustc_target/spec/arm_gentoo_linux_musleabi.rs
 new file mode 100644
-index 0000000000..d47ca84164
+index 00000000000..d47ca841647
 --- /dev/null
 +++ b/src/librustc_target/spec/arm_gentoo_linux_musleabi.rs
 @@ -0,0 +1,11 @@
@@ -57,7 +57,7 @@ index 0000000000..d47ca84164
 +}
 diff --git a/src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs b/src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs
 new file mode 100644
-index 0000000000..f5c85855c1
+index 00000000000..f5c85855c18
 --- /dev/null
 +++ b/src/librustc_target/spec/armv7a_gentoo_linux_musleabihf.rs
 @@ -0,0 +1,11 @@
@@ -74,7 +74,7 @@ index 0000000000..f5c85855c1
 +}
 diff --git a/src/librustc_target/spec/i686_gentoo_linux_musl.rs b/src/librustc_target/spec/i686_gentoo_linux_musl.rs
 new file mode 100644
-index 0000000000..be4d7b8523
+index 00000000000..be4d7b8523f
 --- /dev/null
 +++ b/src/librustc_target/spec/i686_gentoo_linux_musl.rs
 @@ -0,0 +1,13 @@
@@ -92,10 +92,10 @@ index 0000000000..be4d7b8523
 +    Ok(base)
 +}
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index 46fefd78f4..d5069c43bf 100644
+index 844edbb946a..a7d92bcf0ed 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
-@@ -328,7 +328,17 @@ macro_rules! supported_targets {
+@@ -327,7 +327,17 @@ macro_rules! supported_targets {
      )
  }
  
@@ -113,7 +113,7 @@ index 46fefd78f4..d5069c43bf 100644
      ("x86_64-unknown-linux-gnu", x86_64_unknown_linux_gnu),
      ("x86_64-unknown-linux-gnux32", x86_64_unknown_linux_gnux32),
      ("i686-unknown-linux-gnu", i686_unknown_linux_gnu),
-@@ -353,7 +363,6 @@ supported_targets! {
+@@ -352,7 +362,6 @@ supported_targets! {
      ("sparc64-unknown-linux-gnu", sparc64_unknown_linux_gnu),
      ("arm-unknown-linux-gnueabi", arm_unknown_linux_gnueabi),
      ("arm-unknown-linux-gnueabihf", arm_unknown_linux_gnueabihf),
@@ -123,7 +123,7 @@ index 46fefd78f4..d5069c43bf 100644
      ("armv5te-unknown-linux-gnueabi", armv5te_unknown_linux_gnueabi),
 diff --git a/src/librustc_target/spec/powerpc64_gentoo_linux_musl.rs b/src/librustc_target/spec/powerpc64_gentoo_linux_musl.rs
 new file mode 100644
-index 0000000000..e840bb27bb
+index 00000000000..e840bb27bbf
 --- /dev/null
 +++ b/src/librustc_target/spec/powerpc64_gentoo_linux_musl.rs
 @@ -0,0 +1,11 @@
@@ -140,7 +140,7 @@ index 0000000000..e840bb27bb
 +}
 diff --git a/src/librustc_target/spec/powerpc_gentoo_linux_musl.rs b/src/librustc_target/spec/powerpc_gentoo_linux_musl.rs
 new file mode 100644
-index 0000000000..905c5214d4
+index 00000000000..905c5214d41
 --- /dev/null
 +++ b/src/librustc_target/spec/powerpc_gentoo_linux_musl.rs
 @@ -0,0 +1,13 @@
@@ -159,7 +159,7 @@ index 0000000000..905c5214d4
 +}
 diff --git a/src/librustc_target/spec/x86_64_gentoo_linux_musl.rs b/src/librustc_target/spec/x86_64_gentoo_linux_musl.rs
 new file mode 100644
-index 0000000000..f33047358b
+index 00000000000..f33047358b5
 --- /dev/null
 +++ b/src/librustc_target/spec/x86_64_gentoo_linux_musl.rs
 @@ -0,0 +1,11 @@
