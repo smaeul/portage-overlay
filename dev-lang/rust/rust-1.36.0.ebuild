@@ -105,6 +105,7 @@ PATCHES=(
 	"${FILESDIR}/0051-llvm-D45520.patch"
 	"${FILESDIR}/0052-llvm-D52013.patch"
 	"${FILESDIR}/0053-llvm-secureplt.patch"
+	"${FILESDIR}/0060-Update-libressl-support.patch"
 )
 
 S="${WORKDIR}/${MY_P}-src"
