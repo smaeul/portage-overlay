@@ -1,0 +1,13 @@
+diff --git a/src/sntpd.c b/src/sntpd.c
+index f4f939a..9311dee 100644
+--- a/src/sntpd.c
++++ b/src/sntpd.c
+@@ -686,7 +686,7 @@ static void primary_loop(int usd, struct ntp_control *ntpc)
+ 					ERR(errno, "Failed select()");
+ 				continue;
+ 			}
+-			if (to.tv_sec == 0) {
++			if (1) {
+ 				if (probes_sent >= ntpc->probe_count && ntpc->probe_count != 0)
+ 					break;
+ 

@@ -14,6 +14,8 @@ SLOT="0"
 KEYWORDS=""
 IUSE="debug"
 
+PATCHES=( "${FILESDIR}/${P}-select.patch" )
+
 src_prepare() {
 	default
 
