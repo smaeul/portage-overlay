@@ -1,7 +1,7 @@
-From 27dcf49a9a5a27c39b6f66837060bfa5d03ced50 Mon Sep 17 00:00:00 2001
+From f0fce1130ffe6b5a7666979aedd956becc4d7c25 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 6 Oct 2018 04:01:48 +0000
-Subject: [PATCH 07/12] test/use-extern-for-plugins: Don't assume multilib
+Subject: [PATCH 11/16] test/use-extern-for-plugins: Don't assume multilib
 
 ---
  src/test/run-make-fulldeps/use-extern-for-plugins/Makefile | 7 +------
