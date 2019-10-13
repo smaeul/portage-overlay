@@ -28,7 +28,7 @@ SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
 "
 
 ALL_LLVM_TARGETS=( AArch64 AMDGPU ARM BPF Hexagon Lanai Mips MSP430
-	NVPTX PowerPC Sparc SystemZ WebAssembly X86 XCore )
+	NVPTX PowerPC RISCV Sparc SystemZ WebAssembly X86 XCore )
 ALL_LLVM_TARGETS=( "${ALL_LLVM_TARGETS[@]/#/llvm_targets_}" )
 LLVM_TARGET_USEDEPS=${ALL_LLVM_TARGETS[@]/%/?}
 
@@ -37,7 +37,7 @@ LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
 IUSE="clippy cpu_flags_x86_sse2 debug doc libressl miri rls rustfmt system-llvm ${ALL_LLVM_TARGETS[*]}"
 
 # Please keep the LLVM dependency block separate. Since LLVM is slotted,
-# we need to *really* make sure we're not pulling one than more slot
+# we need to *really* make sure we're not pulling more than one slot
 # simultaneously.
 
 # How to use it:
@@ -46,11 +46,11 @@ IUSE="clippy cpu_flags_x86_sse2 debug doc libressl miri rls rustfmt system-llvm 
 # 3. Specify LLVM_MAX_SLOT, e.g. 8.
 LLVM_DEPEND="
 	|| (
-		>=sys-devel/llvm-8:=[${LLVM_TARGET_USEDEPS// /,}]
+		>=sys-devel/llvm-9:=[${LLVM_TARGET_USEDEPS// /,}]
 	)
-	<sys-devel/llvm-9:=
+	<sys-devel/llvm-10:=
 "
-LLVM_MAX_SLOT=8
+LLVM_MAX_SLOT=9
 
 COMMON_DEPEND="
 	!libressl? ( dev-libs/openssl:0= )
@@ -97,19 +97,23 @@ PATCHES=(
 	"${FILESDIR}/0008-Fix-zero-sized-aggregate-ABI-on-powerpc.patch"
 	"${FILESDIR}/0009-compiletest-Match-suffixed-environments.patch"
 	"${FILESDIR}/0010-test-c-variadic-Fix-patterns-on-powerpc64.patch"
-	"${FILESDIR}/0011-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
-	"${FILESDIR}/0012-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
-	"${FILESDIR}/0013-Ignore-broken-and-non-applicable-tests.patch"
-	"${FILESDIR}/0014-Link-stage-2-tools-dynamically-to-libstd.patch"
-	"${FILESDIR}/0015-Move-debugger-scripts-to-usr-share-rust.patch"
-	"${FILESDIR}/0016-Add-gentoo-target-specs.patch"
+	"${FILESDIR}/0011-Use-rustc-workspace-hack-for-rustbook.patch"
+	"${FILESDIR}/0012-test-failed-doctest-output-Fix-normalization.patch"
+	"${FILESDIR}/0013-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
+	"${FILESDIR}/0014-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
+	"${FILESDIR}/0015-Ignore-broken-and-non-applicable-tests.patch"
+	"${FILESDIR}/0016-Link-stage-2-tools-dynamically-to-libstd.patch"
+	"${FILESDIR}/0017-Move-debugger-scripts-to-usr-share-rust.patch"
+	"${FILESDIR}/0018-Add-gentoo-target-specs.patch"
 	"${FILESDIR}/0030-libc-linkage.patch"
+	"${FILESDIR}/0031-typenum-pmmx.patch"
+	"${FILESDIR}/0032-libgit2-sys-abi.patch"
 	"${FILESDIR}/0040-rls-atomics.patch"
 	"${FILESDIR}/0050-llvm.patch"
-	"${FILESDIR}/0051-llvm-D45520.patch"
-	"${FILESDIR}/0052-llvm-D52013.patch"
-	"${FILESDIR}/0053-llvm-secureplt.patch"
+	"${FILESDIR}/0051-llvm-powerpc-plt.patch"
+	"${FILESDIR}/0052-llvm-powerpc-elfv2.patch"
 	"${FILESDIR}/0060-Update-libressl-support.patch"
+	"${FILESDIR}/0061-Update-libressl-support.patch"
 )
 
 S="${WORKDIR}/${MY_P}-src"
@@ -119,10 +123,10 @@ toml_usex() {
 }
 
 pre_build_checks() {
-	CHECKREQS_DISK_BUILD="7G"
+	CHECKREQS_DISK_BUILD="9G"
 	eshopts_push -s extglob
 	if is-flagq '-g?(gdb)?([1-9])'; then
-		CHECKREQS_DISK_BUILD="10G"
+		CHECKREQS_DISK_BUILD="14G"
 	fi
 	eshopts_pop
 	check-reqs_pkg_setup
@@ -133,7 +137,6 @@ pkg_pretend() {
 }
 
 pkg_setup() {
-	export RUST_BACKTRACE=1
 	pre_build_checks
 	python-any-r1_pkg_setup
 	if use system-llvm; then
@@ -227,6 +230,7 @@ src_configure() {
 }
 
 src_compile() {
+	RUST_BACKTRACE=1 \
 	"${EPYTHON}" x.py build --config="${S}"/config.toml -j$(makeopts_jobs) || die
 }
 
@@ -239,13 +243,12 @@ src_test() {
 		src/test/mir-opt \
 		src/test/pretty \
 		src/test/run-fail \
-		src/test/run-fail/pretty \
 		src/test/run-make \
 		src/test/run-make-fulldeps \
-		src/test/run-pass \
-		src/test/run-pass/pretty \
-		src/test/run-pass-fulldeps \
-		src/test/run-pass-fulldeps/pretty \
+		src/test/rustdoc \
+		src/test/rustdoc-js \
+		src/test/rustdoc-js-std \
+		src/test/rustdoc-ui \
 		src/test/ui \
 		src/test/ui-fulldeps || die
 }

@@ -1,0 +1,58 @@
+From 963e5d726f753d1816eae560b99b241934abe786 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 6 Oct 2019 17:30:11 -0500
+Subject: [PATCH 11/18] Use rustc-workspace-hack for rustbook
+
+As rustbook now depends transitively on openssl, it needs access to the
+rustc-workspace-hack/all-static feature to pick up openssl-sys/vendored.
+This fixes the rust build with `all-static = true` on systems where
+openssl is not installed (e.g. when cross-compiling).
+---
+ Cargo.lock                    | 1 +
+ src/bootstrap/tool.rs         | 1 +
+ src/tools/rustbook/Cargo.toml | 5 +++++
+ 3 files changed, 7 insertions(+)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index ab6731e4d43..54177b36827 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2577,6 +2577,7 @@ dependencies = [
+  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+  "mdbook 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+  "mdbook-linkcheck 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
++ "rustc-workspace-hack 1.0.0",
+ ]
+ 
+ [[package]]
+diff --git a/src/bootstrap/tool.rs b/src/bootstrap/tool.rs
+index df7eb7c455d..c91ccc79aa1 100644
+--- a/src/bootstrap/tool.rs
++++ b/src/bootstrap/tool.rs
+@@ -248,6 +248,7 @@ pub fn prepare_tool_cargo(
+             path.ends_with("rls") ||
+             path.ends_with("clippy") ||
+             path.ends_with("miri") ||
++            path.ends_with("rustbook") ||
+             path.ends_with("rustfmt")
+         {
+             cargo.env("LIBZ_SYS_STATIC", "1");
+diff --git a/src/tools/rustbook/Cargo.toml b/src/tools/rustbook/Cargo.toml
+index a7188f0d11e..89bbde4d5a9 100644
+--- a/src/tools/rustbook/Cargo.toml
++++ b/src/tools/rustbook/Cargo.toml
+@@ -13,6 +13,11 @@ clap = "2.25.0"
+ failure = "0.1"
+ mdbook-linkcheck = { version = "0.3.0", optional = true }
+ 
++# A noop dependency that changes in the Rust repository, it's a bit of a hack.
++# See the `src/tools/rustc-workspace-hack/README.md` file in `rust-lang/rust`
++# for more information.
++rustc-workspace-hack = "1.0.0"
++
+ [dependencies.mdbook]
+ version = "0.3.0"
+ default-features = false
+-- 
+2.21.0
+

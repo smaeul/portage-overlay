@@ -1,7 +1,7 @@
-From f67f0ab40f1328e04916512b9af858ca1b7faa24 Mon Sep 17 00:00:00 2001
+From e734014aa61cc130e180600b8cb9fdb57909e843 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 4 Sep 2019 20:44:30 -0500
-Subject: [PATCH 08/16] Fix zero-sized aggregate ABI on powerpc
+Subject: [PATCH 08/18] Fix zero-sized aggregate ABI on powerpc
 
 For targets that pass zero-sized aggregates indirectly (generally
 those that pass all aggregates indirectly), we must allocate a register
@@ -20,10 +20,10 @@ updating each implementation of `compute_abi_info` to handle ZSTs.
  1 file changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/src/librustc/ty/layout.rs b/src/librustc/ty/layout.rs
-index 4af26e19b37..163db9778e5 100644
+index 19c753bc304..b0e1b391e4b 100644
 --- a/src/librustc/ty/layout.rs
 +++ b/src/librustc/ty/layout.rs
-@@ -2667,12 +2667,11 @@ where
+@@ -2660,12 +2660,11 @@ where
          };
  
          let target = &cx.tcx().sess.target.target;
@@ -41,7 +41,7 @@ index 4af26e19b37..163db9778e5 100644
          let rust_abi = match sig.abi {
              RustIntrinsic | PlatformIntrinsic | Rust | RustCall => true,
              _ => false,
-@@ -2742,11 +2741,10 @@ where
+@@ -2735,11 +2734,10 @@ where
              let is_return = arg_idx.is_none();
              let mut arg = mk_arg_type(ty, arg_idx);
              if arg.layout.is_zst() {

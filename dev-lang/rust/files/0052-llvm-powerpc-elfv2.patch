@@ -1,0 +1,12 @@
+--- rustc-1.38.0-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
++++ rustc-1.38.0-src/src/llvm-project/llvm/lib/Target/PowerPC/PPCTargetMachine.cpp
+@@ -213,7 +213,8 @@ static PPCTargetMachine::PPCABI computeTargetABI(const Triple &TT,
+   case Triple::ppc64le:
+     return PPCTargetMachine::PPC_ABI_ELFv2;
+   case Triple::ppc64:
+-    if (TT.getEnvironment() == llvm::Triple::ELFv2)
++    // musl uses the ELFv2 ABI on both endians.
++    if (TT.getEnvironment() == Triple::ELFv2 || TT.isMusl())
+       return PPCTargetMachine::PPC_ABI_ELFv2;
+     return PPCTargetMachine::PPC_ABI_ELFv1;
+   default:

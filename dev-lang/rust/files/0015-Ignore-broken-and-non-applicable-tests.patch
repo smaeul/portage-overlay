@@ -1,13 +1,12 @@
-From 8eb87a7b794e649003bc8f4bed6c6d6739f65e43 Mon Sep 17 00:00:00 2001
+From 7a797219b4604eb039387d188b22ee9b292bf68a Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
-Subject: [PATCH 13/16] Ignore broken and non-applicable tests
+Subject: [PATCH 15/18] Ignore broken and non-applicable tests
 
 c-link-to-rust-va-list-fn: unstable feature, broken on aarch64, #56475
 env-funky-keys: can't handle LD_PRELOAD (e.g. sandbox)
 long-linker-command-lines: takes >10 minutes to run (but still passes)
 simd-intrinsic-generic-bitmask.rs: broken on BE, #59356
-simd-intrinsic-generic-select.rs: broken on BE, #59356
 sparc-struct-abi: no sparc target
 sysroot-crates-are-unstable: can't run rustc without RPATH
 ---
@@ -16,10 +15,9 @@ sysroot-crates-are-unstable: can't run rustc without RPATH
  src/test/run-make-fulldeps/linker-output-non-utf8/Makefile      | 2 ++
  src/test/run-make-fulldeps/long-linker-command-lines/Makefile   | 2 ++
  src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile | 2 ++
- src/test/run-pass/env-funky-keys.rs                             | 1 +
- src/test/run-pass/simd/simd-intrinsic-generic-bitmask.rs        | 2 ++
- src/test/run-pass/simd/simd-intrinsic-generic-select.rs         | 2 ++
- 8 files changed, 14 insertions(+)
+ src/test/ui/env-funky-keys.rs                                   | 1 +
+ src/test/ui/simd/simd-intrinsic-generic-bitmask.rs              | 2 ++
+ 7 files changed, 12 insertions(+)
 
 diff --git a/src/test/codegen/sparc-struct-abi.rs b/src/test/codegen/sparc-struct-abi.rs
 index 78e5b14a212..6f93e93286b 100644
@@ -76,21 +74,22 @@ index 9e770706857..6d92ec5cec8 100644
  -include ../tools.mk
  
  all:
-diff --git a/src/test/run-pass/env-funky-keys.rs b/src/test/run-pass/env-funky-keys.rs
-index 3b236e2b3af..7284d25de48 100644
---- a/src/test/run-pass/env-funky-keys.rs
-+++ b/src/test/run-pass/env-funky-keys.rs
-@@ -1,5 +1,6 @@
+diff --git a/src/test/ui/env-funky-keys.rs b/src/test/ui/env-funky-keys.rs
+index 4faceb53266..09764dc32bf 100644
+--- a/src/test/ui/env-funky-keys.rs
++++ b/src/test/ui/env-funky-keys.rs
+@@ -1,6 +1,7 @@
+ // run-pass
  // Ignore this test on Android, because it segfaults there.
  
 +// ignore-test
  // ignore-android
  // ignore-windows
  // ignore-cloudabi no execve
-diff --git a/src/test/run-pass/simd/simd-intrinsic-generic-bitmask.rs b/src/test/run-pass/simd/simd-intrinsic-generic-bitmask.rs
+diff --git a/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs b/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs
 index b28f742a92e..3ee4ccce731 100644
---- a/src/test/run-pass/simd/simd-intrinsic-generic-bitmask.rs
-+++ b/src/test/run-pass/simd/simd-intrinsic-generic-bitmask.rs
+--- a/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs
++++ b/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs
 @@ -2,6 +2,8 @@
  #![allow(non_camel_case_types)]
  
@@ -99,19 +98,6 @@ index b28f742a92e..3ee4ccce731 100644
 +// ignore-powerpc64
  
  // Test that the simd_bitmask intrinsic produces correct results.
- 
-diff --git a/src/test/run-pass/simd/simd-intrinsic-generic-select.rs b/src/test/run-pass/simd/simd-intrinsic-generic-select.rs
-index f79b140494e..39080c8c90d 100644
---- a/src/test/run-pass/simd/simd-intrinsic-generic-select.rs
-+++ b/src/test/run-pass/simd/simd-intrinsic-generic-select.rs
-@@ -2,6 +2,8 @@
- #![allow(non_camel_case_types)]
- 
- // ignore-emscripten
-+// ignore-powerpc
-+// ignore-powerpc64
- 
- // Test that the simd_select intrinsics produces correct results.
  
 -- 
 2.21.0
