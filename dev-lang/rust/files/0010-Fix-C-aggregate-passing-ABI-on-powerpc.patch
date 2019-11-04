@@ -1,7 +1,7 @@
-From b542c403b8211e1e99278b206b82f5f601dd8cbd Mon Sep 17 00:00:00 2001
+From f5fb5c3ae73b4c848e1e2ecbd21f94351f68b672 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 4 Sep 2019 20:40:18 -0500
-Subject: [PATCH 07/18] Fix C aggregate-passing ABI on powerpc
+Subject: [PATCH 10/20] Fix C aggregate-passing ABI on powerpc
 
 The existing code (which looks like it was copied from MIPS) passes
 aggregates by value in registers. This is wrong. According to the SVR4
@@ -89,5 +89,5 @@ index d496abf8e8b..f20defd6f5b 100644
      }
  }
 -- 
-2.21.0
+2.23.0
 

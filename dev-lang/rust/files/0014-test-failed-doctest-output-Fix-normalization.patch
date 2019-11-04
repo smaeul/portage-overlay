@@ -1,7 +1,7 @@
-From 288b1c1845096034f370b78f0c2ff3e31c468581 Mon Sep 17 00:00:00 2001
+From 37a51bc5f6dbf20cb98434067e635f750ffc897c Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 7 Oct 2019 18:36:28 -0500
-Subject: [PATCH 12/18] test/failed-doctest-output: Fix normalization
+Subject: [PATCH 14/20] test/failed-doctest-output: Fix normalization
 
 Otherwise we get:
 
@@ -32,5 +32,5 @@ index d2cdeb8f8f5..0e3f765fda6 100644
  
  // doctest fails at runtime
 -- 
-2.21.0
+2.23.0
 

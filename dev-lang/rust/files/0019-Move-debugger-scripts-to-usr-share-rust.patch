@@ -1,7 +1,7 @@
-From 7c381527fa142b00f83ec6a9b5f1b7b31fc4d3ee Mon Sep 17 00:00:00 2001
+From 38211bfcaad949da31db7f199d23acaaf6c8e579 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
-Subject: [PATCH 17/18] Move debugger scripts to /usr/share/rust
+Subject: [PATCH 19/20] Move debugger scripts to /usr/share/rust
 
 ---
  src/bootstrap/dist.rs | 2 +-
@@ -49,5 +49,5 @@ index 7b9b40e6b4a..e471db365b7 100755
  category_enable="type category enable Rust"
  
 -- 
-2.21.0
+2.23.0
 

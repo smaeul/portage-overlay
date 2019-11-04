@@ -1,7 +1,7 @@
 From ffe35880050c7e38bb50cb9ecb7b325bb9eff6d9 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 10 Jan 2018 13:36:41 -0600
-Subject: [PATCH 01/18] Don't pass CFLAGS to the C++ compiler
+Subject: [PATCH 01/20] Don't pass CFLAGS to the C++ compiler
 
 ---
  src/bootstrap/builder.rs | 3 +--
@@ -22,5 +22,5 @@ index e54c9360bae..7bdd73aa381 100644
          }
  
 -- 
-2.21.0
+2.23.0
 

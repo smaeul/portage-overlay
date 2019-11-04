@@ -1,0 +1,26 @@
+From 47e4627c986c53b6233e61894bd68e95c091ff28 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sun, 3 Nov 2019 17:01:32 -0600
+Subject: [PATCH 08/20] Link libssp_nonshared.a on all musl targets
+
+---
+ src/librustc_target/spec/linux_musl_base.rs | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/librustc_target/spec/linux_musl_base.rs b/src/librustc_target/spec/linux_musl_base.rs
+index 58ae91a96aa..f1b08e03124 100644
+--- a/src/librustc_target/spec/linux_musl_base.rs
++++ b/src/librustc_target/spec/linux_musl_base.rs
+@@ -9,6 +9,9 @@ pub fn opts() -> TargetOptions {
+     // argument is *not* necessary for normal builds, but it can't hurt!
+     base.pre_link_args.get_mut(&LinkerFlavor::Gcc).unwrap().push("-Wl,--eh-frame-hdr".to_string());
+ 
++    // libssp_nonshared.a is needed for __stack_chk_fail_local when using libc.so
++    base.post_link_args.insert(LinkerFlavor::Gcc, vec!["-lssp_nonshared".to_string()]);
++
+     // These targets statically link libc by default
+     base.crt_static_default = true;
+     // These targets allow the user to choose between static and dynamic linking.
+-- 
+2.23.0
+

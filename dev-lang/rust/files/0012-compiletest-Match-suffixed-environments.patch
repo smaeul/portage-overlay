@@ -1,7 +1,7 @@
-From 12593754aebecd852a8738524025fa59cf44c429 Mon Sep 17 00:00:00 2001
+From 273057d7cfc4e761c7246d1cbb6dbda17d203aef Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 2 Sep 2019 22:10:10 -0500
-Subject: [PATCH 09/18] compiletest: Match suffixed environments
+Subject: [PATCH 12/20] compiletest: Match suffixed environments
 
 ---
  src/tools/compiletest/src/header.rs | 2 +-
@@ -44,5 +44,5 @@ index 56ebea7c20f..3a2ee445087 100644
  
  pub fn get_pointer_width(triple: &str) -> &'static str {
 -- 
-2.21.0
+2.23.0
 

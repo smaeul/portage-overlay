@@ -1,7 +1,7 @@
-From e734014aa61cc130e180600b8cb9fdb57909e843 Mon Sep 17 00:00:00 2001
+From cbbeca02f2a8f19bf5453c4851f8455725324d2f Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 4 Sep 2019 20:44:30 -0500
-Subject: [PATCH 08/18] Fix zero-sized aggregate ABI on powerpc
+Subject: [PATCH 11/20] Fix zero-sized aggregate ABI on powerpc
 
 For targets that pass zero-sized aggregates indirectly (generally
 those that pass all aggregates indirectly), we must allocate a register
@@ -58,5 +58,5 @@ index 19c753bc304..b0e1b391e4b 100644
                  }
              }
 -- 
-2.21.0
+2.23.0
 

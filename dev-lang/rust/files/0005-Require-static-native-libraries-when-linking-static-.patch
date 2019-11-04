@@ -1,7 +1,7 @@
-From 8f2821b37da4fe2710e1bf7944765a5c2cf8d98c Mon Sep 17 00:00:00 2001
+From 7e10afdd743caa98e239f270ca992597776eb304 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
-Subject: [PATCH 04/18] Require static native libraries when linking static
+Subject: [PATCH 05/20] Require static native libraries when linking static
  executables
 
 On ELF targets like Linux, gcc/ld will create a dynamically-linked
@@ -52,5 +52,5 @@ index 8fb0828285c..2d8a0b86076 100644
                  NativeLibraryKind::NativeStaticNobundle => {
                      // Link "static-nobundle" native libs only if the crate they originate from
 -- 
-2.21.0
+2.23.0
 

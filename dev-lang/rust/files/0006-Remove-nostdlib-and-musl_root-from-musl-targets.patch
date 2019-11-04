@@ -1,7 +1,7 @@
-From 87b08278a8640db921cbd699c7a7dc7e1864f21e Mon Sep 17 00:00:00 2001
+From c902f252b16f30117118aba6de49c4dfc3c679c2 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 22:11:14 -0500
-Subject: [PATCH 05/18] Remove -nostdlib and musl_root from musl targets
+Subject: [PATCH 06/20] Remove -nostdlib and musl_root from musl targets
 
 ---
  config.toml.example                           |  6 ----
@@ -390,5 +390,5 @@ index e294e63982d..58ae91a96aa 100644
      base.crt_static_default = true;
      // These targets allow the user to choose between static and dynamic linking.
 -- 
-2.21.0
+2.23.0
 

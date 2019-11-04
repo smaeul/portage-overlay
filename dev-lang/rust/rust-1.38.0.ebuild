@@ -3,9 +3,9 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy )
 
-inherit check-reqs estack flag-o-matic llvm multiprocessing python-any-r1 toolchain-funcs
+inherit check-reqs estack flag-o-matic llvm multilib-build multiprocessing python-any-r1 rust-toolchain toolchain-funcs
 
 ABI_VER="$(ver_cut 1-2)"
 SLOT="stable/${ABI_VER}"
@@ -34,7 +34,7 @@ LLVM_TARGET_USEDEPS=${ALL_LLVM_TARGETS[@]/%/?}
 
 LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
 
-IUSE="clippy cpu_flags_x86_sse2 debug doc libressl miri rls rustfmt system-llvm ${ALL_LLVM_TARGETS[*]}"
+IUSE="clippy cpu_flags_x86_sse2 debug doc libressl miri rls rustfmt system-llvm wasm ${ALL_LLVM_TARGETS[*]}"
 
 # Please keep the LLVM dependency block separate. Since LLVM is slotted,
 # we need to *really* make sure we're not pulling more than one slot
@@ -47,6 +47,7 @@ IUSE="clippy cpu_flags_x86_sse2 debug doc libressl miri rls rustfmt system-llvm 
 LLVM_DEPEND="
 	|| (
 		>=sys-devel/llvm-9:=[${LLVM_TARGET_USEDEPS// /,}]
+		wasm? ( =sys-devel/lld-9* )
 	)
 	<sys-devel/llvm-10:=
 "
@@ -58,6 +59,7 @@ COMMON_DEPEND="
 	net-libs/http-parser:=
 	net-libs/libssh2:=
 	net-misc/curl:=[ssl]
+	sys-libs/libssp_nonshared:=[${MULTILIB_USEDEP}]
 	sys-libs/zlib:=
 	system-llvm? (
 		${LLVM_DEPEND}
@@ -83,6 +85,7 @@ RDEPEND="${COMMON_DEPEND}
 "
 
 REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
+	wasm? ( llvm_targets_WebAssembly )
 	x86? ( cpu_flags_x86_sse2 )
 "
 
@@ -90,21 +93,23 @@ PATCHES=(
 	"${FILESDIR}/0001-Don-t-pass-CFLAGS-to-the-C-compiler.patch"
 	"${FILESDIR}/0002-Fix-LLVM-build.patch"
 	"${FILESDIR}/0003-Allow-rustdoc-to-work-when-cross-compiling-on-musl.patch"
-	"${FILESDIR}/0004-Require-static-native-libraries-when-linking-static-.patch"
-	"${FILESDIR}/0005-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
-	"${FILESDIR}/0006-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
-	"${FILESDIR}/0007-Fix-C-aggregate-passing-ABI-on-powerpc.patch"
-	"${FILESDIR}/0008-Fix-zero-sized-aggregate-ABI-on-powerpc.patch"
-	"${FILESDIR}/0009-compiletest-Match-suffixed-environments.patch"
-	"${FILESDIR}/0010-test-c-variadic-Fix-patterns-on-powerpc64.patch"
-	"${FILESDIR}/0011-Use-rustc-workspace-hack-for-rustbook.patch"
-	"${FILESDIR}/0012-test-failed-doctest-output-Fix-normalization.patch"
-	"${FILESDIR}/0013-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
-	"${FILESDIR}/0014-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
-	"${FILESDIR}/0015-Ignore-broken-and-non-applicable-tests.patch"
-	"${FILESDIR}/0016-Link-stage-2-tools-dynamically-to-libstd.patch"
-	"${FILESDIR}/0017-Move-debugger-scripts-to-usr-share-rust.patch"
-	"${FILESDIR}/0018-Add-gentoo-target-specs.patch"
+	"${FILESDIR}/0004-Use-rustc-workspace-hack-for-rustbook.patch"
+	"${FILESDIR}/0005-Require-static-native-libraries-when-linking-static-.patch"
+	"${FILESDIR}/0006-Remove-nostdlib-and-musl_root-from-musl-targets.patch"
+	"${FILESDIR}/0007-Prefer-libgcc_eh-over-libunwind-for-musl.patch"
+	"${FILESDIR}/0008-Link-libssp_nonshared.a-on-all-musl-targets.patch"
+	"${FILESDIR}/0009-Configure-LLVM-module-PIC-level.patch"
+	"${FILESDIR}/0010-Fix-C-aggregate-passing-ABI-on-powerpc.patch"
+	"${FILESDIR}/0011-Fix-zero-sized-aggregate-ABI-on-powerpc.patch"
+	"${FILESDIR}/0012-compiletest-Match-suffixed-environments.patch"
+	"${FILESDIR}/0013-test-c-variadic-Fix-patterns-on-powerpc64.patch"
+	"${FILESDIR}/0014-test-failed-doctest-output-Fix-normalization.patch"
+	"${FILESDIR}/0015-test-use-extern-for-plugins-Don-t-assume-multilib.patch"
+	"${FILESDIR}/0016-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch"
+	"${FILESDIR}/0017-Ignore-broken-and-non-applicable-tests.patch"
+	"${FILESDIR}/0018-Link-stage-2-tools-dynamically-to-libstd.patch"
+	"${FILESDIR}/0019-Move-debugger-scripts-to-usr-share-rust.patch"
+	"${FILESDIR}/0020-Add-gentoo-target-specs.patch"
 	"${FILESDIR}/0030-libc-linkage.patch"
 	"${FILESDIR}/0031-typenum-pmmx.patch"
 	"${FILESDIR}/0032-libgit2-sys-abi.patch"
@@ -160,7 +165,21 @@ src_prepare() {
 }
 
 src_configure() {
-	local tools='"cargo"'
+	local arch_cflags rust_target="" rust_targets="\"$CHOST\"" tools="\"cargo\""
+
+	# Collect rust target names to compile standard libs for all ABIs.
+	for v in $(multilib_get_enabled_abi_pairs); do
+		rust_target=$(rust_abi $(get_abi_CHOST ${v##*.}) | sed s/gnu/musl/)
+		rust_targets="${rust_targets},\"${rust_target}\""
+
+		if [ "$rust_target" = "armv7-unknown-linux-musleabihf" ] &&
+		   use cpu_flags_arm_neon && use cpu_flags_arm_thumb2; then
+			rust_targets="${rust_targets},\"thumbv7neon-unknown-linux-musleabihf\""
+		fi
+	done
+	if use wasm; then
+		rust_targets="${rust_targets},\"wasm32-unknown-unknown\""
+	fi
 
 	for tool in clippy miri rls rustfmt; do
 		if use $tool; then
@@ -180,7 +199,7 @@ src_configure() {
 		[build]
 		build = "${CHOST}"
 		host = ["${CHOST}"]
-		target = ["${CHOST}"]
+		target = [${rust_targets}]
 		cargo = "${WORKDIR}/stage0/bin/cargo"
 		rustc = "${WORKDIR}/stage0/bin/rustc"
 		docs = $(toml_usex doc)
@@ -214,6 +233,7 @@ src_configure() {
 		optimize-tests = $(toml_usex !debug)
 		codegen-tests = true
 		dist-src = false
+		lld = $(usex system-llvm false $(toml_usex wasm))
 		backtrace-on-ice = true
 		jemalloc = false
 		[dist]
@@ -223,10 +243,50 @@ src_configure() {
 		cxx = "$(tc-getCXX)"
 		linker = "$(tc-getCC)"
 		ar = "$(tc-getAR)"
+		crt-static = false
 	EOF
 	use system-llvm && cat <<- EOF >> "${S}"/config.toml
 		llvm-config = "$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
 	EOF
+
+	for v in $(multilib_get_enabled_abi_pairs); do
+		rust_target=$(rust_abi $(get_abi_CHOST ${v##*.}) | sed s/gnu/musl/)
+		arch_cflags="$(get_abi_CFLAGS ${v##*.})"
+
+		export "CFLAGS_${rust_target//-/_}"="$CFLAGS ${arch_cflags}"
+
+		cat <<- EOF >> "${S}"/config.toml
+			[target.${rust_target}]
+			cc = "$(tc-getCC)"
+			cxx = "$(tc-getCXX)"
+			linker = "$(tc-getCC)"
+			ar = "$(tc-getAR)"
+			crt-static = false
+		EOF
+
+		if [ "$rust_target" = "armv7-unknown-linux-musleabihf" ] &&
+		   use cpu_flags_arm_neon && use cpu_flags_arm_thumb2; then
+			rust_target=thumbv7neon-unknown-linux-musleabihf
+
+			export "CFLAGS_${rust_target//-/_}"="$CFLAGS ${arch_cflags}"
+
+			cat <<- EOF >> "${S}"/config.toml
+				[target.${rust_target}]
+				cc = "$(tc-getCC)"
+				cxx = "$(tc-getCXX)"
+				linker = "$(tc-getCC)"
+				ar = "$(tc-getAR)"
+				crt-static = false
+			EOF
+		fi
+	done
+
+	if use wasm; then
+		cat <<- EOF >> "${S}"/config.toml
+			[target.wasm32-unknown-unknown]
+			linker = "$(usex system-llvm lld rust-lld)"
+		EOF
+	fi
 }
 
 src_compile() {

@@ -1,7 +1,7 @@
-From 662ca3f88621d231be1edb695319efaa6d262572 Mon Sep 17 00:00:00 2001
+From f4aed571cdec50bfd80924cd2f57463c60723ed2 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 24 Sep 2018 23:42:23 +0000
-Subject: [PATCH 16/18] Link stage 2 tools dynamically to libstd
+Subject: [PATCH 18/20] Link stage 2 tools dynamically to libstd
 
 ---
  src/bootstrap/tool.rs | 4 +++-
@@ -23,5 +23,5 @@ index c91ccc79aa1..e1b90400cc0 100644
      if source_type == SourceType::Submodule {
          cargo.env("RUSTC_EXTERNAL_TOOL", "1");
 -- 
-2.21.0
+2.23.0
 
