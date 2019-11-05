@@ -1,7 +1,7 @@
 From 02bae9a59de4e38001272219b8a9909549c12df8 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:04:29 -0500
-Subject: [PATCH 02/20] Fix LLVM build
+Subject: [PATCH 02/21] Fix LLVM build
 
 ---
  src/bootstrap/lib.rs | 3 ++-

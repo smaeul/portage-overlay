@@ -1,7 +1,7 @@
 From 96510c150f16307fb1896cf0d72d3b7937e1ff2d Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 2 Sep 2019 22:09:15 -0500
-Subject: [PATCH 13/20] test/c-variadic: Fix patterns on powerpc64
+Subject: [PATCH 13/21] test/c-variadic: Fix patterns on powerpc64
 
 ---
  src/test/codegen/c-variadic.rs | 22 +++++++++++-----------

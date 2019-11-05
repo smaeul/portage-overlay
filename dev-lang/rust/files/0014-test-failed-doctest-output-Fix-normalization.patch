@@ -1,7 +1,7 @@
 From 37a51bc5f6dbf20cb98434067e635f750ffc897c Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 7 Oct 2019 18:36:28 -0500
-Subject: [PATCH 14/20] test/failed-doctest-output: Fix normalization
+Subject: [PATCH 14/21] test/failed-doctest-output: Fix normalization
 
 Otherwise we get:
 

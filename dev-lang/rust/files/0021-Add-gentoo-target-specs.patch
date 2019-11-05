@@ -1,7 +1,7 @@
-From 00ad8df444d268ca5f42605706332b6eaefbf87a Mon Sep 17 00:00:00 2001
+From 18d98136de363b6140b31283f9dce51ddece76f4 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:29:06 +0000
-Subject: [PATCH 20/20] Add gentoo target specs
+Subject: [PATCH 21/21] Add gentoo target specs
 
 ---
  src/librustc_target/spec/aarch64_gentoo_linux_musl.rs | 11 +++++++++++
@@ -90,7 +90,7 @@ index 00000000000..1cd39cd76af
 +    Ok(base)
 +}
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index ec72c00c28f..f8e6bd987fe 100644
+index 8f6d349020f..9d52f7968af 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
 @@ -329,7 +329,17 @@ macro_rules! supported_targets {

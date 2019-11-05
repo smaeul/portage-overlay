@@ -1,7 +1,7 @@
 From 38211bfcaad949da31db7f199d23acaaf6c8e579 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
-Subject: [PATCH 19/20] Move debugger scripts to /usr/share/rust
+Subject: [PATCH 19/21] Move debugger scripts to /usr/share/rust
 
 ---
  src/bootstrap/dist.rs | 2 +-

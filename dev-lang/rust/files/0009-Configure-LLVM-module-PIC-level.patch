@@ -1,7 +1,7 @@
 From 62210df964c39180438fe5b7532f2f0146df1380 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 3 Nov 2019 10:52:00 -0600
-Subject: [PATCH 09/20] Configure LLVM module PIC level
+Subject: [PATCH 09/21] Configure LLVM module PIC level
 
 As of LLVM 9, this is required for 32-bit PowerPC to properly generate
 PLT references. Previously, only BigPIC was supported; now LLVM supports

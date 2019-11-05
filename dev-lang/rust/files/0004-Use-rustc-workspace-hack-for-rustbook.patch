@@ -1,7 +1,7 @@
 From e9a00c81c5e9abbe69508c4b40d27610a3f0437b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 6 Oct 2019 17:30:11 -0500
-Subject: [PATCH 04/20] Use rustc-workspace-hack for rustbook
+Subject: [PATCH 04/21] Use rustc-workspace-hack for rustbook
 
 As rustbook now depends transitively on openssl, it needs access to the
 rustc-workspace-hack/all-static feature to pick up openssl-sys/vendored.
