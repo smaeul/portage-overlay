@@ -118,8 +118,7 @@ PATCHES=(
 	"${FILESDIR}/0050-llvm.patch"
 	"${FILESDIR}/0051-llvm-powerpc-plt.patch"
 	"${FILESDIR}/0052-llvm-powerpc-elfv2.patch"
-	"${FILESDIR}/0060-Update-libressl-support.patch"
-	"${FILESDIR}/0061-Update-libressl-support.patch"
+	"${FILESDIR}/0060-Update-libressl-support-3.x.patch"
 )
 
 S="${WORKDIR}/${MY_P}-src"
