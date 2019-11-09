@@ -56,6 +56,7 @@ LLVM_MAX_SLOT=9
 COMMON_DEPEND="
 	!libressl? ( dev-libs/openssl:0= )
 	libressl? ( dev-libs/libressl:0= )
+	dev-libs/libgit2:=
 	net-libs/http-parser:=
 	net-libs/libssh2:=
 	net-misc/curl:=[ssl]
@@ -144,6 +145,11 @@ pkg_pretend() {
 pkg_setup() {
 	pre_build_checks
 	python-any-r1_pkg_setup
+
+	export LIBGIT2_SYS_USE_PKG_CONFIG=1
+	export LIBSSH2_SYS_USE_PKG_CONFIG=1
+	export PKG_CONFIG_ALLOW_CROSS=1
+
 	if use system-llvm; then
 		llvm_pkg_setup
 		local llvm_config="$(get_llvm_prefix "$LLVM_MAX_SLOT")/bin/llvm-config"
