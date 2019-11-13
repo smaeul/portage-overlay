@@ -1,7 +1,7 @@
-From 69576480b5f2777d42c5191e576a9a4f4163da80 Mon Sep 17 00:00:00 2001
+From 410b365dd609e6da69771a78cdac3cf62cb4bc6b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 4 Nov 2019 21:48:22 -0600
-Subject: [PATCH 20/21] Add target thumbv7neon-unknown-linux-musleabihf
+Subject: [PATCH 07/19] Add target thumbv7neon-unknown-linux-musleabihf
 
 This is a copy of thumbv7neon-unknown-linux-gnueabihf with musl changes
 merged from armv7-unknown-linux-musleabihf.
@@ -12,10 +12,10 @@ merged from armv7-unknown-linux-musleabihf.
  create mode 100644 src/librustc_target/spec/thumbv7neon_unknown_linux_musleabihf.rs
 
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index ec72c00c28f..8f6d349020f 100644
+index 626fa374a1b..2bd0147513d 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
-@@ -362,6 +362,7 @@ supported_targets! {
+@@ -364,6 +364,7 @@ supported_targets! {
      ("armv7-unknown-linux-gnueabi", armv7_unknown_linux_gnueabi),
      ("armv7-unknown-linux-gnueabihf", armv7_unknown_linux_gnueabihf),
      ("thumbv7neon-unknown-linux-gnueabihf", thumbv7neon_unknown_linux_gnueabihf),

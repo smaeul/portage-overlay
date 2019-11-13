@@ -1,17 +1,17 @@
-From 02bae9a59de4e38001272219b8a9909549c12df8 Mon Sep 17 00:00:00 2001
+From c39f4eb79c5320ef322919d76e27648c5680b610 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:04:29 -0500
-Subject: [PATCH 02/21] Fix LLVM build
+Subject: [PATCH 02/19] Fix LLVM build
 
 ---
  src/bootstrap/lib.rs | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index b72aa78f3de..3374c88550a 100644
+index 9203a558f64..d292609f57c 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -768,7 +768,8 @@ impl Build {
+@@ -757,7 +757,8 @@ impl Build {
          // cc-rs because the build scripts will determine that for themselves.
          let mut base = self.cc[&target].args().iter()
                             .map(|s| s.to_string_lossy().into_owned())

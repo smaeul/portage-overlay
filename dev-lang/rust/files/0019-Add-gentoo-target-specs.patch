@@ -1,7 +1,7 @@
-From 18d98136de363b6140b31283f9dce51ddece76f4 Mon Sep 17 00:00:00 2001
+From 02c682e3ee86cb4fdb0b477e8be3ff740145eca8 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:29:06 +0000
-Subject: [PATCH 21/21] Add gentoo target specs
+Subject: [PATCH 19/19] Add gentoo target specs
 
 ---
  src/librustc_target/spec/aarch64_gentoo_linux_musl.rs | 11 +++++++++++
@@ -90,10 +90,10 @@ index 00000000000..1cd39cd76af
 +    Ok(base)
 +}
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index 8f6d349020f..9d52f7968af 100644
+index 2bd0147513d..b2d2fa98a4a 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
-@@ -329,7 +329,17 @@ macro_rules! supported_targets {
+@@ -331,7 +331,17 @@ macro_rules! supported_targets {
      };
  }
  
@@ -111,7 +111,7 @@ index 8f6d349020f..9d52f7968af 100644
      ("x86_64-unknown-linux-gnu", x86_64_unknown_linux_gnu),
      ("x86_64-unknown-linux-gnux32", x86_64_unknown_linux_gnux32),
      ("i686-unknown-linux-gnu", i686_unknown_linux_gnu),
-@@ -354,7 +364,6 @@ supported_targets! {
+@@ -356,7 +366,6 @@ supported_targets! {
      ("sparc64-unknown-linux-gnu", sparc64_unknown_linux_gnu),
      ("arm-unknown-linux-gnueabi", arm_unknown_linux_gnueabi),
      ("arm-unknown-linux-gnueabihf", arm_unknown_linux_gnueabihf),

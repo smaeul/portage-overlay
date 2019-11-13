@@ -1,7 +1,7 @@
-From 62210df964c39180438fe5b7532f2f0146df1380 Mon Sep 17 00:00:00 2001
+From 0669e638ee940af9da30842a0aeadba399c6f726 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 3 Nov 2019 10:52:00 -0600
-Subject: [PATCH 09/21] Configure LLVM module PIC level
+Subject: [PATCH 08/19] Configure LLVM module PIC level
 
 As of LLVM 9, this is required for 32-bit PowerPC to properly generate
 PLT references. Previously, only BigPIC was supported; now LLVM supports
@@ -13,7 +13,7 @@ both BigPIC and SmallPIC, and there is no default value provided.
  3 files changed, 9 insertions(+)
 
 diff --git a/src/librustc_codegen_llvm/context.rs b/src/librustc_codegen_llvm/context.rs
-index a2aaaddf093..d8e16c31d6a 100644
+index 58ce9703909..137e2fd0648 100644
 --- a/src/librustc_codegen_llvm/context.rs
 +++ b/src/librustc_codegen_llvm/context.rs
 @@ -204,6 +204,10 @@ pub unsafe fn create_module(
@@ -28,10 +28,10 @@ index a2aaaddf093..d8e16c31d6a 100644
          llvm::LLVMRustSetModulePIELevel(llmod);
      }
 diff --git a/src/librustc_codegen_llvm/llvm/ffi.rs b/src/librustc_codegen_llvm/llvm/ffi.rs
-index 9f9410560e3..20ad6097872 100644
+index b07214fdc03..fa3f7f6bc6b 100644
 --- a/src/librustc_codegen_llvm/llvm/ffi.rs
 +++ b/src/librustc_codegen_llvm/llvm/ffi.rs
-@@ -1803,6 +1803,7 @@ extern "C" {
+@@ -1805,6 +1805,7 @@ extern "C" {
  
      pub fn LLVMRustSetComdat(M: &'a Module, V: &'a Value, Name: *const c_char);
      pub fn LLVMRustUnsetComdat(V: &Value);

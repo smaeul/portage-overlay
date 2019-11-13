@@ -1,7 +1,7 @@
-From e9a00c81c5e9abbe69508c4b40d27610a3f0437b Mon Sep 17 00:00:00 2001
+From 1ae4544397321c9bd2a44d2b7e30a66514d96b86 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 6 Oct 2019 17:30:11 -0500
-Subject: [PATCH 04/21] Use rustc-workspace-hack for rustbook
+Subject: [PATCH 12/19] Use rustc-workspace-hack for rustbook
 
 As rustbook now depends transitively on openssl, it needs access to the
 rustc-workspace-hack/all-static feature to pick up openssl-sys/vendored.
@@ -14,22 +14,22 @@ openssl is not installed (e.g. when cross-compiling).
  3 files changed, 7 insertions(+)
 
 diff --git a/Cargo.lock b/Cargo.lock
-index ab6731e4d43..54177b36827 100644
+index 5bc1938fee2..f107865ee2b 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -2577,6 +2577,7 @@ dependencies = [
-  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
-  "mdbook 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
-  "mdbook-linkcheck 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
-+ "rustc-workspace-hack 1.0.0",
+@@ -3036,6 +3036,7 @@ dependencies = [
+  "failure",
+  "mdbook",
+  "mdbook-linkcheck",
++ "rustc-workspace-hack",
  ]
  
  [[package]]
 diff --git a/src/bootstrap/tool.rs b/src/bootstrap/tool.rs
-index df7eb7c455d..c91ccc79aa1 100644
+index f1baeafe26a..815498047fd 100644
 --- a/src/bootstrap/tool.rs
 +++ b/src/bootstrap/tool.rs
-@@ -248,6 +248,7 @@ pub fn prepare_tool_cargo(
+@@ -244,6 +244,7 @@ pub fn prepare_tool_cargo(
              path.ends_with("rls") ||
              path.ends_with("clippy") ||
              path.ends_with("miri") ||

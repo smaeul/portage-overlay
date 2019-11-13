@@ -1,7 +1,7 @@
-From 37a51bc5f6dbf20cb98434067e635f750ffc897c Mon Sep 17 00:00:00 2001
+From be7cd0c95a0dcef577522824e52d0cbb7ad484d4 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 7 Oct 2019 18:36:28 -0500
-Subject: [PATCH 14/21] test/failed-doctest-output: Fix normalization
+Subject: [PATCH 13/19] test/failed-doctest-output: Fix normalization
 
 Otherwise we get:
 
@@ -19,13 +19,13 @@ Otherwise we get:
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/test/rustdoc-ui/failed-doctest-output.rs b/src/test/rustdoc-ui/failed-doctest-output.rs
-index d2cdeb8f8f5..0e3f765fda6 100644
+index fcbd7cabc69..7d19ace7487 100644
 --- a/src/test/rustdoc-ui/failed-doctest-output.rs
 +++ b/src/test/rustdoc-ui/failed-doctest-output.rs
-@@ -3,7 +3,7 @@
- // adapted to use that, and that normalize line can go away
+@@ -4,7 +4,7 @@
  
  // compile-flags:--test
+ // rustc-env:RUST_BACKTRACE=0
 -// normalize-stdout-test: "src/test/rustdoc-ui" -> "$$DIR"
 +// normalize-stdout-test: "[[:graph:]]*src/test/rustdoc-ui" -> "$$DIR"
  // failure-status: 101

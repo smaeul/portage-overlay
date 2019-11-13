@@ -1,0 +1,38 @@
+From b475a534593ea65b8967616a2bc6a642aaa934f5 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Sat, 9 Sep 2017 00:14:16 -0500
+Subject: [PATCH 06/19] Prefer libgcc_eh over libunwind for musl
+
+---
+ src/libunwind/build.rs | 1 -
+ src/libunwind/lib.rs   | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/libunwind/build.rs b/src/libunwind/build.rs
+index f24d957d67b..e08fb4c2781 100644
+--- a/src/libunwind/build.rs
++++ b/src/libunwind/build.rs
+@@ -12,7 +12,6 @@ fn main() {
+     } else if target.contains("linux") {
+         if target.contains("musl") {
+             // linking for musl is handled in lib.rs
+-            llvm_libunwind::compile();
+         } else if !target.contains("android") {
+             println!("cargo:rustc-link-lib=gcc_s");
+         }
+diff --git a/src/libunwind/lib.rs b/src/libunwind/lib.rs
+index 8d916447128..573f56fc880 100644
+--- a/src/libunwind/lib.rs
++++ b/src/libunwind/lib.rs
+@@ -21,7 +21,7 @@ cfg_if::cfg_if! {
+ }
+ 
+ #[cfg(target_env = "musl")]
+-#[link(name = "unwind", kind = "static", cfg(target_feature = "crt-static"))]
++#[link(name = "gcc_eh", kind = "static-nobundle", cfg(target_feature = "crt-static"))]
+ #[link(name = "gcc_s", cfg(not(target_feature = "crt-static")))]
+ extern {}
+ 
+-- 
+2.23.0
+
