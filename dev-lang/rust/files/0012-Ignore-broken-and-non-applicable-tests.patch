@@ -1,7 +1,7 @@
-From afcc045fd13c90bd5aafb506971da131c41ef543 Mon Sep 17 00:00:00 2001
+From aa70a0dc077a03dd7505e4ee97b8097d6bc7d45b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
-Subject: [PATCH 16/19] Ignore broken and non-applicable tests
+Subject: [PATCH 12/15] Ignore broken and non-applicable tests
 
 c-link-to-rust-va-list-fn: unstable feature, broken on aarch64, #56475
 env-funky-keys: can't handle LD_PRELOAD (e.g. sandbox)
@@ -12,12 +12,11 @@ sysroot-crates-are-unstable: can't run rustc without RPATH
 ---
  src/test/codegen/sparc-struct-abi.rs                            | 1 +
  src/test/run-make-fulldeps/c-link-to-rust-va-list-fn/Makefile   | 2 ++
- src/test/run-make-fulldeps/linker-output-non-utf8/Makefile      | 2 ++
  src/test/run-make-fulldeps/long-linker-command-lines/Makefile   | 2 ++
  src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile | 2 ++
  src/test/ui/env-funky-keys.rs                                   | 1 +
  src/test/ui/simd/simd-intrinsic-generic-bitmask.rs              | 2 ++
- 7 files changed, 12 insertions(+)
+ 6 files changed, 10 insertions(+)
 
 diff --git a/src/test/codegen/sparc-struct-abi.rs b/src/test/codegen/sparc-struct-abi.rs
 index 78e5b14a212..6f93e93286b 100644
@@ -41,19 +40,6 @@ index f124ca2ab61..363b18f0985 100644
  -include ../tools.mk
  
  all:
-diff --git a/src/test/run-make-fulldeps/linker-output-non-utf8/Makefile b/src/test/run-make-fulldeps/linker-output-non-utf8/Makefile
-index b47ce17ec8b..59c44fcf438 100644
---- a/src/test/run-make-fulldeps/linker-output-non-utf8/Makefile
-+++ b/src/test/run-make-fulldeps/linker-output-non-utf8/Makefile
-@@ -13,6 +13,8 @@
- # This also does not work on Apple APFS due to the filesystem requiring
- # valid UTF-8 paths.
- 
-+# ignore-musl
-+
- # The zzz it to allow humans to tab complete or glob this thing.
- bad_dir := $(TMPDIR)/zzz$$'\xff'
- 
 diff --git a/src/test/run-make-fulldeps/long-linker-command-lines/Makefile b/src/test/run-make-fulldeps/long-linker-command-lines/Makefile
 index 5876fbc94bc..5f167ece1a2 100644
 --- a/src/test/run-make-fulldeps/long-linker-command-lines/Makefile
@@ -100,5 +86,5 @@ index b28f742a92e..3ee4ccce731 100644
  // Test that the simd_bitmask intrinsic produces correct results.
  
 -- 
-2.23.0
+2.24.1
 

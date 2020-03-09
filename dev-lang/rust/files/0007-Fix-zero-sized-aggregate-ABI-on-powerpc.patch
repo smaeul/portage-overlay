@@ -1,7 +1,7 @@
-From 3ae6d1e727a3748ca50cb10be32af370169a6248 Mon Sep 17 00:00:00 2001
+From 1e3d4b2f211dbf7ffe827b3e30b2510196ad42d1 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 4 Sep 2019 20:44:30 -0500
-Subject: [PATCH 10/19] Fix zero-sized aggregate ABI on powerpc
+Subject: [PATCH 07/15] Fix zero-sized aggregate ABI on powerpc
 
 For targets that pass zero-sized aggregates indirectly (generally
 those that pass all aggregates indirectly), we must allocate a register
@@ -20,10 +20,10 @@ updating each implementation of `compute_abi_info` to handle ZSTs.
  1 file changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/src/librustc/ty/layout.rs b/src/librustc/ty/layout.rs
-index e52feea1624..0ecd6286fad 100644
+index c7278dc4fac..2e5ea499ac2 100644
 --- a/src/librustc/ty/layout.rs
 +++ b/src/librustc/ty/layout.rs
-@@ -2659,12 +2659,11 @@ where
+@@ -2576,12 +2576,11 @@ where
          };
  
          let target = &cx.tcx().sess.target.target;
@@ -41,7 +41,7 @@ index e52feea1624..0ecd6286fad 100644
          let rust_abi = match sig.abi {
              RustIntrinsic | PlatformIntrinsic | Rust | RustCall => true,
              _ => false,
-@@ -2734,11 +2733,10 @@ where
+@@ -2650,11 +2649,10 @@ where
              let is_return = arg_idx.is_none();
              let mut arg = mk_arg_type(ty, arg_idx);
              if arg.layout.is_zst() {
@@ -54,9 +54,9 @@ index e52feea1624..0ecd6286fad 100644
 +                // Zero-sized struct arguments cannot be ignored in the C ABI
 +                // if they are passed indirectly.
 +                if is_return || rust_abi || !indirect_zst {
-                     arg.mode = PassMode::Ignore(IgnoreMode::Zst);
+                     arg.mode = PassMode::Ignore;
                  }
              }
 -- 
-2.23.0
+2.24.1
 

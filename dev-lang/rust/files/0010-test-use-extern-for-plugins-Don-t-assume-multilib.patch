@@ -1,7 +1,7 @@
-From 78976e9fa98239c4d1fdcd5523dfc147b02f20c1 Mon Sep 17 00:00:00 2001
+From 7377256982b3eacc1056de29afa261170f391847 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 6 Oct 2018 04:01:48 +0000
-Subject: [PATCH 14/19] test/use-extern-for-plugins: Don't assume multilib
+Subject: [PATCH 10/15] test/use-extern-for-plugins: Don't assume multilib
 
 ---
  src/test/run-make-fulldeps/use-extern-for-plugins/Makefile | 7 +------
@@ -26,5 +26,5 @@ index 838b1a2719b..94fa9f6d067 100644
  all:
  	$(RUSTC) foo.rs -C extra-filename=-host
 -- 
-2.23.0
+2.24.1
 

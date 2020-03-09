@@ -1,7 +1,7 @@
-From e9000315746f99444ad125e75b07ae1b1840c398 Mon Sep 17 00:00:00 2001
+From 7c6fc043c31a6ae1cd5beb061b3de1e1ff528cce Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
-Subject: [PATCH 03/19] Allow rustdoc to work when cross-compiling on musl
+Subject: [PATCH 03/15] Allow rustdoc to work when cross-compiling on musl
 
 musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
 ---
@@ -9,7 +9,7 @@ musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index a13ff69a7b5..471b60f55a7 100644
+index 6937fb922de..ce78760978d 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
 @@ -22,9 +22,6 @@ fn main() {
@@ -19,7 +19,7 @@ index a13ff69a7b5..471b60f55a7 100644
 -    let mut dylib_path = bootstrap::util::dylib_path();
 -    dylib_path.insert(0, PathBuf::from(libdir.clone()));
 -
-     //FIXME(misdreavus): once stdsimd uses cfg(rustdoc) instead of cfg(dox), remove the `--cfg dox`
+     //FIXME(misdreavus): once stdsimd uses cfg(doc) instead of cfg(dox), remove the `--cfg dox`
      //arguments here
      let mut cmd = Command::new(rustdoc);
 @@ -36,7 +33,7 @@ fn main() {
@@ -41,5 +41,5 @@ index a13ff69a7b5..471b60f55a7 100644
          );
          eprintln!("sysroot: {:?}", sysroot);
 -- 
-2.23.0
+2.24.1
 
