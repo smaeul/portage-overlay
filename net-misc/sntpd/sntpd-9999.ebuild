@@ -12,7 +12,7 @@ EGIT_REPO_URI="https://github.com/troglobit/sntpd.git"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS=""
-IUSE="debug"
+IUSE="debug systemd"
 
 PATCHES=( "${FILESDIR}/${P}-select.patch" )
 
@@ -24,8 +24,11 @@ src_prepare() {
 
 src_configure() {
 	local myeconfargs=(
+		--with-adjtimex
+		--with-ntpclient
 		$(use_enable debug)
 		$(use_enable debug replay)
+		$(use_with systemd)
 	)
 
 	econf "${myeconfargs[@]}"
