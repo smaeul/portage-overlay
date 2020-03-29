@@ -1,4 +1,4 @@
-From 378d6114a63a0b8865b1f500d431543ec8875489 Mon Sep 17 00:00:00 2001
+From b03ee2d0af2621ee4f9a0513eb32d5be693fd890 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:05:18 -0500
 Subject: [PATCH 04/15] Require static native libraries when linking static
@@ -16,10 +16,10 @@ Fixes #54243
  1 file changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/src/librustc_codegen_ssa/back/link.rs b/src/librustc_codegen_ssa/back/link.rs
-index a2b50ea8e2b..3250ec4d296 100644
+index f56a4170c0a..9ae3bf84bc2 100644
 --- a/src/librustc_codegen_ssa/back/link.rs
 +++ b/src/librustc_codegen_ssa/back/link.rs
-@@ -1610,9 +1610,7 @@ fn add_upstream_rust_crates<'a, B: ArchiveBuilder<'a>>(
+@@ -1642,9 +1642,7 @@ fn add_upstream_rust_crates<'a, B: ArchiveBuilder<'a>>(
      }
  }
  
@@ -30,8 +30,8 @@ index a2b50ea8e2b..3250ec4d296 100644
  //
  // 1. The upstream crate is an rlib. In this case we *must* link in the
  // native dependency because the rlib is just an archive.
-@@ -1659,7 +1657,19 @@ pub fn add_upstream_native_libraries(
-                 continue
+@@ -1693,7 +1691,19 @@ pub fn add_upstream_native_libraries(
+                 continue;
              }
              match lib.kind {
 -                NativeLibraryKind::NativeUnknown => cmd.link_dylib(name),

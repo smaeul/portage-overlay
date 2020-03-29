@@ -1,4 +1,4 @@
-From 7c6fc043c31a6ae1cd5beb061b3de1e1ff528cce Mon Sep 17 00:00:00 2001
+From 62f482922a08bcc93cc3212764e47dea09690d12 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
 Subject: [PATCH 03/15] Allow rustdoc to work when cross-compiling on musl
@@ -9,7 +9,7 @@ musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index 6937fb922de..ce78760978d 100644
+index 8c8b33a4e4e..ee8e083d230 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
 @@ -22,9 +22,6 @@ fn main() {
@@ -22,16 +22,16 @@ index 6937fb922de..ce78760978d 100644
      //FIXME(misdreavus): once stdsimd uses cfg(doc) instead of cfg(dox), remove the `--cfg dox`
      //arguments here
      let mut cmd = Command::new(rustdoc);
-@@ -36,7 +33,7 @@ fn main() {
+@@ -35,7 +32,7 @@ fn main() {
+         .arg("dox")
          .arg("--sysroot")
          .arg(&sysroot)
-         .env(bootstrap::util::dylib_path_var(),
--             env::join_paths(&dylib_path).unwrap());
-+             PathBuf::from(libdir.clone()));
+-        .env(bootstrap::util::dylib_path_var(), env::join_paths(&dylib_path).unwrap());
++        .env(bootstrap::util::dylib_path_var(), PathBuf::from(libdir.clone()));
  
      // Force all crates compiled by this compiler to (a) be unstable and (b)
      // allow the `rustc_private` feature to link to other unstable crates
-@@ -87,7 +84,7 @@ fn main() {
+@@ -83,7 +80,7 @@ fn main() {
          eprintln!(
              "rustdoc command: {:?}={:?} {:?}",
              bootstrap::util::dylib_path_var(),

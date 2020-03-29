@@ -1,24 +1,23 @@
-From b5acd49420daf3f5a9a2de8d051e6be28de7c8ff Mon Sep 17 00:00:00 2001
+From fd1236653b000fc0b88a8c9365818c6818bcfbda Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Fri, 8 Sep 2017 00:04:29 -0500
 Subject: [PATCH 02/15] Fix LLVM build
 
 ---
- src/bootstrap/lib.rs | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/bootstrap/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index 080bef6853a..e9b7976dc36 100644
+index 1fee3fd9ac1..9e7176a8def 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -752,7 +752,8 @@ impl Build {
-         // cc-rs because the build scripts will determine that for themselves.
-         let mut base = self.cc[&target].args().iter()
-                            .map(|s| s.to_string_lossy().into_owned())
--                           .filter(|s| !s.starts_with("-O") && !s.starts_with("/O"))
-+                           .filter(|s| !s.starts_with("-O") && !s.starts_with("/O")
-+                                   && !s.starts_with("-static"))
-                            .collect::<Vec<String>>();
+@@ -759,7 +759,7 @@ impl Build {
+             .args()
+             .iter()
+             .map(|s| s.to_string_lossy().into_owned())
+-            .filter(|s| !s.starts_with("-O") && !s.starts_with("/O"))
++            .filter(|s| !s.starts_with("-O") && !s.starts_with("/O") && !s.starts_with("-static"))
+             .collect::<Vec<String>>();
  
          // If we're compiling on macOS then we add a few unconditional flags
 -- 

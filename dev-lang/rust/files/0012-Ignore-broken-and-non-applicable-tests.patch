@@ -1,4 +1,4 @@
-From aa70a0dc077a03dd7505e4ee97b8097d6bc7d45b Mon Sep 17 00:00:00 2001
+From 1879d1d1a284bf51c752e47db284ce22701ed5d0 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
 Subject: [PATCH 12/15] Ignore broken and non-applicable tests
@@ -61,7 +61,7 @@ index 9e770706857..6d92ec5cec8 100644
  
  all:
 diff --git a/src/test/ui/env-funky-keys.rs b/src/test/ui/env-funky-keys.rs
-index 4faceb53266..09764dc32bf 100644
+index c5c824ac58d..f3fe047a79c 100644
 --- a/src/test/ui/env-funky-keys.rs
 +++ b/src/test/ui/env-funky-keys.rs
 @@ -1,6 +1,7 @@

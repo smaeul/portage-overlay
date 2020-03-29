@@ -1,4 +1,4 @@
-From 410067085b2ca738612633fd91412c45bd69de0c Mon Sep 17 00:00:00 2001
+From ac49b6b490e4927c6cfa58ed3de165d9ab5719f9 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 7 Oct 2019 18:36:28 -0500
 Subject: [PATCH 09/15] test/failed-doctest-output: Fix normalization

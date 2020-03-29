@@ -1,4 +1,4 @@
-From 7377256982b3eacc1056de29afa261170f391847 Mon Sep 17 00:00:00 2001
+From 0e06281cb7850bd9ed3a8f1f009eee027d8287eb Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 6 Oct 2018 04:01:48 +0000
 Subject: [PATCH 10/15] test/use-extern-for-plugins: Don't assume multilib

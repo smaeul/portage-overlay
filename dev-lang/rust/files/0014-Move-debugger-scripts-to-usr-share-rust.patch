@@ -1,4 +1,4 @@
-From f5ac90ee5cd2e15189050604a77244cf02b1881d Mon Sep 17 00:00:00 2001
+From a0b85ab579117ce9b622523e26e45d9bed3ada88 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
 Subject: [PATCH 14/15] Move debugger scripts to /usr/share/rust
@@ -10,10 +10,10 @@ Subject: [PATCH 14/15] Move debugger scripts to /usr/share/rust
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/bootstrap/dist.rs b/src/bootstrap/dist.rs
-index 02533944fc2..375f2413a1f 100644
+index 8d13df3ee21..439800d460e 100644
 --- a/src/bootstrap/dist.rs
 +++ b/src/bootstrap/dist.rs
-@@ -593,7 +593,7 @@ impl Step for DebuggerScripts {
+@@ -595,7 +595,7 @@ impl Step for DebuggerScripts {
      fn run(self, builder: &Builder<'_>) {
          let host = self.host;
          let sysroot = self.sysroot;

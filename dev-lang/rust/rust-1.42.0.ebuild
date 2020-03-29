@@ -13,7 +13,7 @@ MY_P="rustc-${PV}"
 SRC="${MY_P}-src.tar.xz"
 KEYWORDS="amd64 ~arm ~arm64 ~ppc ppc64 x86"
 
-RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).0"
+RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).1"
 RUST_TOOLCHAIN_BASEURL="https://portage.smaeul.xyz/distfiles/"
 
 DESCRIPTION="Systems programming language from Mozilla"
@@ -60,8 +60,8 @@ LLVM_MAX_SLOT=10
 BOOTSTRAP_DEPEND="|| ( >=dev-lang/rust-1.$(($(ver_cut 2) - 1)).0-r1 >=dev-lang/rust-bin-1.$(($(ver_cut 2) - 1)) )"
 
 COMMON_DEPEND="
-	net-libs/http-parser:=
 	net-libs/libssh2:=
+	net-libs/http-parser:=
 	net-misc/curl:=[ssl]
 	sys-libs/libssp_nonshared:=[${MULTILIB_USEDEP}]
 	sys-libs/zlib:=
@@ -91,24 +91,23 @@ RDEPEND="${COMMON_DEPEND}
 "
 
 REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
+	miri? ( nightly )
 	parallel-compiler? ( nightly )
 	wasm? ( llvm_targets_WebAssembly )
 	x86? ( cpu_flags_x86_sse2 )
 "
 
 QA_FLAGS_IGNORED="
-	usr/bin/*-${PV}
-	usr/lib*/lib*.so
-	usr/lib/rustlib/*/codegen-backends/librustc_codegen_llvm-llvm.so
-	usr/lib/rustlib/*/lib/lib*.so
+	usr/bin/.*-${PV}
+	usr/lib.*/lib.*.so
+	usr/lib/rustlib/.*/codegen-backends/librustc_codegen_llvm-llvm.so
+	usr/lib/rustlib/.*/lib/lib.*.so
 "
 
 QA_SONAME="usr/lib.*/librustc_macros.*.so"
 
 PATCHES=(
 	"${FILESDIR}"/1.40.0-add-soname.patch
-	"${FILESDIR}"/1.41.1-llvm10.patch
-	"${FILESDIR}"/llvm-gcc10.patch
 	"${FILESDIR}"/0001-Don-t-pass-CFLAGS-to-the-C-compiler.patch
 	"${FILESDIR}"/0002-Fix-LLVM-build.patch
 	"${FILESDIR}"/0003-Allow-rustdoc-to-work-when-cross-compiling-on-musl.patch
@@ -373,18 +372,19 @@ src_install() {
 	rm "${ED}/usr/lib/rustlib/uninstall.sh" || die
 
 	if use clippy; then
-		mv "${ED}/usr/bin/cargo-clippy" "${ED}/usr/bin/cargo-clippy-${PV}" || die
 		mv "${ED}/usr/bin/clippy-driver" "${ED}/usr/bin/clippy-driver-${PV}" || die
+		mv "${ED}/usr/bin/cargo-clippy" "${ED}/usr/bin/cargo-clippy-${PV}" || die
 	fi
 	if use miri; then
 		mv "${ED}/usr/bin/miri" "${ED}/usr/bin/miri-${PV}" || die
+		mv "${ED}/usr/bin/cargo-miri" "${ED}/usr/bin/cargo-miri-${PV}" || die
 	fi
 	if use rls; then
 		mv "${ED}/usr/bin/rls" "${ED}/usr/bin/rls-${PV}" || die
 	fi
 	if use rustfmt; then
-		mv "${ED}/usr/bin/cargo-fmt" "${ED}/usr/bin/cargo-fmt-${PV}" || die
 		mv "${ED}/usr/bin/rustfmt" "${ED}/usr/bin/rustfmt-${PV}" || die
+		mv "${ED}/usr/bin/cargo-fmt" "${ED}/usr/bin/cargo-fmt-${PV}" || die
 	fi
 
 	# Move public shared libs to abi specific libdir
@@ -408,18 +408,19 @@ src_install() {
 		/usr/bin/rust-lldb
 	EOF
 	if use clippy; then
-		echo /usr/bin/cargo-clippy >> "${T}/provider-${P}"
 		echo /usr/bin/clippy-driver >> "${T}/provider-${P}"
+		echo /usr/bin/cargo-clippy >> "${T}/provider-${P}"
 	fi
 	if use miri; then
 		echo /usr/bin/miri >> "${T}/provider-${P}"
+		echo /usr/bin/cargo-miri >> "${T}/provider-${P}"
 	fi
 	if use rls; then
 		echo /usr/bin/rls >> "${T}/provider-${P}"
 	fi
 	if use rustfmt; then
-		echo /usr/bin/cargo-fmt >> "${T}/provider-${P}"
 		echo /usr/bin/rustfmt >> "${T}/provider-${P}"
+		echo /usr/bin/cargo-fmt >> "${T}/provider-${P}"
 	fi
 
 	insinto /etc/env.d/rust

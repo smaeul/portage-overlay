@@ -1,4 +1,4 @@
-From b38795afa965b5f43fee02b2e0752ae967f8239e Mon Sep 17 00:00:00 2001
+From ed91605e3192bf4802e0c9ee87fae4e965382a86 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:29:06 +0000
 Subject: [PATCH 15/15] Add gentoo target specs
@@ -90,7 +90,7 @@ index 00000000000..1cd39cd76af
 +    Ok(base)
 +}
 diff --git a/src/librustc_target/spec/mod.rs b/src/librustc_target/spec/mod.rs
-index 34b321d38f0..db96f3f2f83 100644
+index 67f45d3d230..990b9e5bf6e 100644
 --- a/src/librustc_target/spec/mod.rs
 +++ b/src/librustc_target/spec/mod.rs
 @@ -332,7 +332,17 @@ macro_rules! supported_targets {
