@@ -1,40 +1,48 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
-EAPI=5
+EAPI=7
 
-inherit eutils fcaps git-r3 toolchain-funcs
+inherit autotools fcaps git-r3
 
 DESCRIPTION="generates a status bar for dzen2, xmobar or similar"
-HOMEPAGE="http://i3wm.org/i3status/"
+HOMEPAGE="https://i3wm.org/i3status/"
 EGIT_REPO_URI="https://github.com/smaeul/i3status.git"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
-IUSE="pulseaudio test"
+KEYWORDS="~amd64 ~arm ~x86"
+IUSE="pulseaudio"
 
-RDEPEND="!x11-misc/i3status
+BDEPEND="virtual/pkgconfig"
+RDEPEND="
+	!x11-misc/i3status
+	>=dev-libs/yajl-2.0.2
 	dev-libs/confuse:=
 	dev-libs/libnl:3
-	>=dev-libs/yajl-2.0.2
 	media-libs/alsa-lib
 	media-libs/libmpdclient
-	pulseaudio? ( media-sound/pulseaudio )"
-DEPEND="${RDEPEND}
+	pulseaudio? ( || ( media-sound/pulseaudio media-sound/apulse[sdk] ) )
+"
+DEPEND="
+	${RDEPEND}
 	app-text/asciidoc
-	test? ( sys-apps/grep[pcre] )
-	virtual/pkgconfig"
+	app-text/xmlto
+"
 
 src_prepare() {
-	sed -e "/@echo/d" -e "s:@\$(:\$(:g" -e "/setcap/d" \
-		-e '/CFLAGS+=-g/d' -i Makefile || die
-	rm -rf man/${PN}.1  # man not regenerated in tarball
+	default
+
+	eautoreconf
 }
 
-src_compile() {
-	emake CC="$(tc-getCC)" PULSE=$(usex pulseaudio 1 0)
+src_configure() {
+	local myeconfargs=(
+		--disable-builddir
+		$(use_enable pulseaudio)
+	)
+
+	econf "${myeconfargs[@]}"
 }
 
 pkg_postinst() {
@@ -43,5 +51,5 @@ pkg_postinst() {
 	einfo "   i3bar (x11-wm/i3)"
 	einfo "   x11-misc/xmobar"
 	einfo "   x11-misc/dzen"
-	einfo "Please refer to manual: man ${PN}"
+	einfo "Please refer to manual: man i3status"
 }
