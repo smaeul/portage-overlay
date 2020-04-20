@@ -1,8 +1,8 @@
-diff --git chromium-69.0.3497.100/buildtools/third_party/libc++/trunk/include/__config
-index 52c7142..ca187dd 100644
---- chromium-69.0.3497.100/buildtools/third_party/libc++/trunk/include/__config
-+++ chromium-69.0.3497.100/buildtools/third_party/libc++/trunk/include/__config
-@@ -11,6 +11,8 @@
+diff --git chromium-81.0.4044.113/buildtools/third_party/libc++/trunk/include/__config chromium-81.0.4044.113/buildtools/third_party/libc++/trunk/include/__config
+index 044cd0ceb0..bd73374034 100644
+--- chromium-81.0.4044.113/buildtools/third_party/libc++/trunk/include/__config
++++ chromium-81.0.4044.113/buildtools/third_party/libc++/trunk/include/__config
+@@ -10,6 +10,8 @@
  #ifndef _LIBCPP_CONFIG
  #define _LIBCPP_CONFIG
  

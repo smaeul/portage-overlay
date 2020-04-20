@@ -1,9 +1,7 @@
-Use monotonic clock for pthread_cond_timedwait with musl too.
-
-diff --git a/v8/src/base/platform/condition-variable.cc b/v8/src/base/platform/condition-variable.cc
-index 5ea7083..c13027e 100644
---- ./v8/src/base/platform/condition-variable.cc
-+++ ./v8/src/base/platform/condition-variable.cc
+diff --git chromium-81.0.4044.113/v8/src/base/platform/condition-variable.cc chromium-81.0.4044.113/v8/src/base/platform/condition-variable.cc
+index 5ea70835ee..c13027e2e4 100644
+--- chromium-81.0.4044.113/v8/src/base/platform/condition-variable.cc
++++ chromium-81.0.4044.113/v8/src/base/platform/condition-variable.cc
 @@ -16,7 +16,7 @@ namespace base {
  
  ConditionVariable::ConditionVariable() {

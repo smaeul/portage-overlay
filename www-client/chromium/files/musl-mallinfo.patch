@@ -1,0 +1,60 @@
+diff --git chromium-81.0.4044.113/base/process/process_metrics_posix.cc chromium-81.0.4044.113/base/process/process_metrics_posix.cc
+index 044bd8d244..0521321cfe 100644
+--- chromium-81.0.4044.113/base/process/process_metrics_posix.cc
++++ chromium-81.0.4044.113/base/process/process_metrics_posix.cc
+@@ -110,14 +110,14 @@ size_t ProcessMetrics::GetMallocUsage() {
+   malloc_statistics_t stats = {0};
+   malloc_zone_statistics(nullptr, &stats);
+   return stats.size_in_use;
+-#elif defined(OS_LINUX) || defined(OS_ANDROID)
++#elif (defined(OS_LINUX) && defined(__GLIBC__)) || defined(OS_ANDROID)
+   struct mallinfo minfo = mallinfo();
+ #if BUILDFLAG(USE_TCMALLOC)
+   return minfo.uordblks;
+ #else
+   return minfo.hblkhd + minfo.arena;
+ #endif
+-#elif defined(OS_FUCHSIA)
++#else
+   // TODO(fuchsia): Not currently exposed. https://crbug.com/735087.
+   return 0;
+ #endif
+diff --git chromium-81.0.4044.113/base/trace_event/malloc_dump_provider.cc chromium-81.0.4044.113/base/trace_event/malloc_dump_provider.cc
+index 1bf34c9d9e..29abe2ef85 100644
+--- chromium-81.0.4044.113/base/trace_event/malloc_dump_provider.cc
++++ chromium-81.0.4044.113/base/trace_event/malloc_dump_provider.cc
+@@ -132,7 +132,7 @@ bool MallocDumpProvider::OnMemoryDump(const MemoryDumpArgs& args,
+   }
+ #elif defined(OS_FUCHSIA)
+ // TODO(fuchsia): Port, see https://crbug.com/706592.
+-#else
++#elif defined(OS_LINUX) && defined(__GLIBC__)
+   struct mallinfo info = mallinfo();
+   // In case of Android's jemalloc |arena| is 0 and the outer pages size is
+   // reported by |hblkhd|. In case of dlmalloc the total is given by
+diff --git chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-7.0/configs/linux/include/llvm/Config/config.h chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-7.0/configs/linux/include/llvm/Config/config.h
+index 0ce66203b3..eae9f9f020 100644
+--- chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-7.0/configs/linux/include/llvm/Config/config.h
++++ chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-7.0/configs/linux/include/llvm/Config/config.h
+@@ -122,7 +122,7 @@
+ /* #undef HAVE_MALLCTL */
+ 
+ /* Define to 1 if you have the `mallinfo' function. */
+-#define HAVE_MALLINFO 1
++/* #undef HAVE_MALLINFO */
+ 
+ /* Define to 1 if you have the <malloc.h> header file. */
+ #define HAVE_MALLOC_H 1
+diff --git chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+index 36f3c331e1..b1943e287b 100644
+--- chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+@@ -130,7 +130,7 @@
+ /* #undef HAVE_MALLCTL */
+ 
+ /* Define to 1 if you have the `mallinfo' function. */
+-#define HAVE_MALLINFO 1
++/* #undef HAVE_MALLINFO */
+ 
+ /* Define to 1 if you have the <malloc.h> header file. */
+ #define HAVE_MALLOC_H 1

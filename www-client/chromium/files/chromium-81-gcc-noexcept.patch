@@ -1,0 +1,13 @@
+diff --git chromium-81.0.4044.113/components/paint_preview/browser/paint_preview_client.cc chromium-81.0.4044.113/components/paint_preview/browser/paint_preview_client.cc
+index 38ab6beb57..dccf07f013 100644
+--- chromium-81.0.4044.113/components/paint_preview/browser/paint_preview_client.cc
++++ chromium-81.0.4044.113/components/paint_preview/browser/paint_preview_client.cc
+@@ -78,7 +78,7 @@ PaintPreviewClient::PaintPreviewData::PaintPreviewData() = default;
+ PaintPreviewClient::PaintPreviewData::~PaintPreviewData() = default;
+ 
+ PaintPreviewClient::PaintPreviewData& PaintPreviewClient::PaintPreviewData::
+-operator=(PaintPreviewData&& rhs) noexcept = default;
++operator=(PaintPreviewData&& rhs) = default;
+ PaintPreviewClient::PaintPreviewData::PaintPreviewData(
+     PaintPreviewData&& other) noexcept = default;
+ 

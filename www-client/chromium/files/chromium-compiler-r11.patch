@@ -1,17 +1,8 @@
-From a1207cc75454e653030716948d27ec27412f6fe8 Mon Sep 17 00:00:00 2001
-From: Mike Gilbert <floppym@gentoo.org>
-Date: Sat, 1 Jun 2019 14:22:57 +0100
-Subject: [PATCH] Disable various compiler configs
-
----
- build/config/compiler/BUILD.gn | 68 +++++++++++++++-------------------
- 1 file changed, 29 insertions(+), 39 deletions(-)
-
-diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
-index 4b24c76..0737326 100644
---- a/build/config/compiler/BUILD.gn
-+++ b/build/config/compiler/BUILD.gn
-@@ -230,8 +230,6 @@ config("compiler") {
+diff --git chromium-81.0.4044.113/build/config/compiler/BUILD.gn chromium-81.0.4044.113/build/config/compiler/BUILD.gn
+index eef1140e80..b34b55bfac 100644
+--- chromium-81.0.4044.113/build/config/compiler/BUILD.gn
++++ chromium-81.0.4044.113/build/config/compiler/BUILD.gn
+@@ -260,8 +260,6 @@ config("compiler") {
  
    configs += [
      # See the definitions below.
@@ -20,7 +11,7 @@ index 4b24c76..0737326 100644
      ":compiler_codegen",
      ":compiler_deterministic",
    ]
-@@ -471,20 +469,6 @@ config("compiler") {
+@@ -486,20 +484,6 @@ config("compiler") {
      }
    }
  
@@ -41,9 +32,9 @@ index 4b24c76..0737326 100644
    # C11/C++11 compiler flags setup.
    # ---------------------------
    if (is_linux || is_android || (is_nacl && is_clang) || current_os == "aix") {
-@@ -1433,6 +1417,12 @@ config("default_warnings") {
-         "-Wno-narrowing",
-       ]
+@@ -1446,6 +1430,12 @@ config("default_warnings") {
+         cflags_cc += [ "-Wno-class-memaccess" ]
+       }
  
 +      # -Wno-class-memaccess warns about hash table and vector in blink.
 +      # But the violation is intentional.
@@ -54,18 +45,7 @@ index 4b24c76..0737326 100644
        # -Wunused-local-typedefs is broken in gcc,
        # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63872
        cflags += [ "-Wno-unused-local-typedefs" ]
-@@ -1447,6 +1437,10 @@ config("default_warnings") {
-       # comments
-       # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61638
-       cflags += [ "-Wno-comments" ]
-+
-+      # -Wpacked-not-aligned complains all generated mojom-shared-internal.h
-+      # files.
-+      cflags += [ "-Wno-packed-not-aligned" ]
-     }
-   }
- 
-@@ -1523,7 +1517,7 @@ config("chromium_code") {
+@@ -1560,7 +1550,7 @@ config("chromium_code") {
        defines = [ "_HAS_NODISCARD" ]
      }
    } else {
@@ -74,7 +54,7 @@ index 4b24c76..0737326 100644
      if (treat_warnings_as_errors) {
        cflags += [ "-Werror" ]
  
-@@ -1532,10 +1526,6 @@ config("chromium_code") {
+@@ -1569,10 +1559,6 @@ config("chromium_code") {
        # well.
        ldflags = [ "-Werror" ]
      }
@@ -85,7 +65,7 @@ index 4b24c76..0737326 100644
  
      # In Chromium code, we define __STDC_foo_MACROS in order to get the
      # C99 macros on Mac and Linux.
-@@ -1544,15 +1534,6 @@ config("chromium_code") {
+@@ -1581,15 +1567,6 @@ config("chromium_code") {
        "__STDC_FORMAT_MACROS",
      ]
  
@@ -101,7 +81,7 @@ index 4b24c76..0737326 100644
      if (is_mac) {
        cflags_objc = [ "-Wobjc-missing-property-synthesis" ]
        cflags_objcc = [ "-Wobjc-missing-property-synthesis" ]
-@@ -1941,7 +1922,8 @@ config("default_stack_frames") {
+@@ -1993,7 +1970,8 @@ config("default_stack_frames") {
  }
  
  # Default "optimization on" config.
@@ -111,7 +91,7 @@ index 4b24c76..0737326 100644
    if (is_win) {
      # TODO(thakis): Remove is_clang here, https://crbug.com/598772
      if (is_official_build && full_wpo_on_official && !is_clang) {
-@@ -1975,7 +1957,8 @@ config("optimize") {
+@@ -2019,7 +1997,8 @@ config("optimize") {
  }
  
  # Same config as 'optimize' but without the WPO flag.
@@ -121,7 +101,7 @@ index 4b24c76..0737326 100644
    if (is_win) {
      # Favor size over speed, /O1 must be before the common flags. The GYP
      # build also specifies /Os and /GF but these are implied by /O1.
-@@ -1998,7 +1981,8 @@ config("optimize_no_wpo") {
+@@ -2042,7 +2021,8 @@ config("optimize_no_wpo") {
  }
  
  # Turn off optimizations.
@@ -131,7 +111,7 @@ index 4b24c76..0737326 100644
    if (is_win) {
      cflags = [
        "/Od",  # Disable optimization.
-@@ -2026,7 +2010,8 @@ config("no_optimize") {
+@@ -2076,7 +2056,8 @@ config("no_optimize") {
  # Turns up the optimization level. On Windows, this implies whole program
  # optimization and link-time code generation which is very expensive and should
  # be used sparingly.
@@ -141,7 +121,7 @@ index 4b24c76..0737326 100644
    if (is_nacl && is_nacl_irt) {
      # The NaCl IRT is a special case and always wants its own config.
      # Various components do:
-@@ -2073,7 +2058,8 @@ config("optimize_max") {
+@@ -2115,7 +2096,8 @@ config("optimize_max") {
  #
  # TODO(crbug.com/621335) - rework how all of these configs are related
  # so that we don't need this disclaimer.
@@ -151,7 +131,7 @@ index 4b24c76..0737326 100644
    if (is_nacl && is_nacl_irt) {
      # The NaCl IRT is a special case and always wants its own config.
      # Various components do:
-@@ -2111,7 +2097,8 @@ config("optimize_speed") {
+@@ -2145,7 +2127,8 @@ config("optimize_speed") {
    }
  }
  
@@ -161,7 +141,7 @@ index 4b24c76..0737326 100644
    cflags = [ "-O1" ] + common_optimize_on_cflags
    ldflags = common_optimize_on_ldflags
    visibility = [ ":default_optimization" ]
-@@ -2213,7 +2200,8 @@ config("win_pdbaltpath") {
+@@ -2261,7 +2244,8 @@ config("win_pdbaltpath") {
  }
  
  # Full symbols.
@@ -171,7 +151,7 @@ index 4b24c76..0737326 100644
    if (is_win) {
      if (use_goma || is_clang) {
        # Note that with VC++ this requires is_win_fastlink, enforced elsewhere.
-@@ -2323,7 +2311,8 @@ config("symbols") {
+@@ -2371,7 +2355,8 @@ config("symbols") {
  # Minimal symbols.
  # This config guarantees to hold symbol for stack trace which are shown to user
  # when crash happens in unittests running on buildbot.
@@ -179,9 +159,9 @@ index 4b24c76..0737326 100644
 +config("minimal_symbols") { }
 +config("xminimal_symbols") {
    if (is_win) {
-     # Linker symbols for backtraces only.
+     # Functions, files, and line tables only.
      cflags = []
-@@ -2380,7 +2369,8 @@ config("minimal_symbols") {
+@@ -2426,7 +2411,8 @@ config("minimal_symbols") {
  }
  
  # No symbols.
@@ -191,6 +171,3 @@ index 4b24c76..0737326 100644
    if (!is_win) {
      cflags = [ "-g0" ]
      asmflags = cflags
--- 
-2.21.0
-

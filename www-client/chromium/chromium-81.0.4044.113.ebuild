@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 2009-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -11,17 +11,18 @@ CHROMIUM_LANGS="am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu he
 inherit check-reqs chromium-2 desktop flag-o-matic multilib ninja-utils pax-utils portability python-any-r1 readme.gentoo-r1 toolchain-funcs xdg-utils
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
-HOMEPAGE="http://chromium.org/"
+HOMEPAGE="https://chromium.org/"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 ~x86"
-IUSE="+atk +closure-compile component-build cups +dbus gnome-keyring +hangouts jumbo-build kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
+KEYWORDS="amd64 ~arm64 ~x86"
+IUSE="+atk +closure-compile component-build cups +dbus cpu_flags_arm_neon +glib +hangouts kerberos pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
-
-REQUIRED_USE="atk? ( dbus )
-	component-build? ( !suid )"
+REQUIRED_USE="
+	atk? ( dbus )
+	component-build? ( !suid )
+"
 
 COMMON_DEPEND="
 	atk? ( >=app-accessibility/at-spi2-atk-2.26:2 )
@@ -29,18 +30,17 @@ COMMON_DEPEND="
 	cups? ( >=net-print/cups-1.3.11:= )
 	atk? ( >=dev-libs/atk-2.26 )
 	dev-libs/expat:=
-	dev-libs/glib:2
-	system-icu? ( >=dev-libs/icu-64:= )
+	glib? ( dev-libs/glib:2 )
+	system-icu? ( >=dev-libs/icu-65:= )
 	>=dev-libs/libxml2-2.9.4-r3:=[icu]
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
 	>=dev-libs/nss-3.26:=
-	>=dev-libs/re2-0.2016.11.01:=
-	gnome-keyring? ( >=gnome-base/libgnome-keyring-3.12:= )
+	>=dev-libs/re2-0.2019.08.01:=
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
-	>=media-libs/harfbuzz-2.2.0:0=[icu(-)]
+	>=media-libs/harfbuzz-2.4.0:0=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
 	system-libvpx? ( media-libs/libvpx:=[postproc,svc] )
@@ -52,8 +52,7 @@ COMMON_DEPEND="
 			media-video/ffmpeg[-samba]
 			>=net-fs/samba-4.5.10-r1[-debug(-)]
 		)
-		!=net-fs/samba-4.5.12-r0
-		media-libs/opus:=
+		>=media-libs/opus-1.3.1:=
 	)
 	dbus? ( sys-apps/dbus:= )
 	sys-apps/pciutils:=
@@ -81,28 +80,22 @@ COMMON_DEPEND="
 "
 # For nvidia-drivers blocker, see bug #413637 .
 RDEPEND="${COMMON_DEPEND}
-	!<www-plugins/chrome-binary-plugins-57
 	x11-misc/xdg-utils
 	virtual/opengl
 	virtual/ttf-fonts
 	selinux? ( sec-policy/selinux-chromium )
 	tcmalloc? ( !<x11-drivers/nvidia-drivers-331.20 )
-	widevine? ( www-plugins/chrome-binary-plugins[widevine(-)] )
 "
-# dev-vcs/git - https://bugs.gentoo.org/593476
-# sys-apps/sandbox - https://crbug.com/586444
 DEPEND="${COMMON_DEPEND}
 "
+# dev-vcs/git - https://bugs.gentoo.org/593476
 BDEPEND="
+	${PYTHON_DEPS}
 	>=app-arch/gzip-1.7
-	amd64? (
-		dev-lang/yasm
-	)
-	x86? (
-		dev-lang/yasm
-	)
+	amd64? ( dev-lang/yasm )
+	x86? ( dev-lang/yasm )
 	dev-lang/perl
-	<dev-util/gn-0.1583
+	dev-util/gn
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -147,40 +140,33 @@ For native file dialogs in KDE, install kde-apps/kdialog.
 "
 
 PATCHES=(
-	"${FILESDIR}/chromium-compiler-r9.patch"
-	"${FILESDIR}/chromium-widevine-r4.patch"
+	"${FILESDIR}/chromium-compiler-r11.patch"
 	"${FILESDIR}/chromium-fix-char_traits.patch"
-	"${FILESDIR}/chromium-75-fix-gn-gen.patch"
-	"${FILESDIR}/chromium-75-gcc-angle-fix.patch"
-	"${FILESDIR}/chromium-75-unique_ptr.patch"
-	"${FILESDIR}/chromium-75-lss.patch"
-	"${FILESDIR}/chromium-75-noexcept.patch"
-	"${FILESDIR}/chromium-75-llvm8.patch"
-	"${FILESDIR}/chromium-75-pure-virtual.patch"
-	"${FILESDIR}/chromium-optional-atk-r1.patch"
-	"${FILESDIR}/chromium-optional-dbus-r5.patch"
-	"${FILESDIR}/chromium-url-formatter.patch"
-	"${FILESDIR}/musl-cdefs-r2.patch"
+	"${FILESDIR}/chromium-78-protobuf-export.patch"
+	"${FILESDIR}/chromium-79-gcc-alignas.patch"
+	"${FILESDIR}/chromium-80-gcc-quiche.patch"
+	"${FILESDIR}/chromium-80-gcc-blink.patch"
+	"${FILESDIR}/chromium-81-gcc-noexcept.patch"
+	"${FILESDIR}/chromium-81-gcc-constexpr.patch"
+	"${FILESDIR}/chromium-81-optional-atk.patch"
+	"${FILESDIR}/chromium-81-optional-dbus.patch"
+	"${FILESDIR}/musl-cdefs.patch"
 	"${FILESDIR}/musl-dlopen.patch"
-	"${FILESDIR}/musl-dns-r2.patch"
-	"${FILESDIR}/musl-execinfo-r8.patch"
-	"${FILESDIR}/musl-fpstate-r1.patch"
-	"${FILESDIR}/musl-headers-r1.patch"
+	"${FILESDIR}/musl-dns.patch"
+	"${FILESDIR}/musl-execinfo.patch"
+	"${FILESDIR}/musl-fpstate.patch"
+	"${FILESDIR}/musl-headers.patch"
 	"${FILESDIR}/musl-libcpp.patch"
-	"${FILESDIR}/musl-mallinfo-r7.patch"
-	"${FILESDIR}/musl-pthread-r5.patch"
-	"${FILESDIR}/musl-ptrace.patch"
+	"${FILESDIR}/musl-mallinfo.patch"
+	"${FILESDIR}/musl-pthread.patch"
 	"${FILESDIR}/musl-realpath.patch"
-	"${FILESDIR}/musl-sandbox-r3.patch"
-	"${FILESDIR}/musl-secure_getenv-r1.patch"
-	"${FILESDIR}/musl-siginfo.patch"
+	"${FILESDIR}/musl-sandbox.patch"
 	"${FILESDIR}/musl-socket.patch"
-	"${FILESDIR}/musl-stacksize-r3.patch"
-	"${FILESDIR}/musl-stacktrace-r2.patch"
-	"${FILESDIR}/musl-syscall.patch"
-	"${FILESDIR}/musl-ucontext-r1.patch"
+	"${FILESDIR}/musl-stacksize.patch"
+	"${FILESDIR}/musl-stacktrace.patch"
+	"${FILESDIR}/musl-ucontext.patch"
 	"${FILESDIR}/musl-v8-monotonic-pthread-cont_timedwait.patch"
-	"${FILESDIR}/musl-wordsize-r1.patch"
+	"${FILESDIR}/musl-wordsize.patch"
 )
 
 pre_build_checks() {
@@ -189,11 +175,20 @@ pre_build_checks() {
 		if tc-is-gcc && ! ver_test "$(gcc-version)" -ge 8.0; then
 			die "At least gcc 8.0 is required"
 		fi
+		# component build hangs with tcmalloc enabled due to sandbox issue, bug #695976.
+		if has usersandbox ${FEATURES} && use tcmalloc && use component-build; then
+			die "Component build with tcmalloc requires FEATURES=-usersandbox."
+		fi
+		if [[ ${CHROMIUM_FORCE_CLANG} == yes ]] || tc-is-clang; then
+			if use component-build; then
+				die "Component build with clang requires fuzzer headers."
+			fi
+		fi
 	fi
 
 	# Check build requirements, bug #541816 and bug #471810 .
 	CHECKREQS_MEMORY="3G"
-	CHECKREQS_DISK_BUILD="5G"
+	CHECKREQS_DISK_BUILD="7G"
 	if ( shopt -s extglob; is-flagq '-g?(gdb)?([1-9])' ); then
 		CHECKREQS_DISK_BUILD="25G"
 		if ! use component-build; then
@@ -226,7 +221,8 @@ src_prepare() {
 	filter-ldflags "*sort*"
 
 	local keeplibs=(
-		base/third_party/dmg_fp
+		base/third_party/cityhash
+		base/third_party/double_conversion
 		base/third_party/dynamic_annotations
 		base/third_party/icu
 		base/third_party/nspr
@@ -251,6 +247,7 @@ src_prepare() {
 		third_party/angle/src/third_party/compiler
 		third_party/angle/src/third_party/libXNVCtrl
 		third_party/angle/src/third_party/trace_event
+		third_party/angle/src/third_party/volk
 		third_party/angle/third_party/glslang
 		third_party/angle/third_party/spirv-headers
 		third_party/angle/third_party/spirv-tools
@@ -276,6 +273,7 @@ src_prepare() {
 		third_party/catapult/third_party/six
 		third_party/catapult/tracing/third_party/d3
 		third_party/catapult/tracing/third_party/gl-matrix
+		third_party/catapult/tracing/third_party/jpeg-js
 		third_party/catapult/tracing/third_party/jszip
 		third_party/catapult/tracing/third_party/mannwhitneyu
 		third_party/catapult/tracing/third_party/oboe
@@ -284,17 +282,23 @@ src_prepare() {
 		third_party/cld_3
 		third_party/closure_compiler
 		third_party/crashpad
+		third_party/crashpad/crashpad/third_party/lss
 		third_party/crashpad/crashpad/third_party/zlib
 		third_party/crc32c
 		third_party/cros_system_api
 		third_party/dav1d
 		third_party/dawn
+		third_party/depot_tools
 		third_party/devscripts
+		third_party/devtools-frontend
+		third_party/devtools-frontend/src/front_end/third_party/fabricjs
+		third_party/devtools-frontend/src/front_end/third_party/wasmparser
+		third_party/devtools-frontend/src/third_party
 		third_party/dom_distiller_js
 		third_party/emoji-segmenter
 		third_party/flatbuffers
-		third_party/flot
 		third_party/freetype
+		third_party/libgifcodec
 		third_party/glslang
 		third_party/google_input_tools
 		third_party/google_input_tools/third_party/closure_library
@@ -332,7 +336,9 @@ src_prepare() {
 		third_party/nasm
 		third_party/node
 		third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2
-		third_party/openmax_dl
+		third_party/one_euro_filter
+		third_party/openscreen
+		third_party/openscreen/src/third_party/tinycbor/src/src
 		third_party/ots
 		third_party/pdfium
 		third_party/pdfium/third_party/agg23
@@ -348,17 +354,17 @@ src_prepare() {
 		third_party/pffft
 		third_party/ply
 		third_party/polymer
+		third_party/private-join-and-compute
 		third_party/protobuf
 		third_party/protobuf/third_party/six
 		third_party/pyjson5
 		third_party/qcms
 		third_party/rnnoise
 		third_party/s2cellid
-		third_party/sfntly
 		third_party/simplejson
 		third_party/skia
+		third_party/skia/include/third_party/skcms
 		third_party/skia/include/third_party/vulkan
-		third_party/skia/third_party/gif
 		third_party/skia/third_party/skcms
 		third_party/skia/third_party/vulkan
 		third_party/smhasher
@@ -368,7 +374,9 @@ src_prepare() {
 		third_party/swiftshader
 		third_party/swiftshader/third_party/llvm-7.0
 		third_party/swiftshader/third_party/llvm-subzero
+		third_party/swiftshader/third_party/marl
 		third_party/swiftshader/third_party/subzero
+		third_party/swiftshader/third_party/SPIRV-Headers/include/spirv/unified1
 		third_party/unrar
 		third_party/usrsctp
 		third_party/vulkan
@@ -384,7 +392,9 @@ src_prepare() {
 		third_party/webrtc/rtc_base/third_party/sigslot
 		third_party/widevine
 		third_party/woff2
+		third_party/wuffs
 		third_party/zlib/google
+		tools/grit/third_party/six
 		url/third_party/mozilla
 		v8/src/third_party/siphash
 		v8/src/third_party/valgrind
@@ -458,9 +468,6 @@ src_configure() {
 	# for development and debugging.
 	myconf_gn+=" is_component_build=$(usex component-build true false)"
 
-	# https://chromium.googlesource.com/chromium/src/+/lkcr/docs/jumbo.md
-	myconf_gn+=" use_jumbo_build=$(usex jumbo-build true false)"
-
 	myconf_gn+=" use_allocator=$(usex tcmalloc \"tcmalloc\" \"none\")"
 
 	# Disable nacl, we can't build without pnacl (http://crbug.com/269560).
@@ -507,6 +514,9 @@ src_configure() {
 	# See dependency logic in third_party/BUILD.gn
 	myconf_gn+=" use_system_harfbuzz=true"
 
+	# Disable deprecated libgnome-keyring dependency, bug #713012
+	myconf_gn+=" use_gnome_keyring=false"
+
 	# Optional dependencies.
 	myconf_gn+=" closure_compile=$(usex closure-compile true false)"
 	myconf_gn+=" enable_hangout_services_extension=$(usex hangouts true false)"
@@ -514,7 +524,7 @@ src_configure() {
 	myconf_gn+=" use_atk=$(usex atk true false)"
 	myconf_gn+=" use_cups=$(usex cups true false)"
 	myconf_gn+=" use_dbus=$(usex dbus true false)"
-	myconf_gn+=" use_gnome_keyring=$(usex gnome-keyring true false)"
+	myconf_gn+=" use_glib=$(usex glib true false)"
 	myconf_gn+=" use_kerberos=$(usex kerberos true false)"
 	myconf_gn+=" use_pulseaudio=$(usex pulseaudio true false)"
 
@@ -544,7 +554,6 @@ src_configure() {
 	myconf_gn+=" google_api_key=\"${google_api_key}\""
 	myconf_gn+=" google_default_client_id=\"${google_default_client_id}\""
 	myconf_gn+=" google_default_client_secret=\"${google_default_client_secret}\""
-
 	local myarch="$(tc-arch)"
 
 	# Avoid CFLAGS problems, bug #352457, bug #390147.
@@ -578,7 +587,7 @@ src_configure() {
 		ffmpeg_target_arch=arm64
 	elif [[ $myarch = arm ]] ; then
 		myconf_gn+=" target_cpu=\"arm\""
-		ffmpeg_target_arch=$(usex neon arm-neon arm)
+		ffmpeg_target_arch=$(usex cpu_flags_arm_neon arm-neon arm)
 	else
 		die "Failed to determine target arch, got '$myarch'."
 	fi
@@ -620,6 +629,14 @@ src_configure() {
 		popd > /dev/null || die
 	fi
 
+	# Chromium relies on this, but was disabled in >=clang-10, crbug.com/1042470
+	append-cxxflags $(test-flags-CXX -flax-vector-conversions=all)
+
+	# Explicitly disable ICU data file support for system-icu builds.
+	if use system-icu; then
+		myconf_gn+=" icu_use_data_file=false"
+	fi
+
 	einfo "Configuring Chromium..."
 	set -- gn gen --args="${myconf_gn} ${EXTRA_GN}" out/Release
 	echo "$@"
@@ -653,6 +670,20 @@ src_compile() {
 	use suid && eninja -C out/Release chrome_sandbox
 
 	pax-mark m out/Release/chrome
+
+	# Build manpage; bug #684550
+	sed -e 's|@@PACKAGE@@|chromium-browser|g;
+		s|@@MENUNAME@@|Chromium|g;' \
+		chrome/app/resources/manpage.1.in > \
+		out/Release/chromium-browser.1 || die
+
+	# Build desktop file; bug #706786
+	sed -e 's|@@MENUNAME@@|Chromium|g;
+		s|@@USR_BIN_SYMLINK_NAME@@|chromium-browser|g;
+		s|@@PACKAGE@@|chromium-browser|g;
+		s|\(^Exec=\)/usr/bin/|\1|g;' \
+		chrome/installer/linux/common/desktop.template > \
+		out/Release/chromium-browser-chromium.desktop || die
 }
 
 src_install() {
@@ -704,9 +735,9 @@ src_install() {
 		doins out/Release/swiftshader/*.so
 	fi
 
-	# Install icons and desktop entry.
+	# Install icons
 	local branding size
-	for size in 16 22 24 32 48 64 128 256 ; do
+	for size in 16 24 32 48 64 128 256 ; do
 		case ${size} in
 			16|32) branding="chrome/app/theme/default_100_percent/chromium" ;;
 				*) branding="chrome/app/theme/chromium" ;;
@@ -715,21 +746,16 @@ src_install() {
 			chromium-browser.png
 	done
 
-	local mime_types="text/html;text/xml;application/xhtml+xml;"
-	mime_types+="x-scheme-handler/http;x-scheme-handler/https;" # bug #360797
-	mime_types+="x-scheme-handler/ftp;" # bug #412185
-	mime_types+="x-scheme-handler/mailto;x-scheme-handler/webcal;" # bug #416393
-	make_desktop_entry \
-		chromium-browser \
-		"Chromium" \
-		chromium-browser \
-		"Network;WebBrowser" \
-		"MimeType=${mime_types}\nStartupWMClass=chromium-browser"
-	sed -e "/^Exec/s/$/ %U/" -i "${ED}"/usr/share/applications/*.desktop || die
+	# Install desktop entry
+	domenu out/Release/chromium-browser-chromium.desktop
 
 	# Install GNOME default application entry (bug #303100).
 	insinto /usr/share/gnome-control-center/default-apps
 	newins "${FILESDIR}"/chromium-browser.xml chromium-browser.xml
+
+	# Install manpage; bug #684550
+	doman out/Release/chromium-browser.1
+	dosym chromium-browser.1 /usr/share/man/man1/chromium.1
 
 	readme.gentoo_create_doc
 }

@@ -1,7 +1,7 @@
-diff --git chromium-75.0.3770.100/base/allocator/allocator_shim_internals.h chromium-75.0.3770.100/base/allocator/allocator_shim_internals.h
-index 0196f89..bb42b5d 100644
---- chromium-75.0.3770.100/base/allocator/allocator_shim_internals.h
-+++ chromium-75.0.3770.100/base/allocator/allocator_shim_internals.h
+diff --git chromium-81.0.4044.113/base/allocator/allocator_shim_internals.h chromium-81.0.4044.113/base/allocator/allocator_shim_internals.h
+index 0196f899ae..bb42b5d856 100644
+--- chromium-81.0.4044.113/base/allocator/allocator_shim_internals.h
++++ chromium-81.0.4044.113/base/allocator/allocator_shim_internals.h
 @@ -7,7 +7,9 @@
  
  #if defined(__GNUC__)
@@ -12,10 +12,10 @@ index 0196f89..bb42b5d 100644
  
  #ifndef __THROW  // Not a glibc system
  #ifdef _NOEXCEPT  // LLVM libc++ uses noexcept instead
-diff --git chromium-75.0.3770.100/sandbox/linux/suid/sandbox.c chromium-75.0.3770.100/sandbox/linux/suid/sandbox.c
-index 854819b..39937e4 100644
---- chromium-75.0.3770.100/sandbox/linux/suid/sandbox.c
-+++ chromium-75.0.3770.100/sandbox/linux/suid/sandbox.c
+diff --git chromium-81.0.4044.113/sandbox/linux/suid/sandbox.c chromium-81.0.4044.113/sandbox/linux/suid/sandbox.c
+index 5fdb4817af..2a20d2c1df 100644
+--- chromium-81.0.4044.113/sandbox/linux/suid/sandbox.c
++++ chromium-81.0.4044.113/sandbox/linux/suid/sandbox.c
 @@ -44,7 +44,16 @@
  
  static bool DropRoot();
@@ -33,10 +33,10 @@ index 854819b..39937e4 100644
  
  static void FatalError(const char* msg, ...)
      __attribute__((noreturn, format(printf, 1, 2)));
-diff --git chromium-75.0.3770.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h chromium-75.0.3770.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
-index f8be372..c07e4c8 100644
---- chromium-75.0.3770.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
-+++ chromium-75.0.3770.100/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
+diff --git chromium-81.0.4044.113/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h chromium-81.0.4044.113/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
+index f8be372cc6..c07e4c8804 100644
+--- chromium-81.0.4044.113/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
++++ chromium-81.0.4044.113/third_party/crashpad/crashpad/compat/linux/sys/ptrace.h
 @@ -17,8 +17,6 @@
  
  #include_next <sys/ptrace.h>
@@ -46,10 +46,10 @@ index f8be372..c07e4c8 100644
  // https://sourceware.org/bugzilla/show_bug.cgi?id=22433
  #if !defined(PTRACE_GET_THREAD_AREA) && !defined(PT_GET_THREAD_AREA) && \
      defined(__GLIBC__)
-diff --git chromium-69.0.3497.100/third_party/libsync/src/include/sync/sync.h
-index 50ed0ac..7552a49 100644
---- chromium-69.0.3497.100/third_party/libsync/src/include/sync/sync.h
-+++ chromium-69.0.3497.100/third_party/libsync/src/include/sync/sync.h
+diff --git chromium-81.0.4044.113/third_party/libsync/src/include/sync/sync.h chromium-81.0.4044.113/third_party/libsync/src/include/sync/sync.h
+index 50ed0ac57b..7552a49798 100644
+--- chromium-81.0.4044.113/third_party/libsync/src/include/sync/sync.h
++++ chromium-81.0.4044.113/third_party/libsync/src/include/sync/sync.h
 @@ -19,12 +19,13 @@
  #ifndef __SYS_CORE_SYNC_H
  #define __SYS_CORE_SYNC_H

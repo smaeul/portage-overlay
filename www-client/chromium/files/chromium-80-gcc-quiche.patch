@@ -1,0 +1,13 @@
+diff --git chromium-81.0.4044.113/net/third_party/quiche/src/quic/core/quic_stream_send_buffer.h chromium-81.0.4044.113/net/third_party/quiche/src/quic/core/quic_stream_send_buffer.h
+index 57be51d566..82a8eba00f 100644
+--- chromium-81.0.4044.113/net/third_party/quiche/src/quic/core/quic_stream_send_buffer.h
++++ chromium-81.0.4044.113/net/third_party/quiche/src/quic/core/quic_stream_send_buffer.h
+@@ -66,7 +66,7 @@ class QUIC_EXPORT_PRIVATE QuicStreamSendBuffer {
+  public:
+   explicit QuicStreamSendBuffer(QuicBufferAllocator* allocator);
+   QuicStreamSendBuffer(const QuicStreamSendBuffer& other) = delete;
+-  QuicStreamSendBuffer(QuicStreamSendBuffer&& other) = delete;
++  QuicStreamSendBuffer(QuicStreamSendBuffer&& other) = default;
+   ~QuicStreamSendBuffer();
+ 
+   // Save |data_length| of data starts at |iov_offset| in |iov| to send buffer.

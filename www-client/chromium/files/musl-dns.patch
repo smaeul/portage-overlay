@@ -1,7 +1,7 @@
-diff --git chromium-75.0.3770.100/net/dns/dns_config_service_posix.cc chromium-75.0.3770.100/net/dns/dns_config_service_posix.cc
-index 48ee925..3bf8756 100644
---- chromium-75.0.3770.100/net/dns/dns_config_service_posix.cc
-+++ chromium-75.0.3770.100/net/dns/dns_config_service_posix.cc
+diff --git chromium-81.0.4044.113/net/dns/dns_config_service_posix.cc chromium-81.0.4044.113/net/dns/dns_config_service_posix.cc
+index 2e0f06b0c1..645f610042 100644
+--- chromium-81.0.4044.113/net/dns/dns_config_service_posix.cc
++++ chromium-81.0.4044.113/net/dns/dns_config_service_posix.cc
 @@ -150,7 +150,7 @@ ConfigParsePosixResult ReadDnsConfig(DnsConfig* dns_config) {
  #if !defined(OS_ANDROID)
    ConfigParsePosixResult result;
@@ -20,10 +20,10 @@ index 48ee925..3bf8756 100644
  
  #if defined(OS_MACOSX) && !defined(OS_IOS)
    ConfigParsePosixResult error = DnsConfigWatcher::CheckDnsConfig();
-diff --git chromium-75.0.3770.100/net/dns/dns_reloader.cc chromium-75.0.3770.100/net/dns/dns_reloader.cc
-index 03e248c..6135fcc 100644
---- chromium-75.0.3770.100/net/dns/dns_reloader.cc
-+++ chromium-75.0.3770.100/net/dns/dns_reloader.cc
+diff --git chromium-81.0.4044.113/net/dns/dns_reloader.cc chromium-81.0.4044.113/net/dns/dns_reloader.cc
+index 1c014a6501..87844bafcb 100644
+--- chromium-81.0.4044.113/net/dns/dns_reloader.cc
++++ chromium-81.0.4044.113/net/dns/dns_reloader.cc
 @@ -4,8 +4,7 @@
  
  #include "net/dns/dns_reloader.h"
@@ -34,32 +34,32 @@ index 03e248c..6135fcc 100644
  
  #include <resolv.h>
  
-@@ -108,5 +107,4 @@ void DnsReloaderMaybeReload() {
+@@ -111,5 +110,4 @@ void DnsReloaderMaybeReload() {
  
  }  // namespace net
  
 -#endif  // defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) &&
 -        // !defined(OS_ANDROID)
 +#endif  // defined(__GLIBC__)
-diff --git chromium-75.0.3770.100/net/dns/host_resolver_manager.cc chromium-75.0.3770.100/net/dns/host_resolver_manager.cc
-index 3c75dde..c748d94 100644
---- chromium-75.0.3770.100/net/dns/host_resolver_manager.cc
-+++ chromium-75.0.3770.100/net/dns/host_resolver_manager.cc
-@@ -2266,8 +2266,7 @@ HostResolverManager::HostResolverManager(const Options& options,
-   NetworkChangeNotifier::AddIPAddressObserver(this);
+diff --git chromium-81.0.4044.113/net/dns/host_resolver_manager.cc chromium-81.0.4044.113/net/dns/host_resolver_manager.cc
+index 632f5b46e3..8bf870bb57 100644
+--- chromium-81.0.4044.113/net/dns/host_resolver_manager.cc
++++ chromium-81.0.4044.113/net/dns/host_resolver_manager.cc
+@@ -2770,8 +2770,7 @@ HostResolverManager::HostResolverManager(
    NetworkChangeNotifier::AddConnectionTypeObserver(this);
-   NetworkChangeNotifier::AddDNSObserver(this);
+   if (system_dns_config_notifier_)
+     system_dns_config_notifier_->AddObserver(this);
 -#if defined(OS_POSIX) && !defined(OS_MACOSX) && !defined(OS_OPENBSD) && \
 -    !defined(OS_ANDROID)
 +#if defined(__GLIBC__)
    EnsureDnsReloaderInit();
  #endif
  
-diff --git chromium-75.0.3770.100/net/dns/host_resolver_proc.cc chromium-75.0.3770.100/net/dns/host_resolver_proc.cc
-index 90d9958..71d9b4a 100644
---- chromium-75.0.3770.100/net/dns/host_resolver_proc.cc
-+++ chromium-75.0.3770.100/net/dns/host_resolver_proc.cc
-@@ -197,8 +197,7 @@ int SystemHostResolverCall(const std::string& host,
+diff --git chromium-81.0.4044.113/net/dns/host_resolver_proc.cc chromium-81.0.4044.113/net/dns/host_resolver_proc.cc
+index 7fe8e1d019..bae9316c0a 100644
+--- chromium-81.0.4044.113/net/dns/host_resolver_proc.cc
++++ chromium-81.0.4044.113/net/dns/host_resolver_proc.cc
+@@ -159,8 +159,7 @@ int SystemHostResolverCall(const std::string& host,
    base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                  base::BlockingType::WILL_BLOCK);
  
@@ -68,4 +68,4 @@ index 90d9958..71d9b4a 100644
 +#if defined(__GLIBC__)
    DnsReloaderMaybeReload();
  #endif
-   int err = getaddrinfo(host.c_str(), nullptr, &hints, &ai);
+   base::Optional<AddressInfo> ai;

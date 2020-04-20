@@ -1,7 +1,7 @@
-diff --git chromium-75.0.3770.100/third_party/nasm/config/config-linux.h
-index 7eb7c20..882b736 100644
---- chromium-75.0.3770.100/third_party/nasm/config/config-linux.h.orig
-+++ chromium-75.0.3770.100/third_party/nasm/config/config-linux.h
+diff --git chromium-81.0.4044.113/third_party/nasm/config/config-linux.h chromium-81.0.4044.113/third_party/nasm/config/config-linux.h
+index 7eb7c20ffc..882b736723 100644
+--- chromium-81.0.4044.113/third_party/nasm/config/config-linux.h
++++ chromium-81.0.4044.113/third_party/nasm/config/config-linux.h
 @@ -117,7 +117,7 @@
  #define HAVE_ACCESS 1
  

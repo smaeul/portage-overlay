@@ -1,7 +1,7 @@
-diff --git chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
-index b895f6d..4f13352 100644
---- chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
-+++ chromium-69.0.3497.100/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
+diff --git chromium-81.0.4044.113/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc chromium-81.0.4044.113/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
+index b895f6d7ad..4f13352f35 100644
+--- chromium-81.0.4044.113/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
++++ chromium-81.0.4044.113/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc
 @@ -490,7 +490,9 @@ bool ExceptionHandler::SimulateSignalDelivery(int sig) {
    siginfo.si_code = SI_USER;
    siginfo.si_pid = getpid();
