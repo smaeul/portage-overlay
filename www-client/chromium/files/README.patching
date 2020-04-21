@@ -1,0 +1,87 @@
+How to generate and update chromium patches
+===========================================
+
+FILESDIR=$PWD/files
+VERSION=...
+S=...
+
+ebuild chromium-${VERSION}.ebuild unpack
+pushd ${S}
+
+# Ensure patches to git-ignored files are not lost.
+find -name .gitignore -delete
+
+# Ignore files generated during this process.
+cat > .gitignore << EOF
+/out
+/third_party/node/linux
+*.orig
+EOF
+
+# Create the first baseline.
+git add .
+git commit -m "initial"
+
+# Drop all patches from the ebuild, and then run:
+pushd
+ebuild chromium-${VERSION}.ebuild prepare
+pushd
+
+# Create the second baseline, with libraries unbundled.
+git add .
+git commit -m "unbundle"
+git branch clean
+
+# Now try to apply the patches:
+for file in ${FILESDIR}/*.patch; do
+	base=$(basename $file)
+	echo ======== $base ========
+	if patch -p1 --dry-run --no-backup-if-mismatch -i $file; then
+		patch -p1 --no-backup-if-mismatch -i $file
+		git add .
+		git commit -m "$base"
+	fi
+done
+
+# For each FAILED patch, edit and rerun or manually apply.
+
+# Use interactive rebase to reorder as desired.
+git rebase -i --autosquash clean
+
+# Now regenerate the patch files:
+git log --no-decorate --oneline clean.. |
+while read -r sha name; do
+	git diff --src-prefix=chromium-${VERSION}/ \
+		 --dst-prefix=chromium-${VERSION}/ \
+		 $sha~..$sha > ${FILESDIR}/$name
+done
+
+# And regenerate the patch list:
+git log --no-decorate --oneline --reverse clean.. |
+while read -r sha name; do
+	echo '"${FILESDIR}/'$name'"'
+done
+
+# Attempt to build. Fix errors as necessary.
+pushd
+ebuild chromium-${VERSION}.ebuild compile
+pushd
+
+# Once it builds/runs, commit changes and rebase as needed.
+git add -p
+git commit -m "fixup! foo.patch"
+git add -p
+git commit -m "fixup! bar.patch"
+git rebase -i --autosquash clean
+
+# Now rerun the two loops above to regenerate the patch files and list.
+
+# If you need to clean, save the git dir elsewhere on the filesystem:
+mv .git /tmp/chromium.git
+pushd
+ebuild chromium-${VERSION}.ebuild clean
+ebuild chromium-${VERSION}.ebuild prepare
+pushd
+mv /tmp/chromium.git .git
+
+# The same steps apply for /etc/portage/patches.
