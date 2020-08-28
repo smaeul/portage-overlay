@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit bash-completion-r1 check-reqs estack flag-o-matic llvm multilib-build multiprocessing python-any-r1 rust-toolchain toolchain-funcs
 
@@ -13,7 +13,7 @@ MY_P="rustc-${PV}"
 SRC="${MY_P}-src.tar.xz"
 KEYWORDS="amd64 ~arm ~arm64 ~ppc ppc64 x86"
 
-RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).1"
+RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).2"
 RUST_TOOLCHAIN_BASEURL="https://portage.smaeul.xyz/distfiles/"
 
 DESCRIPTION="Systems programming language from Mozilla"
@@ -57,24 +57,11 @@ LLVM_DEPEND="
 "
 LLVM_MAX_SLOT=10
 
-BOOTSTRAP_DEPEND="|| ( >=dev-lang/rust-1.$(($(ver_cut 2) - 1)).0-r1 >=dev-lang/rust-bin-1.$(($(ver_cut 2) - 1)) )"
+BOOTSTRAP_DEPEND="|| ( >=dev-lang/rust-1.$(($(ver_cut 2) - 1)) >=dev-lang/rust-bin-1.$(($(ver_cut 2) - 1)) )"
 
-COMMON_DEPEND="
-	net-libs/libssh2:=
-	net-libs/http-parser:=
-	net-misc/curl:=[ssl]
-	sys-libs/libssp_nonshared:=[${MULTILIB_USEDEP}]
-	sys-libs/zlib:=
-	!libressl? ( dev-libs/openssl:0= )
-	libressl? ( dev-libs/libressl:0= )
-	system-llvm? (
-		${LLVM_DEPEND}
-		wasm? ( >=sys-devel/lld-9 )
-	)
-"
-
-DEPEND="${COMMON_DEPEND}
+BDEPEND="
 	${PYTHON_DEPS}
+	app-eselect/eselect-rust
 	|| (
 		>=sys-devel/gcc-4.7
 		>=sys-devel/clang-3.5
@@ -86,8 +73,24 @@ DEPEND="${COMMON_DEPEND}
 	)
 "
 
-RDEPEND="${COMMON_DEPEND}
-	>=app-eselect/eselect-rust-20190311
+# libgit2 should be at least same as bundled into libgit-sys #707746
+DEPEND="
+	>=dev-libs/libgit2-0.99:=
+	net-libs/libssh2:=
+	net-libs/http-parser:=
+	net-misc/curl:=[http2,ssl]
+	sys-libs/libssp_nonshared:=[${MULTILIB_USEDEP}]
+	sys-libs/zlib:=
+	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:0= )
+	system-llvm? (
+		${LLVM_DEPEND}
+		wasm? ( sys-devel/lld )
+	)
+"
+
+RDEPEND="${DEPEND}
+	app-eselect/eselect-rust
 "
 
 REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
@@ -99,36 +102,34 @@ REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
 
 QA_FLAGS_IGNORED="
 	usr/bin/.*-${PV}
-	usr/lib.*/lib.*.so
-	usr/lib/rustlib/.*/codegen-backends/librustc_codegen_llvm-llvm.so
-	usr/lib/rustlib/.*/lib/lib.*.so
+	usr/lib/${P}/rustlib/.*/bin/.*
+	usr/lib/${P}/rustlib/.*/lib/lib.*.so.*
 "
 
-QA_SONAME="usr/lib.*/librustc_macros.*.so"
+QA_SONAME="
+	usr/lib/${P}/rustlib/.*/lib/lib.*.so.*
+"
 
 PATCHES=(
-	"${FILESDIR}"/1.40.0-add-soname.patch
 	"${FILESDIR}"/0001-Don-t-pass-CFLAGS-to-the-C-compiler.patch
 	"${FILESDIR}"/0002-Fix-LLVM-build.patch
-	"${FILESDIR}"/0003-Allow-rustdoc-to-work-when-cross-compiling-on-musl.patch
-	"${FILESDIR}"/0004-Require-static-native-libraries-when-linking-static-.patch
-	"${FILESDIR}"/0005-Remove-nostdlib-and-musl_root-from-musl-targets.patch
+	"${FILESDIR}"/0003-Fix-rustdoc-when-cross-compiling-on-musl.patch
+	"${FILESDIR}"/0004-Use-static-native-libraries-when-linking-static-exec.patch
+	"${FILESDIR}"/0005-Remove-musl_root-and-CRT-fallback-from-musl-targets.patch
 	"${FILESDIR}"/0006-Prefer-libgcc_eh-over-libunwind-for-musl.patch
-	"${FILESDIR}"/0007-Fix-zero-sized-aggregate-ABI-on-powerpc.patch
-	"${FILESDIR}"/0008-Link-libssp_nonshared.a-on-all-musl-targets.patch
-	"${FILESDIR}"/0009-test-failed-doctest-output-Fix-normalization.patch
+	"${FILESDIR}"/0007-Link-libssp_nonshared.a-on-all-musl-targets.patch
+	"${FILESDIR}"/0008-test-failed-doctest-output-Fix-normalization.patch
+	"${FILESDIR}"/0009-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch
 	"${FILESDIR}"/0010-test-use-extern-for-plugins-Don-t-assume-multilib.patch
-	"${FILESDIR}"/0011-test-sysroot-crates-are-unstable-Fix-test-when-rpath.patch
-	"${FILESDIR}"/0012-Ignore-broken-and-non-applicable-tests.patch
-	"${FILESDIR}"/0013-Link-stage-2-tools-dynamically-to-libstd.patch
-	"${FILESDIR}"/0014-Move-debugger-scripts-to-usr-share-rust.patch
-	"${FILESDIR}"/0015-Add-gentoo-target-specs.patch
+	"${FILESDIR}"/0011-Ignore-broken-and-non-applicable-tests.patch
+	"${FILESDIR}"/0012-Link-stage-2-tools-dynamically-to-libstd.patch
+	"${FILESDIR}"/0013-Move-debugger-scripts-to-usr-share-rust.patch
+	"${FILESDIR}"/0014-Add-gentoo-target-specs.patch
 	"${FILESDIR}"/0030-libc-linkage.patch
-	"${FILESDIR}"/0031-typenum-pmmx.patch
+	"${FILESDIR}"/0031-libressl.patch
 	"${FILESDIR}"/0040-rls-atomics.patch
 	"${FILESDIR}"/0050-llvm.patch
-	"${FILESDIR}"/0051-llvm-powerpc-plt.patch
-	"${FILESDIR}"/0052-llvm-powerpc-elfv2.patch
+	"${FILESDIR}"/0051-llvm-powerpc-elfv2.patch
 )
 
 S="${WORKDIR}/${MY_P}-src"
@@ -138,13 +139,22 @@ toml_usex() {
 }
 
 pre_build_checks() {
-	CHECKREQS_DISK_BUILD="9G"
+	local M=6144
+	M=$(( $(usex clippy 128 0) + ${M} ))
+	M=$(( $(usex miri 128 0) + ${M} ))
+	M=$(( $(usex rls 512 0) + ${M} ))
+	M=$(( $(usex rustfmt 256 0) + ${M} ))
+	M=$(( $(usex system-llvm 0 2048) + ${M} ))
+	M=$(( $(usex wasm 256 0) + ${M} ))
+	M=$(( $(usex debug 15 10) * ${M} / 10 ))
 	eshopts_push -s extglob
 	if is-flagq '-g?(gdb)?([1-9])'; then
-		CHECKREQS_DISK_BUILD="15G"
+		M=$(( 15 * ${M} / 10 ))
 	fi
 	eshopts_pop
-	check-reqs_pkg_setup
+	M=$(( $(usex system-bootstrap 0 1024) + ${M} ))
+	M=$(( $(usex doc 256 0) + ${M} ))
+	CHECKREQS_DISK_BUILD=${M}M check-reqs_pkg_${EBUILD_PHASE}
 }
 
 pkg_pretend() {
@@ -155,9 +165,9 @@ pkg_setup() {
 	pre_build_checks
 	python-any-r1_pkg_setup
 
-	# use bundled for now, #707746
-	# will need dev-libs/libgit2 slotted dep if re-enabled
-	#export LIBGIT2_SYS_USE_PKG_CONFIG=1
+	# required to link agains system libs, otherwise
+	# crates use bundled sources and compile own static version
+	export LIBGIT2_SYS_USE_PKG_CONFIG=1
 	export LIBSSH2_SYS_USE_PKG_CONFIG=1
 	export PKG_CONFIG_ALLOW_CROSS=1
 
@@ -199,6 +209,11 @@ src_configure() {
 	done
 	if use wasm; then
 		rust_targets="${rust_targets},\"wasm32-unknown-unknown\""
+		if use system-llvm; then
+			# un-hardcode rust-lld linker for this target
+			# https://bugs.gentoo.org/715348
+			sed -i '/linker:/ s/rust-lld/wasm-ld/' src/librustc_target/spec/wasm32_base.rs || die
+		fi
 	fi
 
 	if use clippy; then
@@ -250,9 +265,9 @@ src_configure() {
 		cargo-native-static = false
 		[install]
 		prefix = "${EPREFIX}/usr"
-		libdir = "lib"
+		libdir = "lib/${P}"
 		docdir = "share/doc/${PF}"
-		mandir = "share/man"
+		mandir = "share/${P}/man"
 		[rust]
 		optimize = true
 		debug = $(toml_usex debug)
@@ -268,6 +283,7 @@ src_configure() {
 		optimize-tests = $(toml_usex !debug)
 		codegen-tests = true
 		dist-src = false
+		remap-debuginfo = true
 		lld = $(usex system-llvm false $(toml_usex wasm))
 		backtrace-on-ice = true
 		jemalloc = false
@@ -324,6 +340,9 @@ src_configure() {
 			linker = "$(usex system-llvm lld rust-lld)"
 		EOF
 	fi
+
+	einfo "Rust configured with the following settings:"
+	cat "${S}"/config.toml || die
 }
 
 src_compile() {
@@ -332,6 +351,7 @@ src_compile() {
 }
 
 src_test() {
+	RUST_BACKTRACE=1 \
 	"${EPYTHON}" ./x.py test -vv --config="${S}"/config.toml -j$(makeopts_jobs) --no-doc --no-fail-fast \
 		src/test/codegen \
 		src/test/codegen-units \
@@ -351,7 +371,8 @@ src_test() {
 }
 
 src_install() {
-	env DESTDIR="${D}" "${EPYTHON}" ./x.py install -vv --config="${S}"/config.toml || die
+	DESTDIR="${D}" \
+	"${EPYTHON}" ./x.py install -vv --config="${S}"/config.toml || die
 
 	# bug #689562, #689160
 	rm "${D}/etc/bash_completion.d/cargo" || die
@@ -364,12 +385,6 @@ src_install() {
 	mv "${ED}/usr/bin/rust-gdb" "${ED}/usr/bin/rust-gdb-${PV}" || die
 	mv "${ED}/usr/bin/rust-gdbgui" "${ED}/usr/bin/rust-gdbgui-${PV}" || die
 	mv "${ED}/usr/bin/rust-lldb" "${ED}/usr/bin/rust-lldb-${PV}" || die
-
-	rm "${ED}/usr/lib/rustlib/components" || die
-	rm "${ED}/usr/lib/rustlib/install.log" || die
-	rm "${ED}/usr/lib/rustlib"/manifest-* || die
-	rm "${ED}/usr/lib/rustlib/rust-installer-version" || die
-	rm "${ED}/usr/lib/rustlib/uninstall.sh" || die
 
 	if use clippy; then
 		mv "${ED}/usr/bin/clippy-driver" "${ED}/usr/bin/clippy-driver-${PV}" || die
@@ -388,11 +403,19 @@ src_install() {
 	fi
 
 	# Move public shared libs to abi specific libdir
-	# Private and target specific libs MUST stay in /usr/lib/rustlib/${rust_target}/lib
-	if [[ $(get_libdir) != lib ]]; then
-		dodir /usr/$(get_libdir)
-		mv "${ED}/usr/lib"/*.so "${ED}/usr/$(get_libdir)/" || die
-	fi
+	mv "${ED}/usr/lib/${P}"/*.so "${ED}/usr/lib/${P}/rustlib/${CHOST}/lib" || die
+
+	# versioned libdir/mandir support
+	newenvd - "50${P}" <<-_EOF_
+		LDPATH="${EPREFIX}/usr/lib/${P}/rustlib/${CHOST}/lib"
+		MANPATH="${EPREFIX}/usr/share/${P}/man"
+	_EOF_
+
+	rm "${ED}/usr/lib/${P}/rustlib/components" || die
+	rm "${ED}/usr/lib/${P}/rustlib/install.log" || die
+	rm "${ED}/usr/lib/${P}/rustlib"/manifest-* || die
+	rm "${ED}/usr/lib/${P}/rustlib/rust-installer-version" || die
+	rm "${ED}/usr/lib/${P}/rustlib/uninstall.sh" || die
 
 	dodoc COPYRIGHT
 	rm "${ED}/usr/share/doc/${P}"/*.old || die
@@ -432,10 +455,6 @@ pkg_postinst() {
 
 	elog "Rust installs a helper script for calling GDB and LLDB,"
 	elog "for your convenience it is installed under /usr/bin/rust-{gdb,lldb}-${PV}."
-
-	ewarn "cargo is now installed from dev-lang/rust{,-bin} instead of dev-util/cargo."
-	ewarn "This might have resulted in a dangling symlink for /usr/bin/cargo on some"
-	ewarn "systems. This can be resolved by calling 'sudo eselect rust set ${P}'."
 
 	if has_version app-editors/emacs; then
 		elog "install app-emacs/rust-mode to get emacs support for rust."

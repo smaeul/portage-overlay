@@ -1,7 +1,7 @@
-From 1879d1d1a284bf51c752e47db284ce22701ed5d0 Mon Sep 17 00:00:00 2001
+From 41cac0fe23d390aec4c7debf97348ebaf4b0023b Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sun, 16 Sep 2018 16:38:48 +0000
-Subject: [PATCH 12/15] Ignore broken and non-applicable tests
+Subject: [PATCH 11/14] Ignore broken and non-applicable tests
 
 c-link-to-rust-va-list-fn: unstable feature, broken on aarch64, #56475
 env-funky-keys: can't handle LD_PRELOAD (e.g. sandbox)
@@ -51,7 +51,7 @@ index 5876fbc94bc..5f167ece1a2 100644
  
  all:
 diff --git a/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile b/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile
-index 9e770706857..6d92ec5cec8 100644
+index 30c33c5c13d..d733bb1c557 100644
 --- a/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile
 +++ b/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile
 @@ -1,3 +1,5 @@
@@ -73,7 +73,7 @@ index c5c824ac58d..f3fe047a79c 100644
  // ignore-windows
  // ignore-cloudabi no execve
 diff --git a/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs b/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs
-index b28f742a92e..3ee4ccce731 100644
+index a323bd9e82b..53d003bbe82 100644
 --- a/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs
 +++ b/src/test/ui/simd/simd-intrinsic-generic-bitmask.rs
 @@ -2,6 +2,8 @@
@@ -86,5 +86,5 @@ index b28f742a92e..3ee4ccce731 100644
  // Test that the simd_bitmask intrinsic produces correct results.
  
 -- 
-2.24.1
+2.26.2
 

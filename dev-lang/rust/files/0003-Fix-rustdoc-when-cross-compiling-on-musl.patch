@@ -1,7 +1,7 @@
-From 62f482922a08bcc93cc3212764e47dea09690d12 Mon Sep 17 00:00:00 2001
+From f495dadc3bd3302d4a1ddb93331c350f971155a5 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
-Subject: [PATCH 03/15] Allow rustdoc to work when cross-compiling on musl
+Subject: [PATCH 03/14] Fix rustdoc when cross-compiling on musl
 
 musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
 ---
@@ -9,10 +9,10 @@ musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index 8c8b33a4e4e..ee8e083d230 100644
+index 8c56cf1cb34..a6c89a18ae7 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
-@@ -22,9 +22,6 @@ fn main() {
+@@ -21,9 +21,6 @@ fn main() {
          Err(_) => 0,
      };
  
@@ -22,7 +22,7 @@ index 8c8b33a4e4e..ee8e083d230 100644
      //FIXME(misdreavus): once stdsimd uses cfg(doc) instead of cfg(dox), remove the `--cfg dox`
      //arguments here
      let mut cmd = Command::new(rustdoc);
-@@ -35,7 +32,7 @@ fn main() {
+@@ -34,7 +31,7 @@ fn main() {
          .arg("dox")
          .arg("--sysroot")
          .arg(&sysroot)
@@ -31,7 +31,7 @@ index 8c8b33a4e4e..ee8e083d230 100644
  
      // Force all crates compiled by this compiler to (a) be unstable and (b)
      // allow the `rustc_private` feature to link to other unstable crates
-@@ -83,7 +80,7 @@ fn main() {
+@@ -65,7 +62,7 @@ fn main() {
          eprintln!(
              "rustdoc command: {:?}={:?} {:?}",
              bootstrap::util::dylib_path_var(),
@@ -41,5 +41,5 @@ index 8c8b33a4e4e..ee8e083d230 100644
          );
          eprintln!("sysroot: {:?}", sysroot);
 -- 
-2.24.1
+2.26.2
 

@@ -1,17 +1,17 @@
-From 491405f71c5bdba8a4da1957be738dbfda4bcd61 Mon Sep 17 00:00:00 2001
+From 65d3a8554d3c881ded64513893de89d0b2575a18 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Wed, 10 Jan 2018 13:36:41 -0600
-Subject: [PATCH 01/15] Don't pass CFLAGS to the C++ compiler
+Subject: [PATCH 01/14] Don't pass CFLAGS to the C++ compiler
 
 ---
  src/bootstrap/builder.rs | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/src/bootstrap/builder.rs b/src/bootstrap/builder.rs
-index d9c894aa9c6..4b6617f4f04 100644
+index 557fb1aa550..42217f80883 100644
 --- a/src/bootstrap/builder.rs
 +++ b/src/bootstrap/builder.rs
-@@ -1096,8 +1096,7 @@ impl<'a> Builder<'a> {
+@@ -1205,8 +1205,7 @@ impl<'a> Builder<'a> {
              if let Ok(cxx) = self.cxx(target) {
                  let cxx = ccacheify(&cxx);
                  cargo
@@ -22,5 +22,5 @@ index d9c894aa9c6..4b6617f4f04 100644
          }
  
 -- 
-2.24.1
+2.26.2
 

@@ -1,7 +1,7 @@
-From de65aa7d5e78f0010b5d8f8181d3d7cde119043b Mon Sep 17 00:00:00 2001
+From 08d6b164316d029c97755ebd97b12c3a5e08139c Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 01:32:20 +0000
-Subject: [PATCH 11/15] test/sysroot-crates-are-unstable: Fix test when rpath
+Subject: [PATCH 09/14] test/sysroot-crates-are-unstable: Fix test when rpath
  is disabled
 
 Without this environment var, the test can't run rustc to find
@@ -11,15 +11,15 @@ the sysroot path.
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile b/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile
-index a35174b3c2a..9e770706857 100644
+index 1e267fb9576..30c33c5c13d 100644
 --- a/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile
 +++ b/src/test/run-make-fulldeps/sysroot-crates-are-unstable/Makefile
 @@ -1,2 +1,4 @@
 +-include ../tools.mk
 +
  all:
--	python2.7 test.py
-+	env '$(HOST_RPATH_ENV)' python2.7 test.py
+-	'$(PYTHON)' test.py
++	env '$(HOST_RPATH_ENV)' '$(PYTHON)' test.py
 -- 
-2.24.1
+2.26.2
 
