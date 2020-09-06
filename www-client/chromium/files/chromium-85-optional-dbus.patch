@@ -1,8 +1,8 @@
-diff --git chromium-81.0.4044.113/chrome/browser/chrome_browser_main_linux.cc chromium-81.0.4044.113/chrome/browser/chrome_browser_main_linux.cc
-index 416e3007d9..73df332f48 100644
---- chromium-81.0.4044.113/chrome/browser/chrome_browser_main_linux.cc
-+++ chromium-81.0.4044.113/chrome/browser/chrome_browser_main_linux.cc
-@@ -88,7 +88,7 @@ void ChromeBrowserMainPartsLinux::PostProfileInit() {
+diff --git chromium-85.0.4183.83/chrome/browser/chrome_browser_main_linux.cc chromium-85.0.4183.83/chrome/browser/chrome_browser_main_linux.cc
+index f6ce26c769..271ac75b9d 100644
+--- chromium-85.0.4183.83/chrome/browser/chrome_browser_main_linux.cc
++++ chromium-85.0.4183.83/chrome/browser/chrome_browser_main_linux.cc
+@@ -101,7 +101,7 @@ void ChromeBrowserMainPartsLinux::PostProfileInit() {
  }
  
  void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
@@ -11,7 +11,7 @@ index 416e3007d9..73df332f48 100644
    bluez::BluezDBusManager::Initialize(nullptr /* system_bus */);
  #endif
  
-@@ -96,7 +96,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
+@@ -109,7 +109,7 @@ void ChromeBrowserMainPartsLinux::PostMainMessageLoopStart() {
  }
  
  void ChromeBrowserMainPartsLinux::PostDestroyThreads() {
@@ -20,11 +20,11 @@ index 416e3007d9..73df332f48 100644
    bluez::BluezDBusManager::Shutdown();
    bluez::BluezDBusThreadManager::Shutdown();
  #endif
-diff --git chromium-81.0.4044.113/chrome/browser/metrics/bluetooth_available_utility.cc chromium-81.0.4044.113/chrome/browser/metrics/bluetooth_available_utility.cc
-index 78417e5669..5822f8f76a 100644
---- chromium-81.0.4044.113/chrome/browser/metrics/bluetooth_available_utility.cc
-+++ chromium-81.0.4044.113/chrome/browser/metrics/bluetooth_available_utility.cc
-@@ -14,7 +14,7 @@
+diff --git chromium-85.0.4183.83/chrome/browser/metrics/bluetooth_available_utility.cc chromium-85.0.4183.83/chrome/browser/metrics/bluetooth_available_utility.cc
+index 8acdf7c985..c626975091 100644
+--- chromium-85.0.4183.83/chrome/browser/metrics/bluetooth_available_utility.cc
++++ chromium-85.0.4183.83/chrome/browser/metrics/bluetooth_available_utility.cc
+@@ -13,7 +13,7 @@
  #include "device/bluetooth/bluetooth_adapter.h"
  #include "device/bluetooth/bluetooth_adapter_factory.h"
  
@@ -33,7 +33,7 @@ index 78417e5669..5822f8f76a 100644
  #include "device/bluetooth/dbus/bluez_dbus_manager.h"
  #endif  // defined(OS_LINUX)
  
-@@ -64,7 +64,7 @@ void ReportBluetoothAvailability() {
+@@ -55,7 +55,7 @@ void ReportBluetoothAvailability() {
      return;
    }
  
@@ -42,10 +42,30 @@ index 78417e5669..5822f8f76a 100644
    // This is for tests that have not initialized bluez or dbus thread manager.
    // Outside of tests these are initialized earlier during browser startup.
    if (!bluez::BluezDBusManager::IsInitialized())
-diff --git chromium-81.0.4044.113/chrome/browser/platform_util_linux.cc chromium-81.0.4044.113/chrome/browser/platform_util_linux.cc
+diff --git chromium-85.0.4183.83/chrome/browser/notifications/notification_display_service_impl.cc chromium-85.0.4183.83/chrome/browser/notifications/notification_display_service_impl.cc
+index 85d20f180a..61d2135949 100644
+--- chromium-85.0.4183.83/chrome/browser/notifications/notification_display_service_impl.cc
++++ chromium-85.0.4183.83/chrome/browser/notifications/notification_display_service_impl.cc
+@@ -47,6 +47,7 @@
+ 
+ namespace {
+ 
++#if BUILDFLAG(ENABLE_NATIVE_NOTIFICATIONS)
+ #if !defined(OS_CHROMEOS)
+ bool NativeNotificationsEnabled(Profile* profile) {
+ #if defined(OS_LINUX)
+@@ -60,6 +61,7 @@ bool NativeNotificationsEnabled(Profile* profile) {
+   return base::FeatureList::IsEnabled(features::kNativeNotifications);
+ }
+ #endif
++#endif
+ 
+ // Returns the NotificationPlatformBridge to use for the current platform.
+ // Will return a nullptr for platforms that don't support native notifications.
+diff --git chromium-85.0.4183.83/chrome/browser/platform_util_linux.cc chromium-85.0.4183.83/chrome/browser/platform_util_linux.cc
 index 86cb40c333..c2810d8100 100644
---- chromium-81.0.4044.113/chrome/browser/platform_util_linux.cc
-+++ chromium-81.0.4044.113/chrome/browser/platform_util_linux.cc
+--- chromium-85.0.4183.83/chrome/browser/platform_util_linux.cc
++++ chromium-85.0.4183.83/chrome/browser/platform_util_linux.cc
 @@ -13,14 +13,18 @@
  #include "base/threading/scoped_blocking_call.h"
  #include "chrome/browser/chrome_notification_types.h"
@@ -92,11 +112,11 @@ index 86cb40c333..c2810d8100 100644
  }
  
  void OpenExternal(Profile* profile, const GURL& url) {
-diff --git chromium-81.0.4044.113/chrome/browser/ui/BUILD.gn chromium-81.0.4044.113/chrome/browser/ui/BUILD.gn
-index efacc93f73..6c20a6a135 100644
---- chromium-81.0.4044.113/chrome/browser/ui/BUILD.gn
-+++ chromium-81.0.4044.113/chrome/browser/ui/BUILD.gn
-@@ -2585,10 +2585,6 @@ jumbo_static_library("ui") {
+diff --git chromium-85.0.4183.83/chrome/browser/ui/BUILD.gn chromium-85.0.4183.83/chrome/browser/ui/BUILD.gn
+index a429fd9751..d60d804755 100644
+--- chromium-85.0.4183.83/chrome/browser/ui/BUILD.gn
++++ chromium-85.0.4183.83/chrome/browser/ui/BUILD.gn
+@@ -3065,10 +3065,6 @@ static_library("ui") {
  
      if (use_x11) {
        sources += [
@@ -107,9 +127,9 @@ index efacc93f73..6c20a6a135 100644
          "views/frame/native_browser_frame_factory_aurax11.cc",
          "views/javascript_app_modal_dialog_views_x11.cc",
          "views/javascript_app_modal_dialog_views_x11.h",
-@@ -2597,11 +2593,21 @@ jumbo_static_library("ui") {
+@@ -3076,11 +3072,21 @@ static_library("ui") {
+         "views/javascript_app_modal_event_blocker_x11.h",
        ]
-       configs += [ "//build/config/linux:x11" ]
        deps += [
 -        "//components/dbus/menu",
          "//ui/events/devices",
@@ -130,20 +150,11 @@ index efacc93f73..6c20a6a135 100644
      }
      if (use_ozone) {
        if (!is_desktop_linux) {
-diff --git chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc
-index d2073245dd..31a22b2cde 100644
---- chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc
-+++ chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc
-@@ -22,7 +22,7 @@ BrowserDesktopWindowTreeHostLinux::BrowserDesktopWindowTreeHostLinux(
-     BrowserFrame* browser_frame)
-     : DesktopWindowTreeHostLinuxImpl(native_widget_delegate,
-                                      desktop_native_widget_aura) {
--#if defined(USE_X11)
-+#if defined(USE_X11) && defined(USE_DBUS)
-   browser_view_ = browser_view;
- #endif
-   browser_frame->set_frame_type(browser_frame->UseCustomFrame()
-@@ -57,7 +57,7 @@ void BrowserDesktopWindowTreeHostLinux::Init(
+diff --git chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc
+index 11eb4519eb..c86a4f63ca 100644
+--- chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc
++++ chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.cc
+@@ -76,7 +76,7 @@ void BrowserDesktopWindowTreeHostLinux::Init(
      const views::Widget::InitParams& params) {
    DesktopWindowTreeHostLinuxImpl::Init(std::move(params));
  
@@ -151,8 +162,8 @@ index d2073245dd..31a22b2cde 100644
 +#if defined(USE_X11) && defined(USE_DBUS)
    // We have now created our backing X11 window. We now need to (possibly)
    // alert Unity that there's a menu bar attached to it.
-   global_menu_bar_x11_ =
-@@ -66,7 +66,7 @@ void BrowserDesktopWindowTreeHostLinux::Init(
+   if (!features::IsUsingOzonePlatform())
+@@ -86,7 +86,7 @@ void BrowserDesktopWindowTreeHostLinux::Init(
  }
  
  void BrowserDesktopWindowTreeHostLinux::CloseNow() {
@@ -161,10 +172,10 @@ index d2073245dd..31a22b2cde 100644
    global_menu_bar_x11_.reset();
  #endif
    DesktopWindowTreeHostLinuxImpl::CloseNow();
-diff --git chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h
-index 5ceccb1a39..6a8f0d90eb 100644
---- chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h
-+++ chromium-81.0.4044.113/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h
+diff --git chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h
+index 6077cb0e65..4e3eb1f981 100644
+--- chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h
++++ chromium-85.0.4183.83/chrome/browser/ui/views/frame/browser_desktop_window_tree_host_linux.h
 @@ -9,7 +9,9 @@
  #include "chrome/browser/ui/views/frame/browser_desktop_window_tree_host.h"
  
@@ -175,29 +186,29 @@ index 5ceccb1a39..6a8f0d90eb 100644
  #include "ui/views/widget/desktop_aura/desktop_window_tree_host_x11.h"  // nogncheck
  #else
  #include "ui/views/widget/desktop_aura/desktop_window_tree_host_linux.h"  // nogncheck
-@@ -54,7 +56,7 @@ class BrowserDesktopWindowTreeHostLinux
-   void Init(const views::Widget::InitParams& params) override;
-   void CloseNow() override;
+@@ -63,7 +65,7 @@ class BrowserDesktopWindowTreeHostLinux
+   BrowserView* browser_view_ = nullptr;
+   BrowserFrame* browser_frame_ = nullptr;
  
 -#if defined(USE_X11)
 +#if defined(USE_X11) && defined(USE_DBUS)
-   BrowserView* browser_view_ = nullptr;
- 
    // Each browser frame maintains its own menu bar object because the lower
-diff --git chromium-81.0.4044.113/device/bluetooth/bluetooth_adapter_factory.cc chromium-81.0.4044.113/device/bluetooth/bluetooth_adapter_factory.cc
-index 8c3369595f..be1de81b70 100644
---- chromium-81.0.4044.113/device/bluetooth/bluetooth_adapter_factory.cc
-+++ chromium-81.0.4044.113/device/bluetooth/bluetooth_adapter_factory.cc
-@@ -96,7 +96,7 @@ bool BluetoothAdapterFactory::IsBluetoothSupported() {
+   // level dbus protocol associates a xid to a menu bar; we can't map multiple
+   // xids to the same menu bar.
+diff --git chromium-85.0.4183.83/device/bluetooth/bluetooth_adapter_factory.cc chromium-85.0.4183.83/device/bluetooth/bluetooth_adapter_factory.cc
+index f39209367a..94267acf3a 100644
+--- chromium-85.0.4183.83/device/bluetooth/bluetooth_adapter_factory.cc
++++ chromium-85.0.4183.83/device/bluetooth/bluetooth_adapter_factory.cc
+@@ -45,7 +45,7 @@ bool BluetoothAdapterFactory::IsBluetoothSupported() {
    // instance even on platforms that would otherwise not support it.
-   if (default_adapter.Get())
+   if (Get()->adapter_)
      return true;
 -#if defined(OS_ANDROID) || defined(OS_WIN) || defined(OS_LINUX) || \
 +#if defined(OS_ANDROID) || defined(OS_WIN) || (defined(OS_LINUX) && defined(USE_DBUS)) || \
      defined(OS_MACOSX)
    return true;
  #else
-@@ -119,7 +119,7 @@ bool BluetoothAdapterFactory::IsLowEnergySupported() {
+@@ -68,7 +68,7 @@ bool BluetoothAdapterFactory::IsLowEnergySupported() {
    return base::win::GetVersion() >= base::win::Version::WIN10;
  #elif defined(OS_MACOSX)
    return true;
@@ -206,10 +217,10 @@ index 8c3369595f..be1de81b70 100644
    return true;
  #else
    return false;
-diff --git chromium-81.0.4044.113/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc chromium-81.0.4044.113/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+diff --git chromium-85.0.4183.83/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc chromium-85.0.4183.83/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
 index 2d4cf40561..3ec27fe8bc 100644
---- chromium-81.0.4044.113/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
-+++ chromium-81.0.4044.113/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
+--- chromium-85.0.4183.83/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
++++ chromium-85.0.4183.83/extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.cc
 @@ -1328,7 +1328,7 @@ void BluetoothLowEnergyCreateServiceFunction::DoWork() {
  // TODO: Ideally this should be handled by our feature system, so that this
  // code doesn't even compile on OSes it isn't being used on, but currently this
@@ -255,10 +266,10 @@ index 2d4cf40561..3ec27fe8bc 100644
  }
  
  // registerService:
-diff --git chromium-81.0.4044.113/services/device/battery/battery_status_manager_default.cc chromium-81.0.4044.113/services/device/battery/battery_status_manager_default.cc
-index 0249c6faa5..ab2ff4e179 100644
---- chromium-81.0.4044.113/services/device/battery/battery_status_manager_default.cc
-+++ chromium-81.0.4044.113/services/device/battery/battery_status_manager_default.cc
+diff --git chromium-85.0.4183.83/services/device/battery/battery_status_manager_default.cc chromium-85.0.4183.83/services/device/battery/battery_status_manager_default.cc
+index 35268761d0..dbaa8722c6 100644
+--- chromium-85.0.4183.83/services/device/battery/battery_status_manager_default.cc
++++ chromium-85.0.4183.83/services/device/battery/battery_status_manager_default.cc
 @@ -22,11 +22,10 @@ class BatteryStatusManagerDefault : public BatteryStatusManager {
   private:
    // BatteryStatusManager:
@@ -272,11 +283,11 @@ index 0249c6faa5..ab2ff4e179 100644
  
    DISALLOW_COPY_AND_ASSIGN(BatteryStatusManagerDefault);
  };
-diff --git chromium-81.0.4044.113/services/device/wake_lock/power_save_blocker/BUILD.gn chromium-81.0.4044.113/services/device/wake_lock/power_save_blocker/BUILD.gn
-index af81c2e451..ac1f6bf2b3 100644
---- chromium-81.0.4044.113/services/device/wake_lock/power_save_blocker/BUILD.gn
-+++ chromium-81.0.4044.113/services/device/wake_lock/power_save_blocker/BUILD.gn
-@@ -74,6 +74,9 @@ if (is_android) {
+diff --git chromium-85.0.4183.83/services/device/wake_lock/power_save_blocker/BUILD.gn chromium-85.0.4183.83/services/device/wake_lock/power_save_blocker/BUILD.gn
+index 9365bd609d..fea5949241 100644
+--- chromium-85.0.4183.83/services/device/wake_lock/power_save_blocker/BUILD.gn
++++ chromium-85.0.4183.83/services/device/wake_lock/power_save_blocker/BUILD.gn
+@@ -70,6 +70,9 @@ if (is_android) {
      visibility = [ ":power_save_blocker" ]
      sources = java_sources_needing_jni
    }

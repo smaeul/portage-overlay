@@ -1,7 +1,7 @@
-diff --git chromium-81.0.4044.113/base/native_library_posix.cc chromium-81.0.4044.113/base/native_library_posix.cc
+diff --git chromium-85.0.4183.83/base/native_library_posix.cc chromium-85.0.4183.83/base/native_library_posix.cc
 index 7a5c6f5aa8..6e8a5fad19 100644
---- chromium-81.0.4044.113/base/native_library_posix.cc
-+++ chromium-81.0.4044.113/base/native_library_posix.cc
+--- chromium-85.0.4183.83/base/native_library_posix.cc
++++ chromium-85.0.4183.83/base/native_library_posix.cc
 @@ -34,7 +34,7 @@ NativeLibrary LoadNativeLibraryWithOptions(const FilePath& library_path,
    // further investigation, as it might vary across versions. Crash here to
    // warn developers that they're trying to rely on uncertain behavior.

@@ -1,7 +1,7 @@
-diff --git chromium-81.0.4044.113/base/debug/stack_trace_posix.cc chromium-81.0.4044.113/base/debug/stack_trace_posix.cc
+diff --git chromium-85.0.4183.83/base/debug/stack_trace_posix.cc chromium-85.0.4183.83/base/debug/stack_trace_posix.cc
 index 299feb6c67..76d1f8460c 100644
---- chromium-81.0.4044.113/base/debug/stack_trace_posix.cc
-+++ chromium-81.0.4044.113/base/debug/stack_trace_posix.cc
+--- chromium-85.0.4183.83/base/debug/stack_trace_posix.cc
++++ chromium-85.0.4183.83/base/debug/stack_trace_posix.cc
 @@ -27,7 +27,7 @@
  #if !defined(USE_SYMBOLIZE)
  #include <cxxabi.h>
@@ -72,10 +72,10 @@ index 299feb6c67..76d1f8460c 100644
  void StackTrace::OutputToStreamWithPrefix(std::ostream* os,
                                            const char* prefix_string) const {
    StreamBacktraceOutputHandler handler(os);
-diff --git chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+diff --git chromium-85.0.4183.83/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h chromium-85.0.4183.83/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
 index 2f860e1286..36f3c331e1 100644
---- chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
-+++ chromium-81.0.4044.113/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
+--- chromium-85.0.4183.83/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
++++ chromium-85.0.4183.83/third_party/swiftshader/third_party/llvm-subzero/build/Linux/include/llvm/Config/config.h
 @@ -14,7 +14,7 @@
  #define ENABLE_CRASH_OVERRIDES 0
  

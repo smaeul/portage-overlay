@@ -1,16 +1,16 @@
-diff --git chromium-81.0.4044.113/build/config/ui.gni chromium-81.0.4044.113/build/config/ui.gni
-index ce69f968f3..a9f5bfad7a 100644
---- chromium-81.0.4044.113/build/config/ui.gni
-+++ chromium-81.0.4044.113/build/config/ui.gni
-@@ -48,8 +48,10 @@ use_x11 = is_linux && !use_ozone
+diff --git chromium-85.0.4183.83/build/config/ui.gni chromium-85.0.4183.83/build/config/ui.gni
+index b4477ea25f..9186a8c858 100644
+--- chromium-85.0.4183.83/build/config/ui.gni
++++ chromium-85.0.4183.83/build/config/ui.gni
+@@ -47,8 +47,10 @@ use_x11 = is_linux && !use_ozone
  # Make sure glib is not used if building for ChromeOS/Chromecast
  assert(!use_glib || (is_linux && !is_chromeos && !is_chromecast))
  
 -# Whether to use atk, the Accessibility ToolKit library
--use_atk = is_desktop_linux && use_x11
+-use_atk = is_desktop_linux && !is_chromecast && use_glib
 +declare_args() {
 +  # Whether to use atk, the Accessibility ToolKit library
-+  use_atk = is_desktop_linux && use_x11
++  use_atk = is_desktop_linux && !is_chromecast && use_glib
 +}
  # =============================================
  #   PLEASE DO NOT ADD MORE FLAGS TO THIS FILE

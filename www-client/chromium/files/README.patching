@@ -16,11 +16,13 @@ cat > .gitignore << EOF
 /out
 /third_party/node/linux
 *.orig
+*.rej
 EOF
 
 # Create the first baseline.
+git init
 git add .
-git commit -m "initial"
+git commit -q -m "initial"
 
 # Drop all patches from the ebuild, and then run:
 pushd
@@ -29,7 +31,7 @@ pushd
 
 # Create the second baseline, with libraries unbundled.
 git add .
-git commit -m "unbundle"
+git commit -q -m "unbundle"
 git branch clean
 
 # Now try to apply the patches:
@@ -85,3 +87,17 @@ pushd
 mv /tmp/chromium.git .git
 
 # The same steps apply for /etc/portage/patches.
+FILESDIR=/etc/portage/patches/www-client/chromium
+
+# An example of how to update patches from ungoogled-chromium:
+git clone https://github.com/Eloston/ungoogled-chromium
+git -C ungoogled-chromium pull
+for file in ${FILESDIR}/*; do
+	base=$(basename "$file")
+	new=$(find ungoogled-chromium -name "$base")
+	if test -n "$new"; then
+		cp "$new" "$file"
+	else
+		echo "patch not found: $base"
+	fi
+done

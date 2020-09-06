@@ -1,7 +1,7 @@
-diff --git chromium-81.0.4044.113/base/debug/stack_trace.cc chromium-81.0.4044.113/base/debug/stack_trace.cc
-index d8ca822d96..d78f12804d 100644
---- chromium-81.0.4044.113/base/debug/stack_trace.cc
-+++ chromium-81.0.4044.113/base/debug/stack_trace.cc
+diff --git chromium-85.0.4183.83/base/debug/stack_trace.cc chromium-85.0.4183.83/base/debug/stack_trace.cc
+index e437c9b00f..3dab0d371c 100644
+--- chromium-85.0.4183.83/base/debug/stack_trace.cc
++++ chromium-85.0.4183.83/base/debug/stack_trace.cc
 @@ -225,7 +225,9 @@ void StackTrace::Print() const {
  }
  
@@ -21,11 +21,11 @@ index d8ca822d96..d78f12804d 100644
    OutputToStreamWithPrefix(&stream, prefix_string);
  #endif
    return stream.str();
-diff --git chromium-81.0.4044.113/base/logging.cc chromium-81.0.4044.113/base/logging.cc
-index 608cc1122b..c115702718 100644
---- chromium-81.0.4044.113/base/logging.cc
-+++ chromium-81.0.4044.113/base/logging.cc
-@@ -621,8 +621,8 @@ LogMessage::LogMessage(const char* file, int line, LogSeverity severity,
+diff --git chromium-85.0.4183.83/base/logging.cc chromium-85.0.4183.83/base/logging.cc
+index 2da71c7381..c9a284b177 100644
+--- chromium-85.0.4183.83/base/logging.cc
++++ chromium-85.0.4183.83/base/logging.cc
+@@ -601,8 +601,8 @@ LogMessage::LogMessage(const char* file, int line, const char* condition)
  
  LogMessage::~LogMessage() {
    size_t stack_start = stream_.tellp();

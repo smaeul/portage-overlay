@@ -1,8 +1,8 @@
-diff --git chromium-81.0.4044.113/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc chromium-81.0.4044.113/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-index 149b7753c7..a47685d972 100644
---- chromium-81.0.4044.113/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-+++ chromium-81.0.4044.113/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
-@@ -46,7 +46,9 @@
+diff --git chromium-85.0.4183.83/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc chromium-85.0.4183.83/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+index 28d6e84713..8aa357244a 100644
+--- chromium-85.0.4183.83/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
++++ chromium-85.0.4183.83/chrome/browser/metrics/chrome_browser_main_extra_parts_metrics.cc
+@@ -49,7 +49,9 @@
  #endif  // defined(OS_ANDROID) && defined(__arm__)
  
  #if defined(OS_LINUX) && !defined(OS_CHROMEOS)
@@ -12,7 +12,7 @@ index 149b7753c7..a47685d972 100644
  
  #include "base/linux_util.h"
  #include "base/strings/string_split.h"
-@@ -365,7 +367,7 @@ void RecordLinuxDistro() {
+@@ -291,7 +293,7 @@ void RecordLinuxDistro() {
  #endif  // defined(OS_LINUX) && !defined(OS_CHROMEOS)
  
  void RecordLinuxGlibcVersion() {
@@ -21,3 +21,15 @@ index 149b7753c7..a47685d972 100644
    base::Version version(gnu_get_libc_version());
  
    UMALinuxGlibcVersion glibc_version_result = UMA_LINUX_GLIBC_NOT_PARSEABLE;
+diff --git chromium-85.0.4183.83/mojo/public/cpp/platform/named_platform_channel_posix.cc chromium-85.0.4183.83/mojo/public/cpp/platform/named_platform_channel_posix.cc
+index 9082ac4da5..cbedae6c3c 100644
+--- chromium-85.0.4183.83/mojo/public/cpp/platform/named_platform_channel_posix.cc
++++ chromium-85.0.4183.83/mojo/public/cpp/platform/named_platform_channel_posix.cc
+@@ -5,6 +5,7 @@
+ #include "mojo/public/cpp/platform/named_platform_channel.h"
+ 
+ #include <errno.h>
++#include <string.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <unistd.h>

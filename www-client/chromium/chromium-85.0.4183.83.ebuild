@@ -12,40 +12,54 @@ inherit check-reqs chromium-2 desktop flag-o-matic multilib ninja-utils pax-util
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://chromium.org/"
-SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz"
+PATCHSET="2"
+PATCHSET_NAME="chromium-$(ver_cut 1)-patchset-${PATCHSET}"
+SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz
+	https://files.pythonhosted.org/packages/ed/7b/bbf89ca71e722b7f9464ebffe4b5ee20a9e5c9a555a56e2d3914bb9119a6/setuptools-44.1.0.zip
+	https://github.com/stha09/chromium-patches/releases/download/${PATCHSET_NAME}/${PATCHSET_NAME}.tar.xz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ~x86"
-IUSE="+atk +closure-compile component-build cups +dbus cpu_flags_arm_neon +hangouts kerberos pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
+KEYWORDS="amd64 arm64 ~x86"
+IUSE="+atk component-build cups cpu_flags_arm_neon +dbus +hangouts headless +js-type-check kerberos ozone pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc wayland widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 REQUIRED_USE="
 	atk? ( dbus )
 	component-build? ( !suid )
+	wayland? ( ozone )
+"
+
+COMMON_X_DEPEND="
+	media-libs/mesa:=[gbm]
+	x11-libs/libX11:=
+	x11-libs/libXcomposite:=
+	x11-libs/libXcursor:=
+	x11-libs/libXdamage:=
+	x11-libs/libXext:=
+	x11-libs/libXfixes:=
+	>=x11-libs/libXi-1.6.0:=
+	x11-libs/libXrandr:=
+	x11-libs/libXrender:=
+	x11-libs/libXtst:=
+	x11-libs/libXScrnSaver:=
+	x11-libs/libxcb:=
 "
 
 COMMON_DEPEND="
-	atk? ( >=app-accessibility/at-spi2-atk-2.26:2 )
 	app-arch/bzip2:=
 	cups? ( >=net-print/cups-1.3.11:= )
-	atk? ( >=dev-libs/atk-2.26 )
 	dev-libs/expat:=
 	dev-libs/glib:2
-	system-icu? ( >=dev-libs/icu-65:= )
 	>=dev-libs/libxml2-2.9.4-r3:=[icu]
-	dev-libs/libxslt:=
 	dev-libs/nspr:=
 	>=dev-libs/nss-3.26:=
-	>=dev-libs/re2-0.2019.08.01:=
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
 	>=media-libs/harfbuzz-2.4.0:0=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
-	media-libs/mesa:=[gbm]
 	system-libvpx? ( >=media-libs/libvpx-1.8.2:=[postproc,svc] )
-	>=media-libs/openh264-1.6.0:=
 	pulseaudio? ( media-sound/pulseaudio:= )
 	system-ffmpeg? (
 		>=media-video/ffmpeg-4:=
@@ -60,24 +74,32 @@ COMMON_DEPEND="
 	virtual/udev
 	x11-libs/cairo:=
 	x11-libs/gdk-pixbuf:2
-	x11-libs/gtk+:3[X]
-	x11-libs/libX11:=
-	x11-libs/libXcomposite:=
-	x11-libs/libXcursor:=
-	x11-libs/libXdamage:=
-	x11-libs/libXext:=
-	x11-libs/libXfixes:=
-	>=x11-libs/libXi-1.6.0:=
-	x11-libs/libXrandr:=
-	x11-libs/libXrender:=
-	x11-libs/libXScrnSaver:=
-	x11-libs/libXtst:=
 	x11-libs/pango:=
-	app-arch/snappy:=
 	media-libs/flac:=
 	>=media-libs/libwebp-0.4.0:=
 	sys-libs/zlib:=[minizip]
 	kerberos? ( virtual/krb5 )
+	ozone? (
+		!headless? (
+			${COMMON_X_DEPEND}
+			x11-libs/gtk+:3[wayland?,X]
+			wayland? (
+				dev-libs/wayland:=
+				dev-libs/libffi:=
+				x11-libs/libdrm:=
+				x11-libs/libxkbcommon:=
+			)
+		)
+	)
+	!ozone? (
+		atk? (
+			>=app-accessibility/at-spi2-atk-2.26:2
+			>=app-accessibility/at-spi2-core-2.26:2
+			>=dev-libs/atk-2.26
+		)
+		x11-libs/gtk+:3[X]
+		${COMMON_X_DEPEND}
+	)
 "
 # For nvidia-drivers blocker, see bug #413637 .
 RDEPEND="${COMMON_DEPEND}
@@ -93,8 +115,9 @@ DEPEND="${COMMON_DEPEND}
 BDEPEND="
 	${PYTHON_DEPS}
 	>=app-arch/gzip-1.7
+	app-arch/unzip
 	dev-lang/perl
-	dev-util/gn
+	>=dev-util/gn-0.1726
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -104,17 +127,29 @@ BDEPEND="
 	sys-devel/flex
 	elibc_musl? ( sys-libs/queue-standalone )
 	virtual/pkgconfig
-	closure-compile? ( virtual/jre )
-	!system-libvpx? (
-		amd64? ( dev-lang/yasm )
-		x86? ( dev-lang/yasm )
-	)
+	js-type-check? ( virtual/jre )
 "
 
 : ${CHROMIUM_FORCE_CLANG=no}
+: ${CHROMIUM_FORCE_LIBCXX=no}
 
 if [[ ${CHROMIUM_FORCE_CLANG} == yes ]]; then
-	BDEPEND+=" >=sys-devel/clang-7"
+	BDEPEND+=" >=sys-devel/clang-9"
+fi
+
+if [[ ${CHROMIUM_FORCE_LIBCXX} == yes ]]; then
+	RDEPEND+=" >=sys-libs/libcxx-9"
+	DEPEND+=" >=sys-libs/libcxx-9"
+else
+	COMMON_DEPEND="
+		app-arch/snappy:=
+		dev-libs/libxslt:=
+		>=dev-libs/re2-0.2019.08.01:=
+		>=media-libs/openh264-1.6.0:=
+		system-icu? ( >=dev-libs/icu-67.1:= )
+	"
+	RDEPEND+="${COMMON_DEPEND}"
+	DEPEND+="${COMMON_DEPEND}"
 fi
 
 if ! has chromium_pkg_die ${EBUILD_DEATH_HOOKS}; then
@@ -151,24 +186,13 @@ in /etc/chromium/default.
 "
 
 PATCHES=(
-	"${FILESDIR}/chromium-compiler-r11.patch"
-	"${FILESDIR}/chromium-fix-char_traits.patch"
-	"${FILESDIR}/chromium-78-protobuf-export.patch"
-	"${FILESDIR}/chromium-79-gcc-alignas.patch"
-	"${FILESDIR}/chromium-80-gcc-quiche.patch"
-	"${FILESDIR}/chromium-80-gcc-blink.patch"
-	"${FILESDIR}/chromium-81-gcc-noexcept.patch"
-	"${FILESDIR}/chromium-81-gcc-constexpr.patch"
-	"${FILESDIR}/chromium-81-gcc-10.patch"
-	"${FILESDIR}/chromium-81-icu67.patch"
-	"${FILESDIR}/chromium-81-re2-0.2020.05.01.patch"
-	"${FILESDIR}/chromium-81-optional-atk.patch"
-	"${FILESDIR}/chromium-81-optional-dbus.patch"
+	"${FILESDIR}/chromium-84-mediaalloc.patch"
+	"${FILESDIR}/chromium-85-optional-atk.patch"
+	"${FILESDIR}/chromium-85-optional-dbus.patch"
 	"${FILESDIR}/musl-cdefs.patch"
 	"${FILESDIR}/musl-dlopen.patch"
 	"${FILESDIR}/musl-dns.patch"
 	"${FILESDIR}/musl-execinfo.patch"
-	"${FILESDIR}/musl-fpstate.patch"
 	"${FILESDIR}/musl-headers.patch"
 	"${FILESDIR}/musl-libcpp.patch"
 	"${FILESDIR}/musl-mallinfo.patch"
@@ -180,14 +204,13 @@ PATCHES=(
 	"${FILESDIR}/musl-stacktrace.patch"
 	"${FILESDIR}/musl-ucontext.patch"
 	"${FILESDIR}/musl-v8-monotonic-pthread-cont_timedwait.patch"
-	"${FILESDIR}/musl-wordsize.patch"
 )
 
 pre_build_checks() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
 		local -x CPP="$(tc-getCXX) -E"
-		if tc-is-gcc && ! ver_test "$(gcc-version)" -ge 8.0; then
-			die "At least gcc 8.0 is required"
+		if tc-is-gcc && ! ver_test "$(gcc-version)" -ge 9.2; then
+			die "At least gcc 9.2 is required"
 		fi
 		# component build hangs with tcmalloc enabled due to sandbox issue, bug #695976.
 		if has usersandbox ${FEATURES} && use tcmalloc && use component-build; then
@@ -204,7 +227,9 @@ pre_build_checks() {
 	CHECKREQS_MEMORY="3G"
 	CHECKREQS_DISK_BUILD="7G"
 	if ( shopt -s extglob; is-flagq '-g?(gdb)?([1-9])' ); then
-		CHECKREQS_DISK_BUILD="25G"
+		if use custom-cflags || use component-build; then
+			CHECKREQS_DISK_BUILD="25G"
+		fi
 		if ! use component-build; then
 			CHECKREQS_MEMORY="16G"
 		fi
@@ -226,13 +251,12 @@ src_prepare() {
 	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
 
+	eapply "${WORKDIR}/patches"
+
 	default
 
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
 	ln -s "${EPREFIX}"/usr/bin/node third_party/node/linux/node-linux-x64/bin/node || die
-
-	# These can cause the final link to take several hours.
-	filter-ldflags "*sort*"
 
 	local keeplibs=(
 		base/third_party/cityhash
@@ -305,7 +329,10 @@ src_prepare() {
 		third_party/depot_tools
 		third_party/devscripts
 		third_party/devtools-frontend
+		third_party/devtools-frontend/src/front_end/third_party/acorn
+		third_party/devtools-frontend/src/front_end/third_party/codemirror
 		third_party/devtools-frontend/src/front_end/third_party/fabricjs
+		third_party/devtools-frontend/src/front_end/third_party/lighthouse
 		third_party/devtools-frontend/src/front_end/third_party/wasmparser
 		third_party/devtools-frontend/src/third_party
 		third_party/dom_distiller_js
@@ -318,6 +345,7 @@ src_prepare() {
 		third_party/google_input_tools/third_party/closure_library
 		third_party/google_input_tools/third_party/closure_library/third_party/closure
 		third_party/googletest
+		third_party/harfbuzz-ng/utils
 		third_party/hunspell
 		third_party/iccjpeg
 		third_party/inspector_protocol
@@ -331,6 +359,7 @@ src_prepare() {
 		third_party/libaom
 		third_party/libaom/source/libaom/third_party/vector
 		third_party/libaom/source/libaom/third_party/x86inc
+		third_party/libavif
 		third_party/libjingle
 		third_party/libphonenumber
 		third_party/libsecret
@@ -341,8 +370,10 @@ src_prepare() {
 		third_party/libxml/chromium
 		third_party/libyuv
 		third_party/llvm
+		third_party/lottie
 		third_party/lss
 		third_party/lzma_sdk
+		third_party/mako
 		third_party/markupsafe
 		third_party/mesa
 		third_party/metrics_proto
@@ -351,7 +382,9 @@ src_prepare() {
 		third_party/node
 		third_party/node/node_modules/polymer-bundler/lib/third_party/UglifyJS2
 		third_party/one_euro_filter
+		third_party/opencv
 		third_party/openscreen
+		third_party/openscreen/src/third_party/mozilla
 		third_party/openscreen/src/third_party/tinycbor/src/src
 		third_party/ots
 		third_party/pdfium
@@ -375,6 +408,7 @@ src_prepare() {
 		third_party/qcms
 		third_party/rnnoise
 		third_party/s2cellid
+		third_party/schema_org
 		third_party/simplejson
 		third_party/skia
 		third_party/skia/include/third_party/skcms
@@ -386,7 +420,7 @@ src_prepare() {
 		third_party/SPIRV-Tools
 		third_party/sqlite
 		third_party/swiftshader
-		third_party/swiftshader/third_party/llvm-7.0
+		third_party/swiftshader/third_party/astc-encoder
 		third_party/swiftshader/third_party/llvm-subzero
 		third_party/swiftshader/third_party/marl
 		third_party/swiftshader/third_party/subzero
@@ -397,7 +431,7 @@ src_prepare() {
 		third_party/web-animations-js
 		third_party/webdriver
 		third_party/webrtc
-		third_party/webrtc/common_audio/third_party/fft4g
+		third_party/webrtc/common_audio/third_party/ooura
 		third_party/webrtc/common_audio/third_party/spl_sqrt_floor
 		third_party/webrtc/modules/third_party/fft
 		third_party/webrtc/modules/third_party/g711
@@ -407,6 +441,7 @@ src_prepare() {
 		third_party/widevine
 		third_party/woff2
 		third_party/wuffs
+		third_party/xcbproto
 		third_party/zlib/google
 		tools/grit/third_party/six
 		url/third_party/mozilla
@@ -422,7 +457,6 @@ src_prepare() {
 		third_party/speech-dispatcher
 		third_party/usb_ids
 		third_party/xdg-utils
-		third_party/yasm/run_yasm.py
 	)
 	if ! use system-ffmpeg; then
 		keeplibs+=( third_party/ffmpeg third_party/opus )
@@ -446,7 +480,22 @@ src_prepare() {
 	if use tcmalloc; then
 		keeplibs+=( third_party/tcmalloc )
 	fi
-
+	if use ozone && use wayland && ! use headless ; then
+		keeplibs+=( third_party/wayland )
+	fi
+	if [[ ${CHROMIUM_FORCE_LIBCXX} == yes ]]; then
+		keeplibs+=( third_party/libxml )
+		keeplibs+=( third_party/libxslt )
+		keeplibs+=( third_party/openh264 )
+		keeplibs+=( third_party/re2 )
+		keeplibs+=( third_party/snappy )
+		if use system-icu; then
+			keeplibs+=( third_party/icu )
+		fi
+	fi
+	if use arm64 || use ppc64 ; then
+		keeplibs+=( third_party/swiftshader/third_party/llvm-10.0 )
+	fi
 	# Remove most bundled libraries. Some are still needed.
 	build/linux/unbundle/remove_bundled_libraries.py "${keeplibs[@]}" --do-remove || die
 }
@@ -470,6 +519,9 @@ src_configure() {
 	if tc-is-clang; then
 		myconf_gn+=" is_clang=true clang_use_chrome_plugins=false"
 	else
+		if [[ ${CHROMIUM_FORCE_LIBCXX} == yes ]]; then
+			die "Compiling with sys-libs/libcxx requires clang."
+		fi
 		myconf_gn+=" is_clang=false"
 	fi
 
@@ -515,12 +567,6 @@ src_configure() {
 		libjpeg
 		libpng
 		libwebp
-		libxml
-		libxslt
-		openh264
-		re2
-		snappy
-		yasm
 		zlib
 	)
 	if use system-ffmpeg; then
@@ -532,6 +578,14 @@ src_configure() {
 	if use system-libvpx; then
 		gn_system_libraries+=( libvpx )
 	fi
+	if [[ ${CHROMIUM_FORCE_LIBCXX} != yes ]]; then
+		# unbundle only without libc++, because libc++ is not fully ABI compatible with libstdc++
+		gn_system_libraries+=( libxml )
+		gn_system_libraries+=( libxslt )
+		gn_system_libraries+=( openh264 )
+		gn_system_libraries+=( re2 )
+		gn_system_libraries+=( snappy )
+	fi
 	build/linux/unbundle/replace_gn_files.py --system-libraries "${gn_system_libraries[@]}" || die
 
 	# See dependency logic in third_party/BUILD.gn
@@ -541,7 +595,7 @@ src_configure() {
 	myconf_gn+=" use_gnome_keyring=false"
 
 	# Optional dependencies.
-	myconf_gn+=" closure_compile=$(usex closure-compile true false)"
+	myconf_gn+=" enable_js_type_check=$(usex js-type-check true false)"
 	myconf_gn+=" enable_hangout_services_extension=$(usex hangouts true false)"
 	myconf_gn+=" enable_widevine=$(usex widevine true false)"
 	myconf_gn+=" use_atk=$(usex atk true false)"
@@ -557,7 +611,7 @@ src_configure() {
 	# Never use bundled gold binary. Disable gold linker flags for now.
 	# Do not use bundled clang.
 	# Trying to use gold results in linker crash.
-	myconf_gn+=" use_gold=false use_sysroot=false linux_use_bundled_binutils=false use_custom_libcxx=false"
+	myconf_gn+=" use_gold=false use_sysroot=false use_custom_libcxx=false"
 
 	# Disable forced lld, bug 641556
 	myconf_gn+=" use_lld=false"
@@ -583,15 +637,24 @@ src_configure() {
 		replace-flags "-Os" "-O2"
 		strip-flags
 
+		# These can cause the final link to take several hours.
+		filter-ldflags "*sort*"
+
+		# Debug info section overflows without component build
 		# Prevent linker from running out of address space, bug #471810 .
-		if use x86; then
+		if ! use component-build || use x86; then
 			filter-flags "-g*"
 		fi
 
 		# Prevent libvpx build failures. Bug 530248, 544702, 546984.
 		if [[ ${myarch} == amd64 || ${myarch} == x86 ]]; then
-			filter-flags -mno-mmx -mno-sse2 -mno-ssse3 -mno-sse4.1 -mno-avx -mno-avx2
+			filter-flags -mno-mmx -mno-sse2 -mno-ssse3 -mno-sse4.1 -mno-avx -mno-avx2 -mno-fma -mno-fma4
 		fi
+	fi
+
+	if [[ ${CHROMIUM_FORCE_LIBCXX} == yes ]]; then
+		append-flags -stdlib=libc++
+		append-ldflags -stdlib=libc++
 	fi
 
 	if [[ $myarch = amd64 ]] ; then
@@ -627,7 +690,7 @@ src_configure() {
 
 	# musl does not support malloc interposition
 	if use elibc_musl; then
-        myconf_gn+=" use_allocator_shim=false"
+		myconf_gn+=" use_allocator_shim=false"
 	fi
 
 	# Bug 491582.
@@ -657,9 +720,32 @@ src_configure() {
 	# Chromium relies on this, but was disabled in >=clang-10, crbug.com/1042470
 	append-cxxflags $(test-flags-CXX -flax-vector-conversions=all)
 
+	# Disable unknown warning message from clang.
+	tc-is-clang && append-flags -Wno-unknown-warning-option
+
 	# Explicitly disable ICU data file support for system-icu builds.
 	if use system-icu; then
 		myconf_gn+=" icu_use_data_file=false"
+	fi
+
+	# Enable ozone support
+	if use ozone; then
+		myconf_gn+=" use_ozone=true ozone_auto_platforms=false"
+		myconf_gn+=" ozone_platform_headless=true"
+		if ! use headless; then
+			myconf_gn+=" use_system_libdrm=true"
+			myconf_gn+=" ozone_platform_wayland=$(usex wayland true false)"
+			myconf_gn+=" ozone_platform_x11=true"
+			myconf_gn+=" ozone_platform_headless=true"
+			if use wayland; then
+				myconf_gn+=" use_system_minigbm=true use_xkbcommon=true"
+				myconf_gn+=" ozone_platform=\"wayland\""
+			else
+				myconf_gn+=" ozone_platform=\"x11\""
+			fi
+		else
+			myconf_gn+=" ozone_platform=\"headless\""
+		fi
 	fi
 
 	einfo "Configuring Chromium..."
@@ -674,6 +760,9 @@ src_compile() {
 
 	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
+
+	# https://bugs.gentoo.org/717456
+	local -x PYTHONPATH="${WORKDIR}/setuptools-44.1.0:${PYTHONPATH+:}${PYTHONPATH}"
 
 	#"${EPYTHON}" tools/clang/scripts/update.py --force-local-build --gcc-toolchain /usr --skip-checkout --use-system-cmake --without-android || die
 
@@ -723,8 +812,14 @@ src_install() {
 
 	doexe out/Release/chromedriver
 
-	local sedargs=( -e "s:/usr/lib/:/usr/$(get_libdir)/:g" )
-	sed "${sedargs[@]}" "${FILESDIR}/chromium-launcher-r3.sh" > chromium-launcher.sh || die
+	ozone_auto_session () {
+		use ozone && use wayland && ! use headless && echo true || echo false
+	}
+	local sedargs=( -e
+			"s:/usr/lib/:/usr/$(get_libdir)/:g;
+			s:@@OZONE_AUTO_SESSION@@:$(ozone_auto_session):g"
+	)
+	sed "${sedargs[@]}" "${FILESDIR}/chromium-launcher-r5.sh" > chromium-launcher.sh || die
 	doexe chromium-launcher.sh
 
 	# It is important that we name the target "chromium-browser",
@@ -746,7 +841,11 @@ src_install() {
 	insinto "${CHROMIUM_HOME}"
 	doins out/Release/*.bin
 	doins out/Release/*.pak
-	doins out/Release/*.so
+	(
+		shopt -s nullglob
+		local files=(out/Release/*.so)
+		[[ ${#files[@]} -gt 0 ]] && doins "${files[@]}"
+	)
 
 	if ! use system-icu; then
 		doins out/Release/icudtl.dat

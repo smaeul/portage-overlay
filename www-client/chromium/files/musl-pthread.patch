@@ -1,13 +1,13 @@
-diff --git chromium-81.0.4044.113/third_party/blink/renderer/platform/wtf/stack_util.cc chromium-81.0.4044.113/third_party/blink/renderer/platform/wtf/stack_util.cc
-index b2421649ff..a31b96e90e 100644
---- chromium-81.0.4044.113/third_party/blink/renderer/platform/wtf/stack_util.cc
-+++ chromium-81.0.4044.113/third_party/blink/renderer/platform/wtf/stack_util.cc
+diff --git chromium-85.0.4183.83/third_party/blink/renderer/platform/wtf/stack_util.cc chromium-85.0.4183.83/third_party/blink/renderer/platform/wtf/stack_util.cc
+index f8aa9d89e3..c2d81f968b 100644
+--- chromium-85.0.4183.83/third_party/blink/renderer/platform/wtf/stack_util.cc
++++ chromium-85.0.4183.83/third_party/blink/renderer/platform/wtf/stack_util.cc
 @@ -29,7 +29,7 @@ size_t GetUnderestimatedStackSize() {
  // FIXME: On Mac OSX and Linux, this method cannot estimate stack size
  // correctly for the main thread.
  
--#if defined(__GLIBC__) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
-+#if defined(OS_LINUX) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
+-#elif defined(__GLIBC__) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
++#elif defined(OS_LINUX) || defined(OS_ANDROID) || defined(OS_FREEBSD) || \
      defined(OS_FUCHSIA)
    // pthread_getattr_np() can fail if the thread is not invoked by
    // pthread_create() (e.g., the main thread of blink_unittests).

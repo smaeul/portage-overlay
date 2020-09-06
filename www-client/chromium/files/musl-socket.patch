@@ -1,8 +1,8 @@
-diff --git chromium-81.0.4044.113/net/socket/udp_socket_posix.cc chromium-81.0.4044.113/net/socket/udp_socket_posix.cc
-index 572472a699..91dea995fb 100644
---- chromium-81.0.4044.113/net/socket/udp_socket_posix.cc
-+++ chromium-81.0.4044.113/net/socket/udp_socket_posix.cc
-@@ -1191,7 +1191,7 @@ SendResult UDPSocketPosixSender::InternalSendmmsgBuffers(
+diff --git chromium-85.0.4183.83/net/socket/udp_socket_posix.cc chromium-85.0.4183.83/net/socket/udp_socket_posix.cc
+index 32f0f19982..919a2dbfad 100644
+--- chromium-85.0.4183.83/net/socket/udp_socket_posix.cc
++++ chromium-85.0.4183.83/net/socket/udp_socket_posix.cc
+@@ -1192,7 +1192,7 @@ SendResult UDPSocketPosixSender::InternalSendmmsgBuffers(
      msg_iov->push_back({const_cast<char*>(buffer->data()), buffer->length()});
    msgvec->reserve(buffers.size());
    for (size_t j = 0; j < buffers.size(); j++)
@@ -11,10 +11,10 @@ index 572472a699..91dea995fb 100644
    int result = HANDLE_EINTR(Sendmmsg(fd, &msgvec[0], buffers.size(), 0));
    SendResult send_result(0, 0, std::move(buffers));
    if (result < 0) {
-diff --git chromium-81.0.4044.113/third_party/swiftshader/src/Common/Socket.hpp chromium-81.0.4044.113/third_party/swiftshader/src/Common/Socket.hpp
+diff --git chromium-85.0.4183.83/third_party/swiftshader/src/Common/Socket.hpp chromium-85.0.4183.83/third_party/swiftshader/src/Common/Socket.hpp
 index b6b9abde14..aa61d9fb68 100644
---- chromium-81.0.4044.113/third_party/swiftshader/src/Common/Socket.hpp
-+++ chromium-81.0.4044.113/third_party/swiftshader/src/Common/Socket.hpp
+--- chromium-85.0.4183.83/third_party/swiftshader/src/Common/Socket.hpp
++++ chromium-85.0.4183.83/third_party/swiftshader/src/Common/Socket.hpp
 @@ -18,6 +18,7 @@
  #if defined(_WIN32)
  	#include <winsock2.h>

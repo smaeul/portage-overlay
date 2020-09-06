@@ -1,7 +1,7 @@
-diff --git chromium-81.0.4044.113/base/threading/platform_thread_linux.cc chromium-81.0.4044.113/base/threading/platform_thread_linux.cc
+diff --git chromium-85.0.4183.83/base/threading/platform_thread_linux.cc chromium-85.0.4183.83/base/threading/platform_thread_linux.cc
 index 095c49b8dc..086ac6afc5 100644
---- chromium-81.0.4044.113/base/threading/platform_thread_linux.cc
-+++ chromium-81.0.4044.113/base/threading/platform_thread_linux.cc
+--- chromium-85.0.4183.83/base/threading/platform_thread_linux.cc
++++ chromium-85.0.4183.83/base/threading/platform_thread_linux.cc
 @@ -186,7 +186,11 @@ void TerminateOnThread() {}
  
  size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
@@ -14,10 +14,10 @@ index 095c49b8dc..086ac6afc5 100644
  #else
    // ThreadSanitizer bloats the stack heavily. Evidence has been that the
    // default stack size isn't enough for some browser tests.
-diff --git chromium-81.0.4044.113/chrome/app/shutdown_signal_handlers_posix.cc chromium-81.0.4044.113/chrome/app/shutdown_signal_handlers_posix.cc
+diff --git chromium-85.0.4183.83/chrome/app/shutdown_signal_handlers_posix.cc chromium-85.0.4183.83/chrome/app/shutdown_signal_handlers_posix.cc
 index 621d441e81..8c3e9ee288 100644
---- chromium-81.0.4044.113/chrome/app/shutdown_signal_handlers_posix.cc
-+++ chromium-81.0.4044.113/chrome/app/shutdown_signal_handlers_posix.cc
+--- chromium-85.0.4183.83/chrome/app/shutdown_signal_handlers_posix.cc
++++ chromium-85.0.4183.83/chrome/app/shutdown_signal_handlers_posix.cc
 @@ -187,7 +187,14 @@ void InstallShutdownSignalHandlers(
    g_shutdown_pipe_read_fd = pipefd[0];
    g_shutdown_pipe_write_fd = pipefd[1];
