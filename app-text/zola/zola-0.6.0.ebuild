@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 CRATES="
 MacTypes-sys-2.1.0
@@ -327,6 +327,10 @@ SLOT="0"
 KEYWORDS="amd64 ~arm64 ~ppc64 ~x86"
 IUSE="libressl"
 
+BDEPEND="
+	>=virtual/rust-1.31.0
+"
+
 # sass-rs looks for the wrong .pc
 # dev-libs/libsass:0=
 RDEPEND="
@@ -335,9 +339,8 @@ RDEPEND="
 	!libressl? ( dev-libs/openssl:0= )
 	sys-libs/zlib:0=
 "
-DEPEND="${RDEPEND}
-	>=virtual/rust-1.31.0
-"
+
+DEPEND="${RDEPEND}"
 
 src_compile() {
 	export PKG_CONFIG_ALL_DYNAMIC=1
