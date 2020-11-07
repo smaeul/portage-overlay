@@ -1,20 +1,20 @@
-From 47a4997b7179f175964f175fb513e1c0e7b17ca4 Mon Sep 17 00:00:00 2001
+From 22b25a4088a3d09bb569b23dc282edb77df11ab4 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 17 Sep 2018 02:09:10 +0000
-Subject: [PATCH 13/14] Move debugger scripts to /usr/share/rust
+Subject: [PATCH 14/15] Move debugger scripts to /usr/share/rust
 
 ---
  src/bootstrap/dist.rs | 2 +-
- src/etc/lldb_commands | 2 +-
  src/etc/rust-gdb      | 2 +-
  src/etc/rust-gdbgui   | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ src/etc/rust-lldb     | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/dist.rs b/src/bootstrap/dist.rs
-index 5d2fcba7fea..b14810112b5 100644
+index d021feafbe4..f0f5cb8169a 100644
 --- a/src/bootstrap/dist.rs
 +++ b/src/bootstrap/dist.rs
-@@ -613,7 +613,7 @@ impl Step for DebuggerScripts {
+@@ -614,7 +614,7 @@ impl Step for DebuggerScripts {
      fn run(self, builder: &Builder<'_>) {
          let host = self.host;
          let sysroot = self.sysroot;
@@ -23,16 +23,6 @@ index 5d2fcba7fea..b14810112b5 100644
          t!(fs::create_dir_all(&dst));
          let cp_debugger_script = |file: &str| {
              builder.install(&builder.src.join("src/etc/").join(file), &dst, 0o644);
-diff --git a/src/etc/lldb_commands b/src/etc/lldb_commands
-index f470c62d899..82b9a1e6f50 100644
---- a/src/etc/lldb_commands
-+++ b/src/etc/lldb_commands
-@@ -1,4 +1,4 @@
--command script import \"$RUSTC_SYSROOT/lib/rustlib/etc/lldb_lookup.py\"
-+command script import \"$RUSTC_SYSROOT/share/rust/lldb_lookup.py\"
- type synthetic add -l lldb_lookup.synthetic_lookup -x \".*\" --category Rust
- type summary add -F lldb_lookup.summary_lookup  -e -x -h \"^(alloc::([a-z_]+::)+)String$\" --category Rust
- type summary add -F lldb_lookup.summary_lookup  -e -x -h \"^&str$\" --category Rust
 diff --git a/src/etc/rust-gdb b/src/etc/rust-gdb
 index b950cea79ed..559bfe3f1f9 100755
 --- a/src/etc/rust-gdb
@@ -59,6 +49,21 @@ index 9744913b686..8722acdcc52 100755
  
  # Set the environment variable `RUST_GDB` to overwrite the call to a
  # different/specific command (defaults to `gdb`).
+diff --git a/src/etc/rust-lldb b/src/etc/rust-lldb
+index bce72f1bad6..8abb0124527 100755
+--- a/src/etc/rust-lldb
++++ b/src/etc/rust-lldb
+@@ -30,8 +30,8 @@ EOF
+     fi
+ fi
+ 
+-script_import="command script import \"$RUSTC_SYSROOT/lib/rustlib/etc/lldb_lookup.py\""
+-commands_file="$RUSTC_SYSROOT/lib/rustlib/etc/lldb_commands"
++script_import="command script import \"$RUSTC_SYSROOT/share/rust/lldb_lookup.py\""
++commands_file="$RUSTC_SYSROOT/share/rust/lldb_commands"
+ 
+ # Call LLDB with the commands added to the argument list
+ exec "$lldb" --one-line-before-file "$script_import" --source-before-file "$commands_file" "$@"
 -- 
 2.26.2
 
