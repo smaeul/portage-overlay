@@ -1,17 +1,17 @@
-From 466ffdcb0b132ce135242180e66097ba178122b9 Mon Sep 17 00:00:00 2001
+From 7ed740283e772aa952d1b83059b8e17144e35137 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
-Date: Sun, 1 Nov 2020 20:13:23 -0600
+Date: Wed, 10 Jan 2018 13:36:41 -0600
 Subject: [PATCH 03/15] Fix linking to zlib when cross-compiling
 
 ---
- src/librustc_llvm/build.rs | 7 +++----
+ compiler/rustc_llvm/build.rs | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/src/librustc_llvm/build.rs b/src/librustc_llvm/build.rs
-index 25c0b40c495..485cd05ad63 100644
---- a/src/librustc_llvm/build.rs
-+++ b/src/librustc_llvm/build.rs
-@@ -192,14 +192,13 @@ fn main() {
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
+index 7f1e5cf336a..734e40febc3 100644
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -192,16 +192,15 @@ fn main() {
      // of llvm-config, not the target that we're attempting to link.
      let mut cmd = Command::new(&llvm_config);
      cmd.arg(llvm_link_arg).arg("--libs");
@@ -24,6 +24,8 @@ index 25c0b40c495..485cd05ad63 100644
 +    if target.contains("windows-gnu") {
          println!("cargo:rustc-link-lib=shell32");
          println!("cargo:rustc-link-lib=uuid");
+     } else if target.contains("netbsd") || target.contains("haiku") {
+         println!("cargo:rustc-link-lib=z");
      }
 -    cmd.args(&components);
  

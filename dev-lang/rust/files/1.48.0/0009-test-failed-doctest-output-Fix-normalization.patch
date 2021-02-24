@@ -1,4 +1,4 @@
-From 7fd97298080acbe6f69e49a3d5df9eca423b5fe1 Mon Sep 17 00:00:00 2001
+From 8715da836f3406afd9af7489ef86e5c08b3274fa Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Mon, 7 Oct 2019 18:36:28 -0500
 Subject: [PATCH 09/15] test/failed-doctest-output: Fix normalization
@@ -19,12 +19,12 @@ Otherwise we get:
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/test/rustdoc-ui/failed-doctest-output.rs b/src/test/rustdoc-ui/failed-doctest-output.rs
-index fcbd7cabc69..7d19ace7487 100644
+index 90cdb5127be..b7c30901f8c 100644
 --- a/src/test/rustdoc-ui/failed-doctest-output.rs
 +++ b/src/test/rustdoc-ui/failed-doctest-output.rs
 @@ -4,7 +4,7 @@
  
- // compile-flags:--test
+ // compile-flags:--test --test-args --test-threads=1
  // rustc-env:RUST_BACKTRACE=0
 -// normalize-stdout-test: "src/test/rustdoc-ui" -> "$$DIR"
 +// normalize-stdout-test: "[[:graph:]]*src/test/rustdoc-ui" -> "$$DIR"

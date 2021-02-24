@@ -1,4 +1,4 @@
-From db1328ce566169bf174beb82648eb9b3f075adee Mon Sep 17 00:00:00 2001
+From 74008b6ec23cede9517f660dd96e62fd683a0185 Mon Sep 17 00:00:00 2001
 From: Samuel Holland <samuel@sholland.org>
 Date: Sat, 2 Dec 2017 17:25:44 -0600
 Subject: [PATCH 04/15] Fix rustdoc when cross-compiling on musl
@@ -9,7 +9,7 @@ musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index ab846adf942..bb4cbb038f3 100644
+index cb58eb89ad8..7761f351334 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
 @@ -21,9 +21,6 @@ fn main() {
@@ -31,7 +31,7 @@ index ab846adf942..bb4cbb038f3 100644
  
      // Force all crates compiled by this compiler to (a) be unstable and (b)
      // allow the `rustc_private` feature to link to other unstable crates
-@@ -59,7 +56,7 @@ fn main() {
+@@ -62,7 +59,7 @@ fn main() {
          eprintln!(
              "rustdoc command: {:?}={:?} {:?}",
              bootstrap::util::dylib_path_var(),
