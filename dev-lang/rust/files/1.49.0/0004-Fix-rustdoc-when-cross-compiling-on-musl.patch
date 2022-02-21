@@ -9,21 +9,18 @@ musl can't handle foreign-architecture libraries in LD_LIBRARY_PATH.
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/src/bootstrap/bin/rustdoc.rs b/src/bootstrap/bin/rustdoc.rs
-index cb58eb89ad8..7761f351334 100644
+index cba17c8..dc50cfa 100644
 --- a/src/bootstrap/bin/rustdoc.rs
 +++ b/src/bootstrap/bin/rustdoc.rs
-@@ -21,9 +21,6 @@ fn main() {
+@@ -20,14 +20,11 @@ fn main() {
          Err(_) => 0,
      };
  
 -    let mut dylib_path = bootstrap::util::dylib_path();
 -    dylib_path.insert(0, PathBuf::from(libdir.clone()));
 -
-     //FIXME(misdreavus): once stdsimd uses cfg(doc) instead of cfg(dox), remove the `--cfg dox`
-     //arguments here
      let mut cmd = Command::new(rustdoc);
-@@ -34,7 +31,7 @@ fn main() {
-         .arg("dox")
+     cmd.args(&args)
          .arg("--sysroot")
          .arg(&sysroot)
 -        .env(bootstrap::util::dylib_path_var(), env::join_paths(&dylib_path).unwrap());
@@ -31,7 +28,7 @@ index cb58eb89ad8..7761f351334 100644
  
      // Force all crates compiled by this compiler to (a) be unstable and (b)
      // allow the `rustc_private` feature to link to other unstable crates
-@@ -62,7 +59,7 @@ fn main() {
+@@ -55,7 +52,7 @@ fn main() {
          eprintln!(
              "rustdoc command: {:?}={:?} {:?}",
              bootstrap::util::dylib_path_var(),
