@@ -20,6 +20,7 @@ index dbdefa4..cb83404 100644
 +#[link(name = "gcc_eh", cfg(target_feature = "crt-static"))]
  #[link(name = "gcc_s", cfg(not(target_feature = "crt-static")))]
  extern "C" {}
+
 diff --git a/library/unwind/build.rs b/library/unwind/build.rs
 index 24bcd40..f9720b8 100644
 --- a/library/unwind/build.rs
