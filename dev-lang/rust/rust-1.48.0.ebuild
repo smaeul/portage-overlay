@@ -85,7 +85,6 @@ BDEPEND="${PYTHON_DEPS}
 DEPEND="
 	>=app-arch/xz-utils-5.2
 	net-libs/libssh2:=
-	net-libs/http-parser:=
 	net-misc/curl:=[http2,ssl]
 	elibc_musl? ( >=sys-libs/musl-1.2.1-r2 )
 	sys-libs/zlib:=
