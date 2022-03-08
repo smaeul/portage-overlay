@@ -21,14 +21,6 @@ HOMEPAGE="https://www.rust-lang.org/"
 
 SRC_URI="
 	https://static.rust-lang.org/dist/${SRC}
-	!system-bootstrap? (
-		amd64? ( $(rust_arch_uri x86_64-gentoo-linux-musl        rust-${RUST_STAGE0_VERSION} ) )
-		arm?   ( $(rust_arch_uri armv7a-unknown-linux-musleabihf rust-${RUST_STAGE0_VERSION} ) )
-		arm64? ( $(rust_arch_uri aarch64-gentoo-linux-musl       rust-${RUST_STAGE0_VERSION} ) )
-		ppc?   ( $(rust_arch_uri powerpc-gentoo-linux-musl       rust-${RUST_STAGE0_VERSION} ) )
-		ppc64? ( $(rust_arch_uri powerpc64-gentoo-linux-musl     rust-${RUST_STAGE0_VERSION} ) )
-		x86?   ( $(rust_arch_uri i686-gentoo-linux-musl          rust-${RUST_STAGE0_VERSION} ) )
-	)
 "
 
 # keep in sync with llvm ebuild of the same version as bundled one.
