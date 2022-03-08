@@ -121,10 +121,10 @@ QA_SONAME="
 RESTRICT="test"
 
 PATCHES=(
-	"${FILESDIR}"/1.46.0-don-t-create-prefix-at-time-of-check.patch
 	"${FILESDIR}"/1.47.0-libressl.patch
 	"${FILESDIR}"/1.47.0-llvm-tensorflow-fix.patch
 	"${FILESDIR}"/1.49.0-llvm-ver-display.patch
+	"${FILESDIR}"/1.51.0-slow-doc-install.patch
 	"${FILESDIR}"/${PV}/0001-Don-t-pass-CFLAGS-to-the-C-compiler.patch
 	"${FILESDIR}"/${PV}/0002-Fix-LLVM-build.patch
 	"${FILESDIR}"/${PV}/0003-Fix-linking-to-zlib-when-cross-compiling.patch
