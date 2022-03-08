@@ -454,7 +454,7 @@ src_install() {
 	# bug #689562, #689160
 	rm -v "${ED}/usr/lib/${PN}/${PV}/etc/bash_completion.d/cargo" || die
 	rmdir -v "${ED}/usr/lib/${PN}/${PV}"/etc{/bash_completion.d,} || die
-	dobashcomp build/tmp/dist/cargo-image/etc/bash_completion.d/cargo
+	newbashcomp src/tools/cargo/src/etc/cargo.bashcomp.sh cargo
 
 	# Move public shared libs to abi specific libdir
 	mv "${ED}/usr/lib/${PN}/${PV}/lib"/*.so "${ED}/usr/lib/${PN}/${PV}/lib/rustlib/${CHOST}/lib" || die
@@ -498,6 +498,7 @@ src_install() {
 
 	# symlinks to switch components to active rust in eselect
 	dosym "${PV}/lib" "/usr/lib/${PN}/lib-${PV}"
+	dosym "${PV}/libexec" "/usr/lib/${PN}/libexec-${PV}"
 	dosym "${PV}/share/man" "/usr/lib/${PN}/man-${PV}"
 	dosym "${PN}/${PV}/lib/rustlib" "/usr/lib/rustlib-${PV}"
 	dosym "../../lib/${PN}/${PV}/share/doc/${PN}" "/usr/share/doc/${P}"
