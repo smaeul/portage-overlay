@@ -8,10 +8,10 @@ Subject: [PATCH 03/15] Fix linking to zlib when cross-compiling
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
-index 7f1e5cf336a..734e40febc3 100644
+index 621363b..804e2e2 100644
 --- a/compiler/rustc_llvm/build.rs
 +++ b/compiler/rustc_llvm/build.rs
-@@ -192,16 +192,15 @@ fn main() {
+@@ -189,16 +189,15 @@ fn main() {
      // of llvm-config, not the target that we're attempting to link.
      let mut cmd = Command::new(&llvm_config);
      cmd.arg(llvm_link_arg).arg("--libs");
@@ -30,7 +30,7 @@ index 7f1e5cf336a..734e40febc3 100644
 -    cmd.args(&components);
  
      for lib in output(&mut cmd).split_whitespace() {
-         let name = if lib.starts_with("-l") {
+         let name = if let Some(stripped) = lib.strip_prefix("-l") {
 -- 
 2.26.2
 

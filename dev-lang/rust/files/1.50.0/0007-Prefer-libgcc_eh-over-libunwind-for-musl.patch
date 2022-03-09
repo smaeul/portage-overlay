@@ -9,10 +9,10 @@ Subject: [PATCH 06/16] Prefer libgcc_eh over libunwind for musl
  2 file changed, 2 insertion(+), 13 deletion(-)
 
 diff --git a/library/unwind/src/lib.rs b/library/unwind/src/lib.rs
-index dbdefa4..cb83404 100644
+index d145c67..68a2e31 100644
 --- a/library/unwind/src/lib.rs
 +++ b/library/unwind/src/lib.rs
-@@ -38,7 +38,7 @@ cfg_if::cfg_if! {
+@@ -37,7 +37,7 @@ cfg_if::cfg_if! {
  }
  
  #[cfg(target_env = "musl")]
@@ -60,4 +60,3 @@ index 24bcd40..f9720b8 100644
          cfg.compile("unwind");
      }
  }
-

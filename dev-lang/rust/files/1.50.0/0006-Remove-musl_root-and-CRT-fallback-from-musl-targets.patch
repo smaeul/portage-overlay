@@ -22,10 +22,10 @@ Subject: [PATCH 06/15] Remove musl_root and CRT fallback from musl targets
  15 files changed, 5 insertions(+), 185 deletions(-)
 
 diff --git a/compiler/rustc_codegen_ssa/src/back/link.rs b/compiler/rustc_codegen_ssa/src/back/link.rs
-index 964d657..10e4fe3 100644
+index ec1c2d9..d0134d9 100644
 --- a/compiler/rustc_codegen_ssa/src/back/link.rs
 +++ b/compiler/rustc_codegen_ssa/src/back/link.rs
-@@ -1224,16 +1224,12 @@ fn detect_self_contained_mingw(sess: &Session) -> bool {
+@@ -1321,16 +1321,12 @@ fn detect_self_contained_mingw(sess: &Session) -> bool {
  
  /// Whether we link to our own CRT objects instead of relying on gcc to pull them.
  /// We only provide such support for a very limited number of targets.
@@ -94,10 +94,10 @@ index 76c0bf4..82173d6 100644
              CrtObjectsFallback::Wasm => "wasm",
          }
 diff --git a/compiler/rustc_target/src/spec/linux_musl_base.rs b/compiler/rustc_target/src/spec/linux_musl_base.rs
-index 5038a96..3bb3194 100644
+index 5038a96..9931578 100644
 --- a/compiler/rustc_target/src/spec/linux_musl_base.rs
 +++ b/compiler/rustc_target/src/spec/linux_musl_base.rs
-@@ -1,14 +1,9 @@
+@@ -1,13 +1,9 @@
 -use crate::spec::crt_objects::{self, CrtObjectsFallback};
  use crate::spec::TargetOptions;
  
@@ -108,17 +108,16 @@ index 5038a96..3bb3194 100644
 -    base.pre_link_objects_fallback = crt_objects::pre_musl_fallback();
 -    base.post_link_objects_fallback = crt_objects::post_musl_fallback();
 -    base.crt_objects_fallback = Some(CrtObjectsFallback::Musl);
--
+ 
      // These targets statically link libc by default
      base.crt_static_default = true;
- 
 diff --git a/config.toml.example b/config.toml.example
-index c9e1838..bd78678 100644
+index b1fb890..2868c75 100644
 --- a/config.toml.example
 +++ b/config.toml.example
-@@ -446,9 +446,6 @@ changelog-seen = 2
- # nightly features
- #channel = "dev"
+@@ -459,9 +459,6 @@ changelog-seen = 2
+ # supplementary build information, like distro-specific package versions.
+ #description = ""
  
 -# The root location of the musl installation directory.
 -#musl-root = "..."
@@ -126,7 +125,7 @@ index c9e1838..bd78678 100644
  # By default the `rustc` executable is built with `-Wl,-rpath` flags on Unix
  # platforms to ensure that the compiler is usable by default from the build
  # directory (as it links to a number of dynamic libraries). This may not be
-@@ -601,15 +598,6 @@ changelog-seen = 2
+@@ -614,15 +611,6 @@ changelog-seen = 2
  # only use static libraries. If unset, the target's default linkage is used.
  #crt-static = false
  
@@ -209,7 +208,7 @@ index e750c29..ba37a13 100644
      }
  }
 diff --git a/src/bootstrap/compile.rs b/src/bootstrap/compile.rs
-index cdad1cb..3f8df4e 100644
+index a31c87d..dec51e6 100644
 --- a/src/bootstrap/compile.rs
 +++ b/src/bootstrap/compile.rs
 @@ -168,24 +168,7 @@ fn copy_self_contained_objects(
@@ -255,10 +254,10 @@ index cdad1cb..3f8df4e 100644
              if let Some(p) = builder.wasi_root(target) {
                  let root = format!("native={}/lib/wasm32-wasi", p.to_str().unwrap());
 diff --git a/src/bootstrap/config.rs b/src/bootstrap/config.rs
-index c0753d8..55ff57d 100644
+index def8f21..7fbc280 100644
 --- a/src/bootstrap/config.rs
 +++ b/src/bootstrap/config.rs
-@@ -156,8 +156,6 @@ pub struct Config {
+@@ -161,8 +161,6 @@ pub struct Config {
      pub print_step_timings: bool,
      pub missing_tools: bool,
  
@@ -267,24 +266,24 @@ index c0753d8..55ff57d 100644
      pub prefix: Option<PathBuf>,
      pub sysconfdir: Option<PathBuf>,
      pub datadir: Option<PathBuf>,
-@@ -282,8 +280,6 @@ pub struct Target {
-     pub sanitizers: bool,
-     pub profiler: bool,
+@@ -287,8 +285,6 @@ pub struct Target {
+     pub sanitizers: Option<bool>,
+     pub profiler: Option<bool>,
      pub crt_static: Option<bool>,
 -    pub musl_root: Option<PathBuf>,
 -    pub musl_libdir: Option<PathBuf>,
      pub wasi_root: Option<PathBuf>,
      pub qemu_rootfs: Option<PathBuf>,
      pub no_std: bool,
-@@ -469,7 +465,6 @@ struct Rust {
-     parallel_compiler: Option<bool>,
+@@ -476,7 +472,6 @@ struct Rust {
      default_linker: Option<String>,
      channel: Option<String>,
+     description: Option<String>,
 -    musl_root: Option<String>,
      rpath: Option<bool>,
      verbose_tests: Option<bool>,
      optimize_tests: Option<bool>,
-@@ -508,8 +503,6 @@ struct TomlTarget {
+@@ -517,8 +512,6 @@ struct TomlTarget {
      sanitizers: Option<bool>,
      profiler: Option<bool>,
      crt_static: Option<bool>,
@@ -293,7 +292,7 @@ index c0753d8..55ff57d 100644
      wasi_root: Option<String>,
      qemu_rootfs: Option<String>,
      no_std: Option<bool>,
-@@ -850,7 +843,6 @@ impl Config {
+@@ -862,7 +855,6 @@ impl Config {
              set(&mut config.llvm_tools_enabled, rust.llvm_tools);
              config.rustc_parallel = rust.parallel_compiler.unwrap_or(false);
              config.rustc_default_linker = rust.default_linker;
@@ -301,7 +300,7 @@ index c0753d8..55ff57d 100644
              config.save_toolstates = rust.save_toolstates.map(PathBuf::from);
              set(&mut config.deny_warnings, flags.deny_warnings.or(rust.deny_warnings));
              set(&mut config.backtrace_on_ice, rust.backtrace_on_ice);
-@@ -890,8 +882,6 @@ impl Config {
+@@ -907,8 +899,6 @@ impl Config {
                  target.ranlib = cfg.ranlib.map(PathBuf::from);
                  target.linker = cfg.linker.map(PathBuf::from);
                  target.crt_static = cfg.crt_static;
@@ -309,9 +308,9 @@ index c0753d8..55ff57d 100644
 -                target.musl_libdir = cfg.musl_libdir.map(PathBuf::from);
                  target.wasi_root = cfg.wasi_root.map(PathBuf::from);
                  target.qemu_rootfs = cfg.qemu_rootfs.map(PathBuf::from);
-                 target.sanitizers = cfg.sanitizers.unwrap_or(build.sanitizers.unwrap_or_default());
+                 target.sanitizers = cfg.sanitizers;
 diff --git a/src/bootstrap/configure.py b/src/bootstrap/configure.py
-index 322e9d6..47c7432 100755
+index 42f00ce..6458c35 100755
 --- a/src/bootstrap/configure.py
 +++ b/src/bootstrap/configure.py
 @@ -109,34 +109,6 @@ v("aarch64-linux-android-ndk", "target.aarch64-linux-android.android-ndk",
@@ -350,10 +349,10 @@ index 322e9d6..47c7432 100755
    "rootfs in qemu testing, you probably don't want to use this")
  v("qemu-aarch64-rootfs", "target.aarch64-unknown-linux-gnu.qemu-rootfs",
 diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
-index 39f96c8..e31d480 100644
+index 1448c79..cea94c7 100644
 --- a/src/bootstrap/lib.rs
 +++ b/src/bootstrap/lib.rs
-@@ -921,25 +921,6 @@ impl Build {
+@@ -923,25 +923,6 @@ impl Build {
          }
      }
  
@@ -380,7 +379,7 @@ index 39f96c8..e31d480 100644
      fn wasi_root(&self, target: TargetSelection) -> Option<&Path> {
          self.config.target_config.get(&target).and_then(|t| t.wasi_root.as_ref()).map(|p| &**p)
 diff --git a/src/bootstrap/sanity.rs b/src/bootstrap/sanity.rs
-index 4cfcf6c..c511687 100644
+index acb941d..ff62446 100644
 --- a/src/bootstrap/sanity.rs
 +++ b/src/bootstrap/sanity.rs
 @@ -171,28 +171,6 @@ pub fn check(build: &mut Build) {
@@ -392,7 +391,7 @@ index 4cfcf6c..c511687 100644
 -            // If this is a native target (host is also musl) and no musl-root is given,
 -            // fall back to the system toolchain in /usr before giving up
 -            if build.musl_root(*target).is_none() && build.config.build == *target {
--                let target = build.config.target_config.entry(target.clone()).or_default();
+-                let target = build.config.target_config.entry(*target).or_default();
 -                target.musl_root = Some("/usr".into());
 -            }
 -            match build.musl_libdir(*target) {
@@ -457,18 +456,6 @@ index b8b81ab..69807e7 100644
 +  --set target.wasm32-wasi.wasi-root=/wasm32-wasi
  
  ENV SCRIPT python3 ../x.py dist --host='' --target $TARGETS
-diff --git a/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile b/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile
-index 904ee64..02395b4 100644
---- a/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile
-+++ b/src/ci/docker/host-x86_64/dist-x86_64-musl/Dockerfile
-@@ -32,7 +32,6 @@ RUN sh /scripts/sccache.sh
- ENV HOSTS=x86_64-unknown-linux-musl
- 
- ENV RUST_CONFIGURE_ARGS \
--      --musl-root-x86_64=/usr/local/x86_64-linux-musl \
-       --enable-extended \
-       --enable-profiler \
-       --enable-lld \
 diff --git a/src/ci/docker/host-x86_64/test-various/Dockerfile b/src/ci/docker/host-x86_64/test-various/Dockerfile
 index 8653aec..a3f23ab 100644
 --- a/src/ci/docker/host-x86_64/test-various/Dockerfile
@@ -481,6 +468,3 @@ index 8653aec..a3f23ab 100644
    --set build.nodejs=/node-v14.4.0-linux-x64/bin/node \
    --set rust.lld
  
--- 
-2.26.2
-

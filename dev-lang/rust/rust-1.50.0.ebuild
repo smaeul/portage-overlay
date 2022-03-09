@@ -140,7 +140,7 @@ PATCHES=(
 	"${FILESDIR}"/${PV}/0013-Link-stage-2-tools-dynamically-to-libstd.patch
 	"${FILESDIR}"/${PV}/0014-Move-debugger-scripts-to-usr-share-rust.patch
 	"${FILESDIR}"/${PV}/0015-Add-gentoo-target-specs.patch
-	"${FILESDIR}"/${PV}/0030-libc-linkage.patch
+	"${FILESDIR}"/${PV}/0031-libc-0.2.79-linkage.patch
 	"${FILESDIR}"/${PV}/0040-rls-atomics.patch
 	"${FILESDIR}"/${PV}/0050-llvm.patch
 	"${FILESDIR}"/${PV}/0051-llvm-powerpc-elfv2.patch

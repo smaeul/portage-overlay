@@ -28,9 +28,9 @@ index 90cdb5127be..b7c30901f8c 100644
  // rustc-env:RUST_BACKTRACE=0
 -// normalize-stdout-test: "src/test/rustdoc-ui" -> "$$DIR"
 +// normalize-stdout-test: "[[:graph:]]*src/test/rustdoc-ui" -> "$$DIR"
+ // normalize-stdout-test "finished in \d+\.\d+s" -> "finished in $$TIME"
  // failure-status: 101
- 
- // doctest fails at runtime
+
 -- 
 2.26.2
 

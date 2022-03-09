@@ -14,21 +14,20 @@ executables.
  1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/compiler/rustc_codegen_ssa/src/back/link.rs b/compiler/rustc_codegen_ssa/src/back/link.rs
-index 010fd4e9c5a..3e0f1f8cdba 100644
+index a3a2ef0..ec1c2d9 100644
 --- a/compiler/rustc_codegen_ssa/src/back/link.rs
 +++ b/compiler/rustc_codegen_ssa/src/back/link.rs
-@@ -1993,9 +1993,7 @@ fn add_upstream_rust_crates<'a, B: ArchiveBuilder<'a>>(
+@@ -2076,8 +2076,7 @@ fn add_upstream_rust_crates<'a, B: ArchiveBuilder<'a>>(
      }
  }
  
--// Link in all of our upstream crates' native dependencies. Remember that
--// all of these upstream native dependencies are all non-static
--// dependencies. We've got two cases then:
+-/// Link in all of our upstream crates' native dependencies. Remember that all of these upstream
+-/// native dependencies are all non-static dependencies. We've got two cases then:
 +// Link in all of our upstream crates' native dependencies. We have two cases:
- //
- // 1. The upstream crate is an rlib. In this case we *must* link in the
- // native dependency because the rlib is just an archive.
-@@ -2044,7 +2042,20 @@ fn add_upstream_native_libraries(
+ ///
+ /// 1. The upstream crate is an rlib. In this case we *must* link in the native dependency because
+ /// the rlib is just an archive.
+@@ -2124,7 +2123,20 @@ fn add_upstream_native_libraries(
                  continue;
              }
              match lib.kind {
@@ -50,6 +49,3 @@ index 010fd4e9c5a..3e0f1f8cdba 100644
                  NativeLibKind::Framework => cmd.link_framework(name),
                  NativeLibKind::StaticNoBundle => {
                      // Link "static-nobundle" native libs only if the crate they originate from
--- 
-2.26.2
-

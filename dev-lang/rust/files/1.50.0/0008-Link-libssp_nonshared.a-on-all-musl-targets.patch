@@ -22,8 +22,5 @@ index 3bb3194..daccb2a 100644
 +    base.post_link_args.insert(LinkerFlavor::Gcc, vec!["-lssp_nonshared".to_string()]);
 +
      base.env = "musl".to_string();
+ 
      // These targets statically link libc by default
-     base.crt_static_default = true;
--- 
-2.26.2
-
