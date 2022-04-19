@@ -1,0 +1,25 @@
+From f4091f898e43fbff3dc60556124f961994f9a2ae Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Mon, 24 Sep 2018 23:42:23 +0000
+Subject: [PATCH 13/15] Link stage 2 tools dynamically to libstd
+
+---
+ src/bootstrap/builder.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bootstrap/builder.rs b/src/bootstrap/builder.rs
+index 689097583a2..de5e3fcd1cf 100644
+--- a/src/bootstrap/builder.rs
++++ b/src/bootstrap/builder.rs
+@@ -1536,7 +1536,7 @@ pub fn cargo(
+         // When we build Rust dylibs they're all intended for intermediate
+         // usage, so make sure we pass the -Cprefer-dynamic flag instead of
+         // linking all deps statically into the dylib.
+-        if matches!(mode, Mode::Std | Mode::Rustc) {
++        if matches!(mode, Mode::Std | Mode::Rustc | Mode::ToolRustc) {
+             rustflags.arg("-Cprefer-dynamic");
+         }
+ 
+-- 
+2.35.1
+

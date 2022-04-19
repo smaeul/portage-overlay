@@ -1,0 +1,36 @@
+From f99a5b23554ecbe007110008f02cce68585c3c91 Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Wed, 10 Jan 2018 13:36:41 -0600
+Subject: [PATCH 03/15] Fix linking to zlib when cross-compiling
+
+---
+ compiler/rustc_llvm/build.rs | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
+index 943ce589c4f..ab7606758b5 100644
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
+@@ -177,16 +177,15 @@ fn main() {
+     // of llvm-config, not the target that we're attempting to link.
+     let mut cmd = Command::new(&llvm_config);
+     cmd.arg(llvm_link_arg).arg("--libs");
++    cmd.arg("--system-libs");
++    cmd.args(&components);
+ 
+-    if !is_crossed {
+-        cmd.arg("--system-libs");
+-    } else if target.contains("windows-gnu") {
++    if target.contains("windows-gnu") {
+         println!("cargo:rustc-link-lib=shell32");
+         println!("cargo:rustc-link-lib=uuid");
+     } else if target.contains("netbsd") || target.contains("haiku") || target.contains("darwin") {
+         println!("cargo:rustc-link-lib=z");
+     }
+-    cmd.args(&components);
+ 
+     for lib in output(&mut cmd).split_whitespace() {
+         let name = if let Some(stripped) = lib.strip_prefix("-l") {
+-- 
+2.35.1
+

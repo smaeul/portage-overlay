@@ -1,0 +1,25 @@
+From 4d3fe66093a92007d87f3735cad8d25c86b6c3ff Mon Sep 17 00:00:00 2001
+From: Samuel Holland <samuel@sholland.org>
+Date: Fri, 8 Sep 2017 00:04:29 -0500
+Subject: [PATCH 02/15] Fix LLVM build
+
+---
+ src/bootstrap/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bootstrap/lib.rs b/src/bootstrap/lib.rs
+index 1667dfc3f85..136f5ca1eed 100644
+--- a/src/bootstrap/lib.rs
++++ b/src/bootstrap/lib.rs
+@@ -953,7 +953,7 @@ fn cflags(&self, target: TargetSelection, which: GitRepo) -> Vec<String> {
+             .args()
+             .iter()
+             .map(|s| s.to_string_lossy().into_owned())
+-            .filter(|s| !s.starts_with("-O") && !s.starts_with("/O"))
++            .filter(|s| !s.starts_with("-O") && !s.starts_with("/O") && !s.starts_with("-static"))
+             .collect::<Vec<String>>();
+ 
+         // If we're compiling on macOS then we add a few unconditional flags
+-- 
+2.35.1
+
