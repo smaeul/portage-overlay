@@ -29,6 +29,10 @@ DEPEND="
 	sys-devel/clang
 "
 
+PATCHES=(
+	"${FILESDIR}/android-tools-gettid.patch"
+)
+
 src_compile() {
 	if use static; then
 		LDFLAGS+=" -static"
